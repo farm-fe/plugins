@@ -1,4 +1,3 @@
 packages:
-  - rust-plugins/*
-  - js-plugins/*
+  - packages/*
   - examples/*
