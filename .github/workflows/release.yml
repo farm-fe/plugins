@@ -1,0 +1,26 @@
+name: Release Packages
+
+on:
+  push:
+    branches:
+      - feat/monorepo
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout commit
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Setup node
+        uses: actions/setup-node@v3
+        with:
+          node-version: 20
+          registry-url: https://registry.npmjs.org/
+      - name: pnpm install
+        run: |
+         npm i -g pnpm@8.7.6
+         pnpm install ----frozen-lockfile
+      - name: pnpm build
+        run: pnpm --filter [HEAD^] build
