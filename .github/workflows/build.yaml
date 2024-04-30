@@ -9,70 +9,57 @@ jobs:
       fail-fast: false
       matrix:
         settings:
-          - os: ubuntu-latest
-            docker: ghcr.io/napi-rs/napi-rs/nodejs-rust:lts-debian
-            abi: linux-x64-gnu
-            build: >-
-              git config --global --add safe.directory /build &&
-              set -e &&
-              unset CC_x86_64_unknown_linux_gnu &&
-              unset CC &&
-              pnpm --filter [HEAD^] build --target x86_64-unknown-linux-gnu --abi linux-x64-gnu
-          - os: ubuntu-latest
-            docker: ghcr.io/napi-rs/napi-rs/nodejs-rust:lts-alpine
-            abi: linux-x64-musl
-            build: >-
-              git config --global --add safe.directory /build &&
-              set -e &&
-              unset CC_x86_64_unknown_linux_musl &&
-              unset CC &&
-              pnpm --filter [HEAD^] build --target x86_64-unknown-linux-musl --abi linux-x64-musl
-          - os: windows-latest
-            abi: win32-x64-msvc
-          - os: macos-latest
-            abi: darwin-x64
+          #   - os: ubuntu-latest
+          #     docker: ghcr.io/napi-rs/napi-rs/nodejs-rust:lts-debian
+          #     abi: linux-x64-gnu
+          #     build: >-
+          #       git config --global --add safe.directory /build &&
+          #       set -e &&
+          #       unset CC_x86_64_unknown_linux_gnu &&
+          #       unset CC &&
+          #       pnpm --filter [HEAD^] build --target x86_64-unknown-linux-gnu --abi linux-x64-gnu
+          #   - os: ubuntu-latest
+          #     docker: ghcr.io/napi-rs/napi-rs/nodejs-rust:lts-alpine
+          #     abi: linux-x64-musl
+          #     build: >-
+          #       git config --global --add safe.directory /build &&
+          #       set -e &&
+          #       unset CC_x86_64_unknown_linux_musl &&
+          #       unset CC &&
+          #       pnpm --filter [HEAD^] build --target x86_64-unknown-linux-musl --abi linux-x64-musl
+          #   - os: windows-latest
+          #     abi: win32-x64-msvc
+          #   - os: macos-latest
+          #     abi: darwin-arm64
+          #   - os: macos-13
+          #     abi: darwin-x64
 
-          # cross compile
-          # windows. Note swc plugins is not supported on ia32 and arm64
-          - os: windows-latest
-            abi: win32-ia32-msvc
-            target: i686-pc-windows-msvc
-            build: |
-              export CARGO_PROFILE_RELEASE_LTO=false
-              cargo install cargo-xwin &&
-              pnpm --filter [HEAD^] build --target i686-pc-windows-msvc --abi win32-ia32-msvc --cargo-flags="--no-default-features"
-          - os: windows-latest
-            abi: win32-arm64-msvc
-            target: aarch64-pc-windows-msvc
-            build: |
-              export CARGO_PROFILE_RELEASE_CODEGEN_UNITS=256
-              export CARGO_PROFILE_RELEASE_LTO=false
-              cargo install cargo-xwin &&
-              pnpm --filter [HEAD^] build --target aarch64-pc-windows-msvc --abi win32-arm64-msvc --cargo-flags="--no-default-features"
-          # linux
-          - os: ubuntu-latest
-            abi: linux-arm64-musl
-            target: aarch64-unknown-linux-musl
-            zig: true
+          # # cross compile
+          # # windows. Note swc plugins is not supported on ia32 and arm64
+          # - os: windows-latest
+          #   abi: win32-ia32-msvc
+          #   target: i686-pc-windows-msvc
+          #   build: |
+          #     export CARGO_PROFILE_RELEASE_LTO=false
+          #     cargo install cargo-xwin &&
+          #     pnpm --filter [HEAD^] build --target i686-pc-windows-msvc --abi win32-ia32-msvc --cargo-flags="--no-default-features"
+          # - os: windows-latest
+          #   abi: win32-arm64-msvc
+          #   target: aarch64-pc-windows-msvc
+          #   build: |
+          #     export CARGO_PROFILE_RELEASE_CODEGEN_UNITS=256
+          #     export CARGO_PROFILE_RELEASE_LTO=false
+          #     cargo install cargo-xwin &&
+          #     pnpm --filter [HEAD^] build --target aarch64-pc-windows-msvc --abi win32-arm64-msvc --cargo-flags="--no-default-features"
+          # # linux
+          # - os: ubuntu-latest
+          #   abi: linux-arm64-musl
+          #   target: aarch64-unknown-linux-musl
+          #   zig: true
           - os: ubuntu-latest
             abi: linux-arm64-gnu
             target: aarch64-unknown-linux-gnu
             zig: true
-          # macos
-          - os: macos-latest
-            abi: darwin-arm64
-            target: aarch64-apple-darwin
-            zig: false
-          # - os: ubuntu-latest
-          #   abi: darwin-x64
-          #   target: x86_64-apple-darwin
-          #   osxcross: true
-          #   zig: true
-          # - os: ubuntu-latest
-          #   abi: darwin-arm64
-          #   target: aarch64-apple-darwin
-          #   osxcross: true
-          #   zig: true
     steps:
       - uses: actions/checkout@v3
         with:
@@ -85,9 +72,13 @@ jobs:
         with:
           node-version: 18
       - name: Install Dependencies
-        run: npm install -g pnpm@8.15.1 && pnpm i --frozen-lockfile
-      - run: rustup target add ${{ matrix.settings.target }}
+        run: npm config set registry https://registry.npmmirror.com && npm install -g pnpm@8.15.1 && pnpm i --frozen-lockfile
+      - name: Install rust target
+        uses: dtolnay/rust-toolchain@stable
         if: ${{ matrix.settings.target }}
+        with:
+          toolchain: stable
+          targets: ${{ matrix.settings.target }}
       # Use the v1 of this action
       - uses: mbround18/setup-osxcross@v1
         if: ${{ matrix.settings.osxcross }}
