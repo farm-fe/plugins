@@ -1,0 +1,14 @@
+{
+  "name": "farm-plugins",
+  "version": "1.0.0",
+  "description": "The collections of farm plugins",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "nx": "18.3.4"
+  }
+}
