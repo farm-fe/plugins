@@ -1,3 +1,0 @@
-# `react-components-auto-import-linux-x64-gnu`
-
-This is the **x86_64-unknown-linux-gnu** binary for `react-components-auto-import`
