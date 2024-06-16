@@ -1,0 +1,19 @@
+[package]
+edition = "2021"
+name = "farm_plugin_react_components"
+version = "0.0.0"
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+farmfe_core = { version = "*" }
+farmfe_utils = { version = "*" }
+farmfe_toolkit_plugin_types = { version = "*" }
+farmfe_macro_plugin = { version = "*" }
+pathdiff = "0.2.1"
+farmfe_toolkit = "0.0.8"
+serde = { version = "1.0.197", features = ["derive"] }
+glob = "0.3.1"
+tempfile = "3.10.1"
+walkdir = "2.5.0"
