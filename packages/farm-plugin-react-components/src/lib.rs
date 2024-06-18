@@ -10,6 +10,7 @@ use std::{collections::HashSet, path::PathBuf, sync::Arc};
 use farmfe_core::{
   config::{config_regex::ConfigRegex, Config},
   plugin::{Plugin, PluginTransformHookResult},
+  module::ModuleType,
   serde_json,
   swc_ecma_parser::{Syntax, TsConfig},
 };
@@ -80,6 +81,9 @@ impl Plugin for FarmPluginReactComponents {
     param: &farmfe_core::plugin::PluginTransformHookParam,
     context: &std::sync::Arc<farmfe_core::context::CompilationContext>,
   ) -> farmfe_core::error::Result<Option<farmfe_core::plugin::PluginTransformHookResult>> {
+    if param.module_type != ModuleType::Jsx && param.module_type != ModuleType::Tsx{
+      return Ok(None);
+    }
     let options = self.options.clone();
     let include = options.include.unwrap_or(vec![]);
     let exclude = options.exclude.unwrap_or(vec![]);

@@ -1,15 +1,64 @@
 use std::{collections::HashSet, fs, path::Path};
 
 use crate::find_local_components::{ComponentInfo, ExportType};
-use farmfe_core::{config::config_regex::ConfigRegex, regex::Regex, serde_json::Value};
+use farmfe_core::{config::config_regex::ConfigRegex, regex::Regex};
 use farmfe_toolkit::resolve::package_json_loader::{Options, PackageJsonLoader};
+use serde::de::{self, Visitor};
+use serde::{Deserialize, Deserializer, Serialize, Serializer};
+use std::{fmt, fmt::Formatter};
+
+#[derive(Hash, Clone, Debug, PartialEq, Eq)]
+pub enum ImportStyle {
+  Bool(bool),
+  String(String),
+}
+
+impl Serialize for ImportStyle {
+  fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+  where
+    S: Serializer,
+  {
+    match *self {
+      ImportStyle::Bool(ref b) => serializer.serialize_bool(*b),
+      ImportStyle::String(ref s) => serializer.serialize_str(s),
+    }
+  }
+}
+
+impl<'de> Deserialize<'de> for ImportStyle {
+  fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+  where
+    D: Deserializer<'de>,
+  {
+    struct StringOrBoolVisitor;
+    impl<'de> Visitor<'de> for StringOrBoolVisitor {
+      type Value = ImportStyle;
+      fn expecting(&self, formatter: &mut Formatter) -> fmt::Result {
+        formatter.write_str("a boolean or a string")
+      }
+      fn visit_bool<E>(self, value: bool) -> Result<Self::Value, E>
+      where
+        E: de::Error,
+      {
+        Ok(ImportStyle::Bool(value))
+      }
+      fn visit_str<E>(self, value: &str) -> Result<Self::Value, E>
+      where
+        E: de::Error,
+      {
+        Ok(ImportStyle::String(value.to_owned()))
+      }
+    }
+    deserializer.deserialize_any(StringOrBoolVisitor)
+  }
+}
 
 #[derive(serde::Deserialize, serde::Serialize, Clone, Debug)]
 pub struct ResolverOption {
   pub module: String,
   pub prefix: Option<String>,
   pub export_type: Option<ExportType>,
-  pub style: Option<bool>,
+  pub import_style: Option<ImportStyle>,
   pub exclude: Option<Vec<ConfigRegex>>,
   pub include: Option<Vec<ConfigRegex>>,
 }
@@ -42,17 +91,22 @@ pub fn get_resolvers(root_path: &str, component_lib: ResolverOption) -> Vec<Comp
       },
     )
     .unwrap();
-  let default_relative_type_file = Value::from("./index.d.ts");
-  let relative_type_file = package_json
-    .raw_map()
-    .get("typings")
-    .unwrap_or(&default_relative_type_file)
-    .as_str()
-    .unwrap();
-  print!("relative_type_file:{:?}", relative_type_file);
-  let type_file = package_path.join(relative_type_file);
-  println!("type_file:{:?}", type_file);
+  let types = package_json.raw_map().get("types");
+  let typings = package_json.raw_map().get("typings");
+  let relative_type_file = {
+    if let Some(typings) = typings {
+      typings.as_str().unwrap()
+    } else if let Some(types) = types {
+      types.as_str().unwrap()
+    } else {
+      "index.d.ts"
+    }
+  };
+  let type_file = package_path.join(Path::new(relative_type_file));
   let content = fs::read_to_string(type_file).expect("Failed to read file");
+  let import_style = component_lib
+    .import_style
+    .unwrap_or(ImportStyle::Bool(false));
   let re = Regex::new(r"export\s+\{\s*default\s+as\s+(\w+)\s*\}\s+from\s+'\.\/(\w+)';").unwrap();
   for cap in re.captures_iter(&content) {
     components.push(ComponentInfo {
@@ -60,7 +114,7 @@ pub fn get_resolvers(root_path: &str, component_lib: ResolverOption) -> Vec<Comp
       path: component_lib.module.clone(),
       export_type: ExportType::Named,
       original_name: cap[1].to_string(),
-      style: false,
+      import_style: import_style.clone(),
     })
   }
   components
@@ -78,7 +132,7 @@ mod tests {
     let resolver_option = ResolverOption {
       module: "antd".to_string(),
       export_type: Some(ExportType::Named),
-      style: Some(false),
+      import_style: Some(ImportStyle::Bool(false)),
       exclude: None,
       include: None,
       prefix: Some("Ant".to_string()),

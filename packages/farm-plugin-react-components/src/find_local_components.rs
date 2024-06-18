@@ -1,3 +1,4 @@
+use crate::resolvers::ImportStyle;
 use farmfe_core::{
   swc_ecma_ast::*,
   swc_ecma_parser::{Syntax, TsConfig},
@@ -11,13 +12,14 @@ use std::fs;
 use std::path::PathBuf;
 use std::{collections::HashSet, path::Path};
 use walkdir::{DirEntry, WalkDir};
+
 #[derive(Debug, Hash, Eq, PartialEq, Clone)]
 pub struct ComponentInfo {
   pub name: String,
   pub path: String,
   pub export_type: ExportType,
   pub original_name: String,
-  pub style: bool,
+  pub import_style: ImportStyle,
 }
 
 #[derive(serde::Deserialize, serde::Serialize, Debug, Hash, Eq, PartialEq, Clone)]
@@ -92,7 +94,7 @@ impl ExportComponentsFinder {
       path: self.path.clone(),
       export_type,
       original_name: name.to_string(),
-      style: false,
+      import_style: ImportStyle::Bool(false),
     });
   }
 }

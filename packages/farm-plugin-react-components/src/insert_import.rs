@@ -1,17 +1,22 @@
-use farmfe_core::{swc_common::DUMMY_SP, swc_ecma_ast::*};
+use farmfe_core::{config::TargetEnv, swc_common::DUMMY_SP, swc_ecma_ast::*};
 use farmfe_toolkit::swc_ecma_visit::{VisitMut, VisitMutWith};
-use std::collections::HashSet;
+use std::{collections::HashSet, path::Path};
 
-use crate::find_local_components::{ComponentInfo, ExportType};
+use crate::{
+  find_local_components::{ComponentInfo, ExportType},
+  resolvers::ImportStyle,
+};
 pub struct ImportModifier {
   pub components: HashSet<ComponentInfo>,
   pub used_components: HashSet<ComponentInfo>,
+  pub target_env: TargetEnv,
 }
 
 impl ImportModifier {
-  pub fn new(components: HashSet<ComponentInfo>) -> Self {
+  pub fn new(components: HashSet<ComponentInfo>, target_env: TargetEnv) -> Self {
     Self {
       components,
+      target_env,
       used_components: HashSet::new(),
     }
   }
@@ -119,6 +124,49 @@ impl VisitMut for InsertImportModifier {
       };
 
       new_imports.push(ModuleItem::ModuleDecl(ModuleDecl::Import(import_decl)));
+      if ImportStyle::Bool(false) != component.import_style {
+        // {module}/{lib|es}/{Button}/style/index.css|js
+        // module antd
+        // target env [lib/es]
+        // Button ComponentName
+        // ImportStyle string
+
+        match &component.import_style {
+          ImportStyle::Bool(res) => {
+            if *res {
+              let import_decl = ImportDecl {
+                src: Box::new(Str {
+                  value: component.path.clone().into(),
+                  span: DUMMY_SP,
+                  raw: None,
+                }),
+                specifiers: vec![],
+                type_only: false,
+                span: DUMMY_SP,
+                with: Default::default(),
+                phase: Default::default(),
+              };
+              new_imports.push(ModuleItem::ModuleDecl(ModuleDecl::Import(import_decl)));
+            }
+          }
+          ImportStyle::String(res) => {
+            let style_path = Path::new(&component.path).join(Path::new(res));
+            let import_decl = ImportDecl {
+              src: Box::new(Str {
+                value: style_path.to_string_lossy().to_string().into(),
+                span: DUMMY_SP,
+                raw: None,
+              }),
+              specifiers: vec![],
+              type_only: false,
+              span: DUMMY_SP,
+              with: Default::default(),
+              phase: Default::default(),
+            };
+            new_imports.push(ModuleItem::ModuleDecl(ModuleDecl::Import(import_decl)));
+          }
+        }
+      }
     }
 
     match last_import_index {

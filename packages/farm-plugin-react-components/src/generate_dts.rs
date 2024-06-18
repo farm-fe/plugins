@@ -87,7 +87,7 @@ mod tests {
   use super::*;
   use crate::{
     find_local_components::find_local_components,
-    resolvers::{get_resolvers_result, ResolverOption},
+    resolvers::{get_resolvers_result, ImportStyle, ResolverOption},
   };
   use std::env;
   #[test]
@@ -99,7 +99,7 @@ mod tests {
     let resolvers = [ResolverOption {
       module: "antd".to_string(),
       export_type: Some(ExportType::Named),
-      style: Some(false),
+      import_style: Some(ImportStyle::Bool(false)),
       exclude: None,
       include: None,
       prefix: Some("Ant".to_string()),
