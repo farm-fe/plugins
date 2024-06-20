@@ -1,5 +1,5 @@
 import { defineConfig } from "@farmfe/core";
-
+import farmJsPluginLess from '@farmfe/js-plugin-less';
 export default defineConfig({
   compilation: {
     input: {
@@ -9,7 +9,21 @@ export default defineConfig({
     progress: false,
   },
   plugins: [
-    ["farm-plugin-react-components",{}],
     ["@farmfe/plugin-react", { runtime: "automatic" }],
+    ["farm-plugin-react-components", {
+      import_mode:"Relative",
+      resolvers: [
+        {
+          module: "antd",
+          prefix: "Ant",
+        },
+        {
+          module: "@arco-design/web-react",
+          prefix: "A",
+          import_style: "style/index.js"
+        }
+      ]
+    }],
+    farmJsPluginLess(),
   ],
 });

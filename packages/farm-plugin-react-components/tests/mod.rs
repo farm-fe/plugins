@@ -7,8 +7,11 @@ use std::io::Write;
 use std::sync::Arc;
 
 use farm_plugin_react_components::find_local_components::ExportType;
+use farm_plugin_react_components::resolvers::ImportStyle;
 use farm_plugin_react_components::resolvers::ResolverOption;
+use farm_plugin_react_components::ImportMode;
 use farm_plugin_react_components::{FarmPluginReactComponents, Options};
+use farmfe_core::config::config_regex::ConfigRegex;
 use farmfe_core::config::Config;
 use farmfe_core::context::CompilationContext;
 use farmfe_core::module::ModuleType;
@@ -27,18 +30,29 @@ fn transform() {
     .join("playground/src/main.tsx")
     .to_string_lossy()
     .to_string();
-  let resolvers = [ResolverOption {
-    module: "antd".to_string(),
-    export_type: Some(ExportType::Named),
-    style: Some(false),
-    exclude: None,
-    include: None,
-    prefix: Some("Ant".to_string()),
-  }];
+  let resolvers = [
+    ResolverOption {
+      module: "antd".to_string(),
+      export_type: Some(ExportType::Named),
+      import_style: Some(ImportStyle::Bool(false)),
+      exclude: None,
+      include: None,
+      prefix: Some("Ant".to_string()),
+    },
+    ResolverOption {
+      module: "@arco-design/web-react".to_string(),
+      export_type: Some(ExportType::Named),
+      import_style: Some(ImportStyle::Bool(true)),
+      exclude: None,
+      include: None,
+      prefix: Some("A".to_string()),
+    },
+  ];
   // let resolvers_components = get_resolvers_result(&root_path.to_string_lossy().to_string(), resolvers.to_vec());
   let option = Options {
-    dirs: None,
+    dirs: Some(vec![ConfigRegex::new("src/components")]),
     dts: Some(true),
+    import_mode: Some(ImportMode::Relative),
     local: Some(true),
     include: None,
     exclude: None,

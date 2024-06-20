@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import { CompA } from "./components/CompA";
 import "./main.css"; 
 import reactLogo from "./assets/react.svg";
 import FarmLogo from "./assets/logo.png";
@@ -14,9 +13,15 @@ export function Main() {
       </a>
     </div>
     <h1>Farm + React</h1>
-    <CompA title=""></CompA>
+    <CompA title="asdsad"></CompA>
     <CompC></CompC>
-    <AntButton></AntButton>
+    <AntButton onClick={() => setCount(count => count + 1)}>AntButton</AntButton>
+    <AntEmpty/>
+    <AntInput></AntInput>
+    <AButton type={'primary'}>Click</AButton>
+    <CompTest></CompTest>
+    <AntTable></AntTable>
+    <AInput></AInput>
     <div className="card">
       <button onClick={() => setCount(count => count + 1)}>
         count is {count}

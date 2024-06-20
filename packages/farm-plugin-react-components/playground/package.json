@@ -10,9 +10,12 @@
     "clean": "farm clean"
   },
   "dependencies": {
+    "@arco-design/web-react": "^2.63.0",
+    "@farmfe/js-plugin-less": "^1.7.0",
     "antd": "^5.18.0",
     "clsx": "^1.2.1",
     "farm-plugin-react-components": "workspace:*",
+    "less": "^4.2.0",
     "react": "18",
     "react-dom": "18"
   },

@@ -1,8 +1,11 @@
+use crate::resolvers::ImportStyle;
 use farmfe_core::{
+  config::config_regex::ConfigRegex,
   swc_ecma_ast::*,
   swc_ecma_parser::{Syntax, TsConfig},
 };
 use farmfe_toolkit::{
+  common::PathFilter,
   script::{parse_module, ParseScriptModuleResult},
   swc_ecma_visit::{Visit, VisitWith},
 };
@@ -11,13 +14,15 @@ use std::fs;
 use std::path::PathBuf;
 use std::{collections::HashSet, path::Path};
 use walkdir::{DirEntry, WalkDir};
+
 #[derive(Debug, Hash, Eq, PartialEq, Clone)]
 pub struct ComponentInfo {
   pub name: String,
   pub path: String,
   pub export_type: ExportType,
   pub original_name: String,
-  pub style: bool,
+  pub import_style: ImportStyle,
+  pub is_local: bool,
 }
 
 #[derive(serde::Deserialize, serde::Serialize, Debug, Hash, Eq, PartialEq, Clone)]
@@ -75,10 +80,10 @@ fn is_jsx_return_with_block_stmt_or_expr(body: &BlockStmtOrExpr) -> bool {
 impl ExportComponentsFinder {
   fn new(path: &str, all_components: &Vec<String>) -> Self {
     Self {
-      exported_components: HashSet::new(),
-      all_components: all_components.to_vec(),
       path: path.to_owned(),
       filename: get_filename_by_path(path),
+      exported_components: HashSet::new(),
+      all_components: all_components.to_vec(),
     }
   }
 
@@ -92,7 +97,8 @@ impl ExportComponentsFinder {
       path: self.path.clone(),
       export_type,
       original_name: name.to_string(),
-      style: false,
+      import_style: ImportStyle::Bool(false),
+      is_local: true,
     });
   }
 }
@@ -252,7 +258,7 @@ impl Visit for ExportComponentsFinder {
 }
 
 // Function to parse the code in a .tsx/.jsx file and collect React components
-fn parse_jsx_file(file_path: &PathBuf) -> HashSet<ComponentInfo> {
+fn gen_components_by_file(file_path: &PathBuf) -> HashSet<ComponentInfo> {
   let file_content = fs::read_to_string(file_path)
     .unwrap_or_else(|_| panic!("Unable to read file: {:?}", file_path));
   let components_path = file_path.to_string_lossy().into_owned();
@@ -287,29 +293,34 @@ pub fn is_target_file(file_path: &Path, patterns: &[Pattern]) -> bool {
     .any(|pattern| pattern.matches_path(file_path))
 }
 
-pub fn is_execute_dir(entry: &DirEntry, patterns: &[Pattern]) -> bool {
-  patterns
-    .iter()
-    .any(|pattern| pattern.matches_path(entry.path()))
+pub fn is_exclude_dir(entry: &DirEntry, exclude_patterns: &[Pattern]) -> bool {
+  let path = entry.path();
+  exclude_patterns.iter().any(|p| p.matches_path(path))
 }
 
-pub fn find_local_components(root_path: &str) -> HashSet<ComponentInfo> {
+pub fn find_local_components(root_path: &str, dirs: Vec<ConfigRegex>) -> HashSet<ComponentInfo> {
   let mut all_components = HashSet::new();
   let exclude_patterns = vec![Pattern::new("**/node_modules/**").expect("Invalid pattern")];
-
+  let exclude = vec![];
+  let filter = PathFilter::new(&dirs, &exclude);
   let patterns = [
     Pattern::new("**/*.tsx").unwrap(),
     Pattern::new("**/*.jsx").unwrap(),
   ];
-  // let filtered_entries = get_filtered_entries_with_path(root_path, &exclude_patterns, &patterns);
+
   let walker = WalkDir::new(root_path).into_iter();
   let filtered_entries = walker
-    .filter_entry(|e| !is_execute_dir(e, &exclude_patterns))
+    .filter_entry(move |e| !is_exclude_dir(e, &exclude_patterns))
     .filter_map(Result::ok)
-    .filter(|e| e.file_type().is_file() && is_target_file(e.path(), &patterns));
+    .filter(|e| {
+      e.file_type().is_file()
+        && filter.execute(e.path().to_str().unwrap())
+        && is_target_file(e.path(), &patterns)
+    });
+
   for entry in filtered_entries {
     let file_path = entry.path().to_path_buf();
-    all_components.extend(parse_jsx_file(&file_path));
+    all_components.extend(gen_components_by_file(&file_path));
   }
 
   all_components
@@ -324,7 +335,7 @@ mod tests {
     let current_dir = env::current_dir().unwrap();
     let binding = current_dir.join("playground");
     let root_path = binding.to_str().unwrap();
-    let components = find_local_components(root_path);
+    let components = find_local_components(root_path, vec![]);
     assert!(!components.is_empty(), "Components should not be empty");
   }
 }

@@ -1,8 +1,13 @@
-use farmfe_core::{swc_common::DUMMY_SP, swc_ecma_ast::*};
+use farmfe_core::{config::TargetEnv, swc_common::DUMMY_SP, swc_ecma_ast::*};
 use farmfe_toolkit::swc_ecma_visit::{VisitMut, VisitMutWith};
-use std::collections::HashSet;
+use farmfe_utils::relative;
+use std::{collections::HashSet, path::Path};
 
-use crate::find_local_components::{ComponentInfo, ExportType};
+use crate::{
+  find_local_components::{ComponentInfo, ExportType},
+  resolvers::ImportStyle,
+  ImportMode,
+};
 pub struct ImportModifier {
   pub components: HashSet<ComponentInfo>,
   pub used_components: HashSet<ComponentInfo>,
@@ -65,10 +70,23 @@ impl VisitMut for ImportModifier {
 
 pub struct InsertImportModifier {
   pub components: HashSet<ComponentInfo>,
+  pub target_env: TargetEnv,
+  pub import_mode: ImportMode,
+  pub file_path: String,
 }
 impl InsertImportModifier {
-  pub fn new(components: HashSet<ComponentInfo>) -> Self {
-    Self { components }
+  pub fn new(
+    target_env: TargetEnv,
+    import_mode: ImportMode,
+    file_path: String,
+    components: HashSet<ComponentInfo>,
+  ) -> Self {
+    Self {
+      components,
+      target_env,
+      import_mode,
+      file_path,
+    }
   }
 }
 impl VisitMut for InsertImportModifier {
@@ -79,9 +97,25 @@ impl VisitMut for InsertImportModifier {
         last_import_index = Some(index);
       }
     }
-
     let mut new_imports = Vec::new();
     for component in &self.components {
+      let mut component_path = component.path.clone();
+      if component.is_local {
+        component_path = match self.import_mode {
+          ImportMode::Relative => format!(
+            "./{}",
+            relative(
+              Path::new(&self.file_path)
+                .parent()
+                .unwrap()
+                .to_str()
+                .unwrap(),
+              &component.path,
+            )
+          ),
+          ImportMode::Absolute => component_path,
+        };
+      }
       let imported = {
         if component.original_name != component.name {
           Some(ModuleExportName::Ident(Ident::new(
@@ -104,10 +138,9 @@ impl VisitMut for InsertImportModifier {
           is_type_only: false,
         }),
       };
-
       let import_decl = ImportDecl {
         src: Box::new(Str {
-          value: component.path.clone().into(),
+          value: component_path.into(),
           span: DUMMY_SP,
           raw: None,
         }),
@@ -119,6 +152,56 @@ impl VisitMut for InsertImportModifier {
       };
 
       new_imports.push(ModuleItem::ModuleDecl(ModuleDecl::Import(import_decl)));
+      if ImportStyle::Bool(false) != component.import_style {
+        let target_dir = match self.target_env {
+          TargetEnv::Browser => "es",
+          TargetEnv::Node => "lib",
+        };
+        // {module}/{lib|es}/{Button}/style/index.css|js
+        // module antd
+        // target env [lib/es]
+        // Button ComponentName
+        // ImportStyle string
+        let full_component_path = format!(
+          "{}/{}/{}",
+          component.path, target_dir, component.original_name
+        );
+
+        match &component.import_style {
+          ImportStyle::Bool(res) => {
+            if *res {
+              let import_decl = ImportDecl {
+                src: Box::new(Str {
+                  value: format!("{}/{}", full_component_path, "style").into(),
+                  span: DUMMY_SP,
+                  raw: None,
+                }),
+                specifiers: vec![],
+                type_only: false,
+                span: DUMMY_SP,
+                with: Default::default(),
+                phase: Default::default(),
+              };
+              new_imports.push(ModuleItem::ModuleDecl(ModuleDecl::Import(import_decl)));
+            }
+          }
+          ImportStyle::String(res) => {
+            let import_decl = ImportDecl {
+              src: Box::new(Str {
+                value: format!("{}/{}", full_component_path, res).into(),
+                span: DUMMY_SP,
+                raw: None,
+              }),
+              specifiers: vec![],
+              type_only: false,
+              span: DUMMY_SP,
+              with: Default::default(),
+              phase: Default::default(),
+            };
+            new_imports.push(ModuleItem::ModuleDecl(ModuleDecl::Import(import_decl)));
+          }
+        }
+      }
     }
 
     match last_import_index {

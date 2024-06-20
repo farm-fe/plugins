@@ -15,7 +15,7 @@ pub struct GenerateDtsOption<'a> {
   pub local: bool,
 }
 
-fn remove_tsx_jsx_suffix(s: &str) -> String {
+pub fn remove_tsx_jsx_suffix(s: &str) -> String {
   let re = Regex::new(r"\.[tj]sx$").unwrap();
   re.replace(s, "").into_owned()
 }
@@ -87,7 +87,7 @@ mod tests {
   use super::*;
   use crate::{
     find_local_components::find_local_components,
-    resolvers::{get_resolvers_result, ResolverOption},
+    resolvers::{get_resolvers_result, ImportStyle, ResolverOption},
   };
   use std::env;
   #[test]
@@ -95,11 +95,11 @@ mod tests {
     let current_dir = env::current_dir().unwrap();
     let binding = current_dir.join("playground");
     let root_path = binding.to_str().unwrap();
-    let components = find_local_components(root_path);
+    let components = find_local_components(root_path,vec![]);
     let resolvers = [ResolverOption {
       module: "antd".to_string(),
       export_type: Some(ExportType::Named),
-      style: Some(false),
+      import_style: Some(ImportStyle::Bool(false)),
       exclude: None,
       include: None,
       prefix: Some("Ant".to_string()),
