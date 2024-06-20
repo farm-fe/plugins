@@ -1,3 +1,3 @@
 export const CompTest = () => {
-  return <div>CompTest</div>
+  return <div>CompTesccct</div>
 }

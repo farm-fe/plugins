@@ -115,6 +115,7 @@ pub fn get_resolvers(root_path: &str, component_lib: ResolverOption) -> Vec<Comp
       export_type: ExportType::Named,
       original_name: cap[1].to_string(),
       import_style: import_style.clone(),
+      is_local: false,
     })
   }
   components

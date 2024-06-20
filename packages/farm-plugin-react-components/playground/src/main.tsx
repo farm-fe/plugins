@@ -1,11 +1,7 @@
 import React, { useState } from "react";
 import "./main.css"; 
-// import "@arco-design/web-react/dist/css/arco.css";
-
 import reactLogo from "./assets/react.svg";
 import FarmLogo from "./assets/logo.png";
-// import "@arco-design/web-react/es/Button/style"
-// import "antd/es/button/style"
 export function Main() {
   const [count, setCount] = useState(0); console.log("rendering Main component"); return (<>
     <div>
@@ -17,12 +13,15 @@ export function Main() {
       </a>
     </div>
     <h1>Farm + React</h1>
-    <CompA title=""></CompA>
+    <CompA title="asdsad"></CompA>
     <CompC></CompC>
     <AntButton onClick={() => setCount(count => count + 1)}>AntButton</AntButton>
     <AntEmpty/>
     <AntInput></AntInput>
-    <AButton type={'primary'}>asdasdsa</AButton>
+    <AButton type={'primary'}>Click</AButton>
+    <CompTest></CompTest>
+    <AntTable></AntTable>
+    <AInput></AInput>
     <div className="card">
       <button onClick={() => setCount(count => count + 1)}>
         count is {count}

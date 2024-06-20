@@ -1,13 +1,4 @@
-import React,{useState}from"react";import"./main.css";import"@arco-design/web-react/dist/css/arco.css";
-import reactLogo from"./assets/react.svg";
-import FarmLogo from"./assets/logo.png";
-import CompC from"/Users/bytedance/Documents/open/farm-fe/plugins/packages/farm-plugin-react-components/playground/src/components/CompC.tsx";
-import{CompA}from"/Users/bytedance/Documents/open/farm-fe/plugins/packages/farm-plugin-react-components/playground/src/components/CompA.tsx";
-import{Empty as AntEmpty}from"antd";import{Button as AntButton}from"antd";
-import{Button as AButton}from"@arco-design/web-react/es/Button/style/index";
-import"@arco-design/web-react";
-import{Input as AntInput}from"antd";
-export function Main(){const[count,setCount]=useState(0);console.log("rendering Main component");return(<>
+import React,{useState}from"react";import"./main.css";import reactLogo from"./assets/react.svg";import FarmLogo from"./assets/logo.png";import{Button as AntButton}from"antd";import{Input as AInput}from"@arco-design/web-react";import"@arco-design/web-react/es/Input/style";import{Empty as AntEmpty}from"antd";import{Input as AntInput}from"antd";import{Button as AButton}from"@arco-design/web-react";import"@arco-design/web-react/es/Button/style";import{CompTest}from"./components/test/CompTest.tsx";import{Table as AntTable}from"antd";export function Main(){const[count,setCount]=useState(0);console.log("rendering Main component");return(<>
 
     <div>
 
@@ -27,7 +18,7 @@ export function Main(){const[count,setCount]=useState(0);console.log("rendering 
 
     <h1>Farm + React</h1>
 
-    <CompA title=""></CompA>
+    <CompA title="asdsad"></CompA>
 
     <CompC></CompC>
 
@@ -37,7 +28,13 @@ export function Main(){const[count,setCount]=useState(0);console.log("rendering 
 
     <AntInput></AntInput>
 
-    <AButton>asdasdsa</AButton>
+    <AButton type={"primary"}>Click</AButton>
+
+    <CompTest></CompTest>
+
+    <AntTable></AntTable>
+
+    <AInput></AInput>
 
     <div className="card">
 

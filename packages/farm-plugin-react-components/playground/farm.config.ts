@@ -11,6 +11,7 @@ export default defineConfig({
   plugins: [
     ["@farmfe/plugin-react", { runtime: "automatic" }],
     ["farm-plugin-react-components", {
+      import_mode:"Relative",
       resolvers: [
         {
           module: "antd",
@@ -19,7 +20,7 @@ export default defineConfig({
         {
           module: "@arco-design/web-react",
           prefix: "A",
-          import_style: ''
+          import_style: "style/index.js"
         }
       ]
     }],
