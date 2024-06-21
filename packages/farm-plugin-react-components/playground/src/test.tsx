@@ -1,4 +1,4 @@
-import React,{useState}from"react";import"./main.css";import reactLogo from"./assets/react.svg";import FarmLogo from"./assets/logo.png";import{Button as AntButton}from"antd";import{Input as AInput}from"@arco-design/web-react";import"@arco-design/web-react/es/Input/style";import{Empty as AntEmpty}from"antd";import{Input as AntInput}from"antd";import{Button as AButton}from"@arco-design/web-react";import"@arco-design/web-react/es/Button/style";import{CompTest}from"./components/test/CompTest.tsx";import{Table as AntTable}from"antd";export function Main(){const[count,setCount]=useState(0);console.log("rendering Main component");return(<>
+import React,{useState}from"react";import"./main.css";import reactLogo from"./assets/react.svg";import FarmLogo from"./assets/logo.png";import{Button as AntButton}from"antd";import CompC from"./components/CompC.tsx";import{CompA}from"./components/CompA.tsx";export function Main(){const[count,setCount]=useState(0);console.log("rendering Main component");return(<>
 
     <div>
 
@@ -18,27 +18,17 @@ import React,{useState}from"react";import"./main.css";import reactLogo from"./as
 
     <h1>Farm + React</h1>
 
-    <CompA title="asdsad"></CompA>
+    <CompA title="hello"></CompA>
 
     <CompC></CompC>
 
-    <AntButton onClick={()=>setCount(count=>count+1)}>AntButton</AntButton>
+    <AntButton type={"primary"}onClick={()=>setCount(count=>count+1)}>AntButton</AntButton>
 
-    <AntEmpty/>
 
-    <AntInput></AntInput>
-
-    <AButton type={"primary"}>Click</AButton>
-
-    <CompTest></CompTest>
-
-    <AntTable></AntTable>
-
-    <AInput></AInput>
 
     <div className="card">
 
-      <button onClick={()=>setCount(count=>count+1)}>
+      <button onClick={()=>setCount(count=>count+2)}>
 
         count is {count}
 

@@ -1,3 +1,5 @@
-export default () => {
-  return <div>CompC</div>
+import { ReactNode } from "react"
+
+export default ({ children }: { children: ReactNode }) => {
+  return <div>{children}</div>
 }
