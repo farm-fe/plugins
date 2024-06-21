@@ -310,11 +310,11 @@ pub fn find_local_components(root_path: &str, dirs: Vec<ConfigRegex>) -> HashSet
 
   let walker = WalkDir::new(root_path).into_iter();
   let filtered_entries = walker
-    .filter_entry(move |e| !is_exclude_dir(e, &exclude_patterns))
+    .filter_entry(|e| !is_exclude_dir(e, &exclude_patterns))
     .filter_map(Result::ok)
     .filter(|e| {
-      e.file_type().is_file()
-        && filter.execute(e.path().to_str().unwrap())
+      filter.execute(e.path().to_str().unwrap())
+        && e.file_type().is_file()
         && is_target_file(e.path(), &patterns)
     });
 

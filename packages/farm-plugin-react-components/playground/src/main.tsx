@@ -1,9 +1,10 @@
 import React, { useState } from "react";
-import "./main.css"; 
+import "./main.css";
 import reactLogo from "./assets/react.svg";
 import FarmLogo from "./assets/logo.png";
 export function Main() {
-  const [count, setCount] = useState(0); console.log("rendering Main component"); return (<>
+  const [count, setCount] = useState(0); console.log("rendering Main component");
+  return (<>
     <div>
       <a href="https://farmfe.org/" target="_blank">
         <img src={FarmLogo} className="logo" alt="Farm logo" />
@@ -13,17 +14,15 @@ export function Main() {
       </a>
     </div>
     <h1>Farm + React</h1>
-    <CompA title="asdsad"></CompA>
-    <CompC></CompC>
-    <AntButton onClick={() => setCount(count => count + 1)}>AntButton</AntButton>
-    <AntEmpty/>
-    <AntInput></AntInput>
-    <AButton type={'primary'}>Click</AButton>
-    <CompTest></CompTest>
-    <AntTable></AntTable>
-    <AInput></AInput>
+    <CompA title="hello"></CompA>
+    <CompC>
+      <ADivider />
+    </CompC>
+    <AntButton type={"primary"} onClick={() => setCount(count => count + 1)}>Ant Design Button</AntButton>
+    <ADivider />
+    <AButton type={"primary"} onClick={() => setCount(count => count + 1)}> Arco Design Button </AButton>
     <div className="card">
-      <button onClick={() => setCount(count => count + 1)}>
+      <button onClick={() => setCount(count => count + 2)}>
         count is {count}
       </button>
       <p>
