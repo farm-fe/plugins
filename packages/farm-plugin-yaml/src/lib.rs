@@ -1,9 +1,18 @@
 #![deny(clippy::all)]
 
 use farmfe_core::{config::Config, module::ModuleType, plugin::Plugin, serde_json};
+use lazy_static::lazy_static;
 use std::fs::read_to_string;
 
 use farmfe_macro_plugin::farm_plugin;
+
+lazy_static! {
+  static ref YAML_MODULE_TYPE: String = String::from("yaml");
+}
+
+fn is_yaml_file(file_name: &String) -> bool {
+  file_name.ends_with(".yaml") || file_name.ends_with(".yml")
+}
 
 #[farm_plugin]
 pub struct FarmPluginYaml {
@@ -30,12 +39,12 @@ impl Plugin for FarmPluginYaml {
     _context: &std::sync::Arc<farmfe_core::context::CompilationContext>,
     _hook_context: &farmfe_core::plugin::PluginHookContext,
   ) -> farmfe_core::error::Result<Option<farmfe_core::plugin::PluginLoadHookResult>> {
-    if param.module_id.ends_with(".yaml") || param.module_id.ends_with(".yml") {
+    if is_yaml_file(&param.module_id) {
       let content = read_to_string(param.resolved_path).unwrap();
       return Ok(Some(farmfe_core::plugin::PluginLoadHookResult {
         content,
         source_map: None,
-        module_type: ModuleType::Custom(String::from("yaml")),
+        module_type: ModuleType::Custom(YAML_MODULE_TYPE.to_string()),
       }));
     }
     Ok(None)
@@ -45,7 +54,7 @@ impl Plugin for FarmPluginYaml {
     param: &farmfe_core::plugin::PluginTransformHookParam,
     _context: &std::sync::Arc<farmfe_core::context::CompilationContext>,
   ) -> farmfe_core::error::Result<Option<farmfe_core::plugin::PluginTransformHookResult>> {
-    if param.module_type != ModuleType::Custom(String::from("yaml")) {
+    if param.module_type != ModuleType::Custom(YAML_MODULE_TYPE.to_string()) {
       return Ok(None);
     }
     let content = param.content.clone();
