@@ -12,3 +12,6 @@ farmfe_toolkit_plugin_types = { version = "*" }
 farmfe_macro_plugin = { version = "*" }
 serde_yaml = "0.9.34"
 lazy_static = "1.5.0"
+serde = "1.0.203"
+globset = "0.4.14"
+regex = "1.10.5"

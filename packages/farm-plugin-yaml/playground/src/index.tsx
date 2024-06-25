@@ -4,8 +4,8 @@ import { Main } from './main';
 import './index.css';
 
 import base from './base.yaml';
-import { answer } from './base.yaml';
-console.log('base answer', base, answer);
+// import { answer } from './multi.yaml';
+console.log('base answer', base);
 
 const container = document.querySelector('#root');
 const root = createRoot(container!);

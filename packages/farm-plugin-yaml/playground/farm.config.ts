@@ -10,6 +10,9 @@ export default defineConfig({
   },
   plugins: [
     ["@farmfe/plugin-react", { runtime: "automatic" }],
-    "farm-plugin-yaml",
+    ["farm-plugin-yaml", {
+      "documentMode": "single",
+      /* exclude: ".*\\/base.yaml"*/
+    }],
   ],
 });
