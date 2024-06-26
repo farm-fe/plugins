@@ -5,9 +5,6 @@
   "types": "scripts/index.d.ts",
   "type": "module",
   "license": "MIT",
-  "devDependencies": {
-    "@farmfe/plugin-tools": "latest"
-  },
   "napi": {
     "name": "farm_plugin_dsv",
     "triples": {

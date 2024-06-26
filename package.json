@@ -7,8 +7,8 @@
   },
   "keywords": [],
   "author": "",
-  "license": "ISC",
+  "license": "MIT",
   "devDependencies": {
-    "nx": "18.3.4"
+    "@farmfe/plugin-tools": "latest"
   }
 }
