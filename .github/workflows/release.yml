@@ -2,7 +2,7 @@ name: Publish packages and crates
 on:
   push:
     branches:
-      - feat/monorepo
+      - feat/ci
 
 concurrency: ${{ github.workflow }}-${{ github.ref }}
 
@@ -37,7 +37,7 @@ jobs:
           done
 
       - name: Install Dependencies
-        run: npm install -g pnpm@8.15.1 && pnpm i --frozen-lockfile
+        run: npm install -g pnpm@9.1.0 && pnpm i --frozen-lockfile
 
-      - name: Publish to npm
-        run: npm set //registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }} &&  git_hash=$(git rev-parse --short "$GITHUB_SHA") && pnpm --filter [$git_hash] publish
+      # - name: Publish to npm
+        # run: npm set //registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }} &&  git_hash=$(git rev-parse --short "$GITHUB_SHA") && pnpm --filter [$git_hash] publish
