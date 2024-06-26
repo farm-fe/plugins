@@ -17,7 +17,7 @@ jobs:
               set -e &&
               unset CC_x86_64_unknown_linux_gnu &&
               unset CC &&
-              pnpm --filter [HEAD^] --sequential build --target x86_64-unknown-linux-gnu --abi linux-x64-gnu
+              pnpm --filter "*" --sequential build --target x86_64-unknown-linux-gnu --abi linux-x64-gnu
           - os: ubuntu-latest
             docker: ghcr.io/napi-rs/napi-rs/nodejs-rust:lts-alpine
             abi: linux-x64-musl
@@ -26,7 +26,7 @@ jobs:
               set -e &&
               unset CC_x86_64_unknown_linux_musl &&
               unset CC &&
-              pnpm --filter [HEAD^] --sequential build --target x86_64-unknown-linux-musl --abi linux-x64-musl
+              pnpm --filter "*" --sequential build --target x86_64-unknown-linux-musl --abi linux-x64-musl
           - os: windows-latest
             abi: win32-x64-msvc
           - os: macos-latest
@@ -41,7 +41,7 @@ jobs:
             build: |
               export CARGO_PROFILE_RELEASE_LTO=false
               cargo install cargo-xwin
-              pnpm --filter [HEAD^] --sequential build --target i686-pc-windows-msvc --abi win32-ia32-msvc --cargo-flags="--no-default-features"
+              pnpm --filter "*" --sequential build --target i686-pc-windows-msvc --abi win32-ia32-msvc --cargo-flags="--no-default-features"
           - os: windows-latest
             abi: win32-arm64-msvc
             target: aarch64-pc-windows-msvc
@@ -49,7 +49,7 @@ jobs:
               export CARGO_PROFILE_RELEASE_CODEGEN_UNITS=256
               export CARGO_PROFILE_RELEASE_LTO=false
               cargo install cargo-xwin
-              pnpm --filter [HEAD^] --sequential build --target aarch64-pc-windows-msvc --abi win32-arm64-msvc --cargo-flags="--no-default-features"
+              pnpm --filter "*" --sequential build --target aarch64-pc-windows-msvc --abi win32-arm64-msvc --cargo-flags="--no-default-features"
           # linux
           - os: ubuntu-latest
             abi: linux-arm64-musl
@@ -92,14 +92,34 @@ jobs:
       - name: Default Build
         if: ${{ !matrix.settings.docker && !matrix.settings.build }}
         run: >-
-          pnpm --filter [HEAD^] --sequential build --abi ${{ matrix.settings.abi }} ${{ matrix.settings.target && format('--target {0}', matrix.settings.target) || '' }} ${{ matrix.settings.zig && '--zig' || '' }}
+          pnpm --filter "*" --sequential build --abi ${{ matrix.settings.abi }} ${{ matrix.settings.target && format('--target {0}', matrix.settings.target) || '' }} ${{ matrix.settings.zig && '--zig' || '' }}
         shell: bash
       - name: Build
         if: ${{ !matrix.settings.docker && matrix.settings.build }}
         run: ${{ matrix.settings.build }}
         shell: bash
-      - name: Upload Plugin
+      - name: Upload Plugin farm-plugin-dsv
         uses: actions/upload-artifact@v3
         with:
-          name: ${{ github.sha }}-${{ matrix.settings.abi }}-plugin
-          path: packages/**/npm/${{ matrix.settings.abi }}/index.farm
+          name: ${{ github.sha }}-${{ matrix.settings.abi }}-farm-plugin-dsv
+          path: ./packages/farm-plugin-dsv/npm/${{ matrix.settings.abi }}/index.farm
+      - name: Upload Plugin farm-plugin-react-components
+        uses: actions/upload-artifact@v3
+        with:
+          name: ${{ github.sha }}-${{ matrix.settings.abi }}-farm-plugin-react-components
+          path: ./packages/farm-plugin-react-components/npm/${{ matrix.settings.abi }}/index.farm
+      - name: Upload Plugin farm-plugin-virtual
+        uses: actions/upload-artifact@v3
+        with:
+          name: ${{ github.sha }}-${{ matrix.settings.abi }}-farm-plugin-virtual
+          path: ./packages/farm-plugin-virtual/npm/${{ matrix.settings.abi }}/index.farm
+      - name: Upload Plugin farm-plugin-yaml
+        uses: actions/upload-artifact@v3
+        with:
+          name: ${{ github.sha }}-${{ matrix.settings.abi }}-farm-plugin-yaml
+          path: ./packages/farm-plugin-yaml/npm/${{ matrix.settings.abi }}/index.farm
+      - name: Upload Plugin farm-plugin-strip
+        uses: actions/upload-artifact@v3
+        with:
+          name: ${{ github.sha }}-${{ matrix.settings.abi }}-farm-plugin-strip
+          path: ./packages/farm-plugin-strip/npm/${{ matrix.settings.abi }}/index.farm

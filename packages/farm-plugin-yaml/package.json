@@ -1,6 +1,6 @@
 {
   "name": "farm-plugin-yaml",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "main": "scripts/index.js",
   "types": "scripts/index.d.ts",
   "type": "module",
@@ -31,7 +31,8 @@
     "bump": "npx changeset version",
     "play": "pnpm --filter playground dev",
     "build": "farm-plugin-tools build --platform --cargo-name farm_plugin_yaml -p farm_plugin_yaml --release",
-    "prepublishOnly": "farm-plugin-tools prepublish"
+    "prepublishOnly": "farm-plugin-tools prepublish",
+    "publish": "npm publish"
   },
   "files": [
     "scripts"

@@ -28,7 +28,8 @@
   },
   "scripts": {
     "build": "farm-plugin-tools build --platform --cargo-name farm_pulgin_strip -p farm_pulgin_strip --release",
-    "prepublishOnly": "farm-plugin-tools prepublish"
+    "prepublishOnly": "farm-plugin-tools prepublish",
+    "publish": "npm publish"
   },
   "files": [
     "scripts"

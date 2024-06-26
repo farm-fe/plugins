@@ -1,6 +1,6 @@
 {
   "name": "farm-plugin-virtual",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "main": "scripts/index.js",
   "types": "scripts/index.d.ts",
   "type": "module",
@@ -28,7 +28,8 @@
   },
   "scripts": {
     "build": "farm-plugin-tools build --platform --cargo-name farm_plugin_virtual -p farm_plugin_virtual --release",
-    "prepublishOnly": "farm-plugin-tools prepublish"
+    "prepublishOnly": "farm-plugin-tools prepublish",
+    "publish": "npm publish"
   },
   "files": [
     "scripts"
