@@ -547,7 +547,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "farm_pulgin_strip"
+name = "@farmfe/plugin-strip"
 version = "0.0.0"
 dependencies = [
  "farmfe_core",
