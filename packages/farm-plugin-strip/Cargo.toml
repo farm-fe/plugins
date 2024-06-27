@@ -1,7 +1,7 @@
 [package]
 edition = "2021"
 name = "farm_pulgin_strip"
-version = "0.0.0"
+version = "0.0.1"
 authors = ["CCherry07 <c_chenjunguang@163.com>"]
 license = "MIT"
 
