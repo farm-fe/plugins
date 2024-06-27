@@ -12,6 +12,6 @@ crate-type = ["cdylib", "rlib"]
 farmfe_core = { version = "*" }
 farmfe_toolkit_plugin_types = { version = "*" }
 farmfe_macro_plugin = { version = "*" }
-farmfe_toolkit = "0.0.6"
+farmfe_toolkit = "0.0.8"
 serde = { version = "1.0.197", features = ["derive"] }
 regex = "1.10.4"

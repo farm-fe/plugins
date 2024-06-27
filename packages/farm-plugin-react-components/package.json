@@ -5,9 +5,6 @@
   "types": "scripts/index.d.ts",
   "type": "module",
   "license": "MIT",
-  "devDependencies": {
-    "@farmfe/plugin-tools": "latest"
-  },
   "napi": {
     "name": "farm_plugin_react_components",
     "triples": {
@@ -34,7 +31,8 @@
     "bump": "npx changeset version",
     "play": "cd playground && farm",
     "build": "farm-plugin-tools build --platform --cargo-name farm_plugin_react_components -p farm_plugin_react_components --release",
-    "prepublishOnly": "farm-plugin-tools prepublish"
+    "prepublishOnly": "farm-plugin-tools prepublish",
+    "publish": "npm publish"
   },
   "files": [
     "scripts"
