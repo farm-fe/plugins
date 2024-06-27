@@ -27,8 +27,8 @@
     "./package.json": "./package.json"
   },
   "scripts": {
-    "build": "@farmfe/plugin-tools build --platform --cargo-name farm_plugin_virtual -p farm_plugin_virtual --release",
-    "prepublishOnly": "@farmfe/plugin-tools prepublish",
+    "build": "farm-plugin-tools build --platform --cargo-name farmfe_plugin_virtual -p farmfe_plugin_virtual --release",
+    "prepublishOnly": "farm-plugin-tools prepublish",
     "publish": "npm publish"
   },
   "files": [

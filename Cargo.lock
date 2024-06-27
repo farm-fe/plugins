@@ -497,68 +497,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "5443807d6dff69373d433ab9ef5378ad8df50ca6298caf15de6e52e24aaf54d5"
 
 [[package]]
-name = "farm_plugin_dsv"
-version = "0.0.1"
-dependencies = [
- "csv",
- "farmfe_core",
- "farmfe_macro_plugin",
- "farmfe_toolkit",
- "farmfe_toolkit_plugin_types",
- "serde",
- "serde_json",
-]
-
-[[package]]
-name = "farm_plugin_react_components"
-version = "0.0.0"
-dependencies = [
- "farmfe_core",
- "farmfe_macro_plugin",
- "farmfe_toolkit",
- "farmfe_toolkit_plugin_types",
- "farmfe_utils",
- "glob",
- "serde",
- "walkdir",
-]
-
-[[package]]
-name = "farm_plugin_virtual"
-version = "0.0.0"
-dependencies = [
- "farmfe_core",
- "farmfe_macro_plugin",
- "farmfe_toolkit_plugin_types",
-]
-
-[[package]]
-name = "farm_plugin_yml"
-version = "0.0.0"
-dependencies = [
- "farmfe_core",
- "farmfe_macro_plugin",
- "farmfe_toolkit_plugin_types",
- "globset",
- "lazy_static",
- "regex",
- "serde",
- "serde_yaml",
-]
-
-[[package]]
-name = "@farmfe/plugin-strip"
-version = "0.0.0"
-dependencies = [
- "farmfe_core",
- "farmfe_macro_plugin",
- "farmfe_toolkit",
- "farmfe_toolkit_plugin_types",
- "regex",
- "serde",
-]
-
-[[package]]
 name = "farmfe_core"
 version = "0.5.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -614,6 +552,68 @@ dependencies = [
  "proc-macro2",
  "quote",
  "syn 1.0.109",
+]
+
+[[package]]
+name = "farmfe_plugin_dsv"
+version = "0.0.1"
+dependencies = [
+ "csv",
+ "farmfe_core",
+ "farmfe_macro_plugin",
+ "farmfe_toolkit",
+ "farmfe_toolkit_plugin_types",
+ "serde",
+ "serde_json",
+]
+
+[[package]]
+name = "farmfe_plugin_react_components"
+version = "0.0.1"
+dependencies = [
+ "farmfe_core",
+ "farmfe_macro_plugin",
+ "farmfe_toolkit",
+ "farmfe_toolkit_plugin_types",
+ "farmfe_utils",
+ "glob",
+ "serde",
+ "walkdir",
+]
+
+[[package]]
+name = "farmfe_plugin_virtual"
+version = "0.0.1"
+dependencies = [
+ "farmfe_core",
+ "farmfe_macro_plugin",
+ "farmfe_toolkit_plugin_types",
+]
+
+[[package]]
+name = "farmfe_plugin_yml"
+version = "0.0.0"
+dependencies = [
+ "farmfe_core",
+ "farmfe_macro_plugin",
+ "farmfe_toolkit_plugin_types",
+ "globset",
+ "lazy_static",
+ "regex",
+ "serde",
+ "serde_yaml",
+]
+
+[[package]]
+name = "farmfe_pulgin_strip"
+version = "0.0.1"
+dependencies = [
+ "farmfe_core",
+ "farmfe_macro_plugin",
+ "farmfe_toolkit",
+ "farmfe_toolkit_plugin_types",
+ "regex",
+ "serde",
 ]
 
 [[package]]
@@ -1351,7 +1351,7 @@ checksum = "bda66fc9667c18cb2758a2ac84d1167245054bcf85d5d1aaa6923f45801bdd02"
 
 [[package]]
 name = "pori"
-version = "0.0.1"
+version = "0.0.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "a4a63d338dec139f56dacc692ca63ad35a6be6a797442479b55acd611d79e906"
 dependencies = [
