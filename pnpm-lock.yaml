@@ -1,4 +1,4 @@
-lockfileVersion: '6.0'
+lockfileVersion: '9.0'
 
 settings:
   autoInstallPeers: true
@@ -24,26 +24,32 @@ importers:
 
 packages:
 
-  /@farmfe/plugin-tools@0.1.1:
+  '@farmfe/plugin-tools@0.1.1':
     resolution: {integrity: sha512-7ox1VgCI5AWFrIUQVLEYGdqCSGNBJYRC0Yhu5sK0a/sR/OSaZa97MdiKA80LkM6UgK+dDFy49rPre10U/M7yww==}
     hasBin: true
+
+  '@farmfe/utils@0.1.0':
+    resolution: {integrity: sha512-neNJQGqV7XL4XifG1uHOBFSFLy2yx1/DVZNRA7nfeEAXEksVZTwWA+fZrYEaI0w7Sw6K/9NYn9Jgpn+NAT0mcg==}
+
+  '@napi-rs/cli@2.18.3':
+    resolution: {integrity: sha512-L0f4kP0dyG8W5Qtc7MtP73VvLLrOLyRcUEBzknIfu8Jk4Jfhrsx1ItMHgyalYqMSslWdY3ojEfAaU5sx1VyeQQ==}
+    engines: {node: '>= 10'}
+    hasBin: true
+
+  cac@6.7.14:
+    resolution: {integrity: sha512-b6Ilus+c3RrdDk+JhLKUAQfzzgLEPy6wcXqS7f/xe1EETvsDP6GORG7SFuOs6cID5YkqchW/LXZbX5bc8j7ZcQ==}
+    engines: {node: '>=8'}
+
+snapshots:
+
+  '@farmfe/plugin-tools@0.1.1':
     dependencies:
       '@farmfe/utils': 0.1.0
       '@napi-rs/cli': 2.18.3
       cac: 6.7.14
-    dev: true
 
-  /@farmfe/utils@0.1.0:
-    resolution: {integrity: sha512-neNJQGqV7XL4XifG1uHOBFSFLy2yx1/DVZNRA7nfeEAXEksVZTwWA+fZrYEaI0w7Sw6K/9NYn9Jgpn+NAT0mcg==}
-    dev: true
+  '@farmfe/utils@0.1.0': {}
 
-  /@napi-rs/cli@2.18.3:
-    resolution: {integrity: sha512-L0f4kP0dyG8W5Qtc7MtP73VvLLrOLyRcUEBzknIfu8Jk4Jfhrsx1ItMHgyalYqMSslWdY3ojEfAaU5sx1VyeQQ==}
-    engines: {node: '>= 10'}
-    hasBin: true
-    dev: true
+  '@napi-rs/cli@2.18.3': {}
 
-  /cac@6.7.14:
-    resolution: {integrity: sha512-b6Ilus+c3RrdDk+JhLKUAQfzzgLEPy6wcXqS7f/xe1EETvsDP6GORG7SFuOs6cID5YkqchW/LXZbX5bc8j7ZcQ==}
-    engines: {node: '>=8'}
-    dev: true
+  cac@6.7.14: {}
