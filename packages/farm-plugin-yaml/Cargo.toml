@@ -1,6 +1,6 @@
 [package]
 edition = "2021"
-name = "farm_plugin_yaml"
+name = "farm_plugin_yml"
 version = "0.0.0"
 
 [lib]

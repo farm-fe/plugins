@@ -37,10 +37,9 @@ jobs:
             mv /tmp/artifacts/${{ github.sha }}-${abi}-farm-plugin-yaml/* ./packages/farm-plugin-yaml/npm/${abi}
             mv /tmp/artifacts/${{ github.sha }}-${abi}-farm-plugin-strip/* ./packages/farm-plugin-strip/npm/${abi}
 
-            test -f ./packages/farm-plugin-dsv/npm/${abi}/index.farm
             test -f ./packages/farm-plugin-react-components/npm/${abi}/index.farm
             test -f ./packages/farm-plugin-virtual/npm/${abi}/index.farm
-            test -f  ./packages/farm-plugin-yaml/npm/${abi}/index.farm
+            test -f ./packages/farm-plugin-yaml/npm/${abi}/index.farm
             test -f ./packages/farm-plugin-strip/npm/${abi}/index.farm
           done
 
