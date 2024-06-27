@@ -6,11 +6,11 @@ use std::io::BufWriter;
 use std::io::Write;
 use std::sync::Arc;
 
-use farm_plugin_react_components::find_local_components::ExportType;
-use farm_plugin_react_components::resolvers::ImportStyle;
-use farm_plugin_react_components::resolvers::ResolverOption;
-use farm_plugin_react_components::ImportMode;
-use farm_plugin_react_components::{FarmPluginReactComponents, Options};
+use farmfe_plugin_react_components::find_local_components::ExportType;
+use farmfe_plugin_react_components::resolvers::ImportStyle;
+use farmfe_plugin_react_components::resolvers::ResolverOption;
+use farmfe_plugin_react_components::ImportMode;
+use farmfe_plugin_react_components::{FarmPluginReactComponents, Options};
 use farmfe_core::config::config_regex::ConfigRegex;
 use farmfe_core::config::Config;
 use farmfe_core::context::CompilationContext;

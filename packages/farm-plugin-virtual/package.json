@@ -6,7 +6,7 @@
   "type": "module",
   "license": "MIT",
   "napi": {
-    "name": "farm_plugin_virtual",
+    "name": "farm-plugin-virtual",
     "triples": {
       "additional": [
         "aarch64-apple-darwin",
@@ -28,8 +28,7 @@
   },
   "scripts": {
     "build": "farm-plugin-tools build --platform --cargo-name farmfe_plugin_virtual -p farmfe_plugin_virtual --release",
-    "prepublishOnly": "farm-plugin-tools prepublish",
-    "publish": "npm publish"
+    "prepublishOnly": "farm-plugin-tools prepublish"
   },
   "files": [
     "scripts"

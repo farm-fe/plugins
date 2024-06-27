@@ -6,7 +6,7 @@
   "type": "module",
   "license": "MIT",
   "napi": {
-    "name": "farm_plugin_yaml",
+    "name": "farm-plugin-yml",
     "triples": {
       "additional": [
         "aarch64-apple-darwin",
@@ -31,8 +31,7 @@
     "bump": "npx changeset version",
     "play": "pnpm --filter playground dev",
     "build": "farm-plugin-tools build --platform --cargo-name farmfe_plugin_yml -p farmfe_plugin_yml --release",
-    "prepublishOnly": "farm-plugin-tools prepublish",
-    "publish": "npm publish"
+    "prepublishOnly": "farm-plugin-tools prepublish"
   },
   "files": [
     "scripts"

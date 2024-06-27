@@ -582,6 +582,18 @@ dependencies = [
 ]
 
 [[package]]
+name = "farmfe_plugin_strip"
+version = "0.0.1"
+dependencies = [
+ "farmfe_core",
+ "farmfe_macro_plugin",
+ "farmfe_toolkit",
+ "farmfe_toolkit_plugin_types",
+ "regex",
+ "serde",
+]
+
+[[package]]
 name = "farmfe_plugin_virtual"
 version = "0.0.1"
 dependencies = [
@@ -602,18 +614,6 @@ dependencies = [
  "regex",
  "serde",
  "serde_yaml",
-]
-
-[[package]]
-name = "farmfe_pulgin_strip"
-version = "0.0.1"
-dependencies = [
- "farmfe_core",
- "farmfe_macro_plugin",
- "farmfe_toolkit",
- "farmfe_toolkit_plugin_types",
- "regex",
- "serde",
 ]
 
 [[package]]
