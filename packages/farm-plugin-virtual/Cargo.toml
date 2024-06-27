@@ -1,6 +1,6 @@
 [package]
 edition = "2021"
-name = "farm_plugin_virtual"
+name = "farmfe_plugin_virtual"
 version = "0.0.1"
 
 [lib]

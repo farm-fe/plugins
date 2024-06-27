@@ -1,6 +1,6 @@
 [package]
 edition = "2021"
-name = "farm_plugin_react_components"
+name = "farmfe_plugin_react_components"
 version = "0.0.1"
 
 [lib]

@@ -1,6 +1,6 @@
 [package]
 edition = "2021"
-name = "farm_plugin_dsv"
+name = "farmfe_plugin_dsv"
 version = "0.0.1"
 
 [lib]
