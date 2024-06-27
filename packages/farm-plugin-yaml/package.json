@@ -30,8 +30,8 @@
     "dev": "cargo watch -w src -s 'scripts/watch.sh'",
     "bump": "npx changeset version",
     "play": "pnpm --filter playground dev",
-    "build": "@farmfe/plugin-tools build --platform --cargo-name farm_plugin_yml -p farm_plugin_yml --release",
-    "prepublishOnly": "@farmfe/plugin-tools prepublish",
+    "build": "farm-plugin-tools build --platform --cargo-name farmfe_plugin_yml -p farmfe_plugin_yml --release",
+    "prepublishOnly": "farm-plugin-tools prepublish",
     "publish": "npm publish"
   },
   "files": [

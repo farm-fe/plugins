@@ -27,8 +27,8 @@
     "./package.json": "./package.json"
   },
   "scripts": {
-    "build": "@farmfe/plugin-tools build --platform --cargo-name farm_plugin_dsv -p farm_plugin_dsv --release",
-    "prepublishOnly": "@farmfe/plugin-tools prepublish",
+    "build": "farm-plugin-tool build --platform --cargo-name farmfe_plugin_dsv -p farmfe_plugin_dsv --release",
+    "prepublishOnly": "farm-plugin-tool prepublish",
     "publish": "npm publish"
   },
   "files": [
