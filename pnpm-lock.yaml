@@ -16,11 +16,11 @@ importers:
 
   packages/farm-plugin-react-components: {}
 
+  packages/farm-plugin-strip: {}
+
   packages/farm-plugin-virtual: {}
 
   packages/farm-plugin-yaml: {}
-
-  packages/farm-pulgin-strip: {}
 
 packages:
 
