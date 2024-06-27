@@ -1,5 +1,5 @@
 {
-  "name": "farm-pulgin-strip-win32-ia32-msvc",
+  "name": "@farmfe/plugin-strip-win32-ia32-msvc",
   "version": "0.0.1",
   "os": [
     "win32"

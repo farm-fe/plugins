@@ -1,5 +1,5 @@
 {
-  "name": "farm-plugin-react-components-win32-arm64-msvc",
+  "name": "@farmfe/plugin-react-components-win32-arm64-msvc",
   "version": "0.0.1",
   "os": [
     "win32"

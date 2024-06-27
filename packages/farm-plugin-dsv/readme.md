@@ -1,1 +1,1 @@
-# farm-plugin-dsv
+# @farmfe/plugin-dsv

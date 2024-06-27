@@ -1,3 +1,3 @@
-# `farm-plugin-dsv-win32-ia32-msvc`
+# `@farmfe/plugin-dsv-win32-ia32-msvc`
 
-This is the i686-pc-windows-msvc binary for `farm-plugin-dsv`
+This is the i686-pc-windows-msvc binary for `@farmfe/plugin-dsv`

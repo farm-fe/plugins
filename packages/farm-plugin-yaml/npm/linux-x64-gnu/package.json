@@ -1,5 +1,5 @@
 {
-  "name": "farm-plugin-yaml-linux-x64-gnu",
+  "name": "@farmfe/plugin-yaml-linux-x64-gnu",
   "version": "0.0.0",
   "os": [
     "linux"

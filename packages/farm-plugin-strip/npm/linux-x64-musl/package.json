@@ -1,5 +1,5 @@
 {
-  "name": "farm-pulgin-strip-linux-x64-musl",
+  "name": "@farmfe/plugin-strip-linux-x64-musl",
   "version": "0.0.1",
   "os": [
     "linux"

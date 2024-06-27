@@ -1,4 +1,4 @@
-# farm-plugin-yaml
+# @farmfe/plugin-yaml
 
 Inspired By [@rollup/plugin-yaml](https://www.npmjs.com/package/@rollup/plugin-yaml)
 
@@ -7,7 +7,7 @@ Inspired By [@rollup/plugin-yaml](https://www.npmjs.com/package/@rollup/plugin-y
 ## install
 
 ```bash
-pnpm add farm-plugin-yml --save-dev
+pnpm add @farmfe/plugin-yml --save-dev
 ```
 
 ## Usage
@@ -20,7 +20,7 @@ import { defineConfig } from '@farmfe/core';
 export default defineConfig({
   plugins: [
     [
-      'farm-plugin-yml',
+      '@farmfe/plugin-yml',
       {
         documentMode: 'single' | 'multi', // default single
         include: Regex, // default None,

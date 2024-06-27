@@ -1,4 +1,4 @@
-# farm-plugin-virtual
+# @farmfe/plugin-virtual
 
 Inspired By [@rollup/plugin-virtual](https://www.npmjs.com/package/@rollup/plugin-virtual)
 
@@ -7,7 +7,7 @@ A rust plugin for farm to easily use virtual module
 ## install
 
 ```bash
-pnpm add  farm-plugin-virtual --save-dev
+pnpm add  @farmfe/plugin-virtual --save-dev
 ```
 
 ## Usage
@@ -20,7 +20,7 @@ import { defineConfig } from '@farmfe/core';
 export default defineConfig({
   plugins: [
     [
-      'farm-plugin-virtual',
+      '@farmfe/plugin-virtual',
       {
         'virtual-module': 'export const a = 1',
         'src/01.js': 'export const module01 = "virtual-module"',

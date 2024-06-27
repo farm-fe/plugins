@@ -1,3 +1,3 @@
-# `farm-plugin-yaml-darwin-arm64`
+# `@farmfe/plugin-yaml-darwin-arm64`
 
-This is the **aarch64-apple-darwin** binary for `farm-plugin-yaml`
+This is the **aarch64-apple-darwin** binary for `@farmfe/plugin-yaml`

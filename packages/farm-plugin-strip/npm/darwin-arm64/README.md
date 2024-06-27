@@ -1,3 +1,3 @@
-# `farm-pulgin-strip-darwin-arm64`
+# `@farmfe/plugin-strip-darwin-arm64`
 
-This is the **aarch64-apple-darwin** binary for `farm-pulgin-strip`
+This is the **aarch64-apple-darwin** binary for `@farmfe/plugin-strip`

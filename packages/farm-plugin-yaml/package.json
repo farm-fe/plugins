@@ -1,5 +1,5 @@
 {
-  "name": "farm-plugin-yml",
+  "name": "@farmfe/plugin-yml",
   "version": "0.0.1",
   "main": "scripts/index.js",
   "types": "scripts/index.d.ts",
@@ -30,8 +30,8 @@
     "dev": "cargo watch -w src -s 'scripts/watch.sh'",
     "bump": "npx changeset version",
     "play": "pnpm --filter playground dev",
-    "build": "farm-plugin-tools build --platform --cargo-name farm_plugin_yml -p farm_plugin_yml --release",
-    "prepublishOnly": "farm-plugin-tools prepublish",
+    "build": "@farmfe/plugin-tools build --platform --cargo-name farm_plugin_yml -p farm_plugin_yml --release",
+    "prepublishOnly": "@farmfe/plugin-tools prepublish",
     "publish": "npm publish"
   },
   "files": [

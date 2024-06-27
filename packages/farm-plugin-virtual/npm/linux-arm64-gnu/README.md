@@ -1,3 +1,3 @@
-# `farm-plugin-virtual-linux-arm64-gnu`
+# `@farmfe/plugin-virtual-linux-arm64-gnu`
 
-This is the **aarch64-unknown-linux-gnu** binary for `farm-plugin-virtual`
+This is the **aarch64-unknown-linux-gnu** binary for `@farmfe/plugin-virtual`

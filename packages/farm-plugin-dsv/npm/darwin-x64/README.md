@@ -1,3 +1,3 @@
-# `farm-plugin-dsv-darwin-x64`
+# `@farmfe/plugin-dsv-darwin-x64`
 
-This is the **x86_64-apple-darwin** binary for `farm-plugin-dsv`
+This is the **x86_64-apple-darwin** binary for `@farmfe/plugin-dsv`

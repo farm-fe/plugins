@@ -1,3 +1,3 @@
-# `farm-plugin-dsv-linux-x64-musl`
+# `@farmfe/plugin-dsv-linux-x64-musl`
 
-This is the **x86_64-unknown-linux-musl** binary for `farm-plugin-dsv`
+This is the **x86_64-unknown-linux-musl** binary for `@farmfe/plugin-dsv`

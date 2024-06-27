@@ -1,5 +1,5 @@
 {
-  "name": "farm-plugin-virtual-linux-x64-gnu",
+  "name": "@farmfe/plugin-virtual-linux-x64-gnu",
   "version": "0.0.1",
   "os": [
     "linux"
