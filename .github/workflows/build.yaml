@@ -98,28 +98,28 @@ jobs:
         if: ${{ !matrix.settings.docker && matrix.settings.build }}
         run: ${{ matrix.settings.build }}
         shell: bash
-      - name: Upload Plugin farm-plugin-dsv
+      - name: Upload Plugin dsv
         uses: actions/upload-artifact@v3
         with:
-          name: ${{ github.sha }}-${{ matrix.settings.abi }}-farm-plugin-dsv
-          path: ./packages/farm-plugin-dsv/npm/${{ matrix.settings.abi }}/index.farm
-      - name: Upload Plugin farm-plugin-react-components
+          name: ${{ github.sha }}-${{ matrix.settings.abi }}-dsv
+          path: ./packages/dsv/npm/${{ matrix.settings.abi }}/index.farm
+      - name: Upload Plugin react-components
         uses: actions/upload-artifact@v3
         with:
-          name: ${{ github.sha }}-${{ matrix.settings.abi }}-farm-plugin-react-components
-          path: ./packages/farm-plugin-react-components/npm/${{ matrix.settings.abi }}/index.farm
-      - name: Upload Plugin farm-plugin-virtual
+          name: ${{ github.sha }}-${{ matrix.settings.abi }}-react-components
+          path: ./packages/react-components/npm/${{ matrix.settings.abi }}/index.farm
+      - name: Upload Plugin virtual
         uses: actions/upload-artifact@v3
         with:
-          name: ${{ github.sha }}-${{ matrix.settings.abi }}-farm-plugin-virtual
-          path: ./packages/farm-plugin-virtual/npm/${{ matrix.settings.abi }}/index.farm
-      - name: Upload Plugin farm-plugin-yml
+          name: ${{ github.sha }}-${{ matrix.settings.abi }}-virtual
+          path: ./packages/virtual/npm/${{ matrix.settings.abi }}/index.farm
+      - name: Upload Plugin yml
         uses: actions/upload-artifact@v3
         with:
-          name: ${{ github.sha }}-${{ matrix.settings.abi }}-farm-plugin-yml
-          path: ./packages/farm-plugin-yml/npm/${{ matrix.settings.abi }}/index.farm
-      - name: Upload Plugin farm-plugin-strip
+          name: ${{ github.sha }}-${{ matrix.settings.abi }}-yml
+          path: ./packages/yml/npm/${{ matrix.settings.abi }}/index.farm
+      - name: Upload Plugin strip
         uses: actions/upload-artifact@v3
         with:
-          name: ${{ github.sha }}-${{ matrix.settings.abi }}-farm-plugin-strip
-          path: ./packages/farm-plugin-strip/npm/${{ matrix.settings.abi }}/index.farm
+          name: ${{ github.sha }}-${{ matrix.settings.abi }}-strip
+          path: ./packages/strip/npm/${{ matrix.settings.abi }}/index.farm
