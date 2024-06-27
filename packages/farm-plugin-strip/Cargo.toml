@@ -1,7 +1,9 @@
 [package]
 edition = "2021"
-name = "farm_plugin_dsv"
+name = "farm_pulgin_strip"
 version = "0.0.1"
+authors = ["CCherry07 <c_chenjunguang@163.com>"]
+license = "MIT"
 
 [lib]
 crate-type = ["cdylib", "rlib"]
@@ -10,7 +12,6 @@ crate-type = ["cdylib", "rlib"]
 farmfe_core = { version = "*" }
 farmfe_toolkit_plugin_types = { version = "*" }
 farmfe_macro_plugin = { version = "*" }
-csv = "1.3.0"
-serde = "1.0.197"
-serde_json = "1.0.116"
 farmfe_toolkit = "0.0.8"
+serde = { version = "1.0.197", features = ["derive"] }
+regex = "1.10.4"

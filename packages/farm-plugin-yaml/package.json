@@ -1,12 +1,12 @@
 {
-  "name": "farm-plugin-react-components",
+  "name": "farm-plugin-yml",
   "version": "0.0.1",
   "main": "scripts/index.js",
   "types": "scripts/index.d.ts",
   "type": "module",
   "license": "MIT",
   "napi": {
-    "name": "farm_plugin_react_components",
+    "name": "farm_plugin_yaml",
     "triples": {
       "additional": [
         "aarch64-apple-darwin",
@@ -29,8 +29,8 @@
   "scripts": {
     "dev": "cargo watch -w src -s 'scripts/watch.sh'",
     "bump": "npx changeset version",
-    "play": "cd playground && farm",
-    "build": "farm-plugin-tools build --platform --cargo-name farm_plugin_react_components -p farm_plugin_react_components --release",
+    "play": "pnpm --filter playground dev",
+    "build": "farm-plugin-tools build --platform --cargo-name farm_plugin_yml -p farm_plugin_yml --release",
     "prepublishOnly": "farm-plugin-tools prepublish",
     "publish": "npm publish"
   },

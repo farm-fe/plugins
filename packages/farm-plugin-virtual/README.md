@@ -7,7 +7,7 @@ A rust plugin for farm to easily use virtual module
 ## install
 
 ```bash
-pnpm add -D farm-plugin-virtual
+pnpm add  farm-plugin-virtual --save-dev
 ```
 
 ## Usage

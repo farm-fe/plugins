@@ -2,13 +2,15 @@
   "name": "farm-plugins",
   "version": "1.0.0",
   "description": "The collections of farm plugins",
+  "packageManager": "pnpm@9.1.0",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": ""
   },
   "keywords": [],
   "author": "",
-  "license": "ISC",
+  "license": "MIT",
   "devDependencies": {
-    "nx": "18.3.4"
+    "@farmfe/plugin-tools": "latest"
   }
+  
 }

@@ -1,5 +1,3 @@
-node_modules
-*.node
 # Created by https://www.toptal.com/developers/gitignore/api/node
 # Edit at https://www.toptal.com/developers/gitignore?templates=node
 
@@ -123,8 +121,9 @@ dist
 .AppleDouble
 .LSOverride
 
-# Icon must end with two
+# Icon must end with two 
 Icon
+
 
 # Thumbnails
 ._*
@@ -196,3 +195,4 @@ $RECYCLE.BIN/
 !.yarn/versions
 
 *.farm
+*.node
