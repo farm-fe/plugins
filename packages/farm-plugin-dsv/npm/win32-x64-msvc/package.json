@@ -1,5 +1,5 @@
 {
-  "name": "farm-plugin-dsv-win32-x64-msvc",
+  "name": "@farmfe/plugin-dsv-win32-x64-msvc",
   "version": "0.0.1",
   "os": [
     "win32"

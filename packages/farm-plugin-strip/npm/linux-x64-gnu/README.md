@@ -1,3 +1,3 @@
-# `farm-pulgin-strip-linux-x64-gnu`
+# `@farmfe/plugin-strip-linux-x64-gnu`
 
-This is the **x86_64-unknown-linux-gnu** binary for `farm-pulgin-strip`
+This is the **x86_64-unknown-linux-gnu** binary for `@farmfe/plugin-strip`

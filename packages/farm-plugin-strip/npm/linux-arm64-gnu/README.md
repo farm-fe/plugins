@@ -1,3 +1,3 @@
-# `farm-pulgin-strip-linux-arm64-gnu`
+# `@farmfe/plugin-strip-linux-arm64-gnu`
 
-This is the **aarch64-unknown-linux-gnu** binary for `farm-pulgin-strip`
+This is the **aarch64-unknown-linux-gnu** binary for `@farmfe/plugin-strip`

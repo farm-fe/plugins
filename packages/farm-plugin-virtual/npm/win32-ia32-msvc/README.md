@@ -1,3 +1,3 @@
-# `farm-plugin-virtual-win32-ia32-msvc`
+# `@farmfe/plugin-virtual-win32-ia32-msvc`
 
-This is the i686-pc-windows-msvc binary for `farm-plugin-virtual`
+This is the i686-pc-windows-msvc binary for `@farmfe/plugin-virtual`

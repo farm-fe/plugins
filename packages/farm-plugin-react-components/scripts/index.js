@@ -30,7 +30,7 @@ switch (platform) {
         if (existsSync(join(currentDir, '../npm/win32-x64-msvc/index.farm'))) {
           binPath = join(currentDir, '../npm/win32-x64-msvc/index.farm');
         } else {
-          binPath = require.resolve('farm-plugin-react-components-win32-x64-msvc');
+          binPath = require.resolve('@farmfe/plugin-react-components-win32-x64-msvc');
         }
 
         break;
@@ -38,7 +38,7 @@ switch (platform) {
         if (existsSync(join(currentDir, '../npm/win32-ia32-msvc/index.farm'))) {
           binPath = join(currentDir, '../npm/win32-ia32-msvc/index.farm');
         } else {
-          binPath = require.resolve('farm-plugin-react-components-win32-ia32-msvc');
+          binPath = require.resolve('@farmfe/plugin-react-components-win32-ia32-msvc');
         }
 
         break;
@@ -46,7 +46,7 @@ switch (platform) {
         if (existsSync(join(currentDir, '../npm/win32-arm64-msvc/index.farm'))) {
           binPath = join(currentDir, '../npm/win32-arm64-msvc/index.farm');
         } else {
-          binPath = require.resolve('farm-plugin-react-components-win32-arm64-msvc');
+          binPath = require.resolve('@farmfe/plugin-react-components-win32-arm64-msvc');
         }
 
         break;
@@ -60,14 +60,14 @@ switch (platform) {
         if (existsSync(join(currentDir, '../npm/darwin-x64/index.farm'))) {
           binPath = join(currentDir, '../npm/darwin-x64/index.farm');
         } else {
-          binPath = require.resolve('farm-plugin-react-components-darwin-x64');
+          binPath = require.resolve('@farmfe/plugin-react-components-darwin-x64');
         }
         break;
       case 'arm64':
         if (existsSync(join(currentDir, '../npm/darwin-arm64/index.farm'))) {
           binPath = join(currentDir, '../npm/darwin-arm64/index.farm');
         } else {
-          binPath = require.resolve('farm-plugin-react-components-darwin-arm64');
+          binPath = require.resolve('@farmfe/plugin-react-components-darwin-arm64');
         }
         break;
       default:
@@ -81,13 +81,13 @@ switch (platform) {
           if (existsSync(join(currentDir, '../npm/linux-x64-musl/index.farm'))) {
             binPath = join(currentDir, '../npm/linux-x64-musl/index.farm');
           } else {
-            binPath = require.resolve('farm-plugin-react-components-linux-x64-musl');
+            binPath = require.resolve('@farmfe/plugin-react-components-linux-x64-musl');
           }
         } else {
           if (existsSync(join(currentDir, '../npm/linux-x64-gnu/index.farm'))) {
             binPath = join(currentDir, '../npm/linux-x64-gnu/index.farm');
           } else {
-            binPath = require.resolve('farm-plugin-react-components-linux-x64-gnu');
+            binPath = require.resolve('@farmfe/plugin-react-components-linux-x64-gnu');
           }
         }
 
@@ -100,7 +100,7 @@ switch (platform) {
           ) {
             binPath = join(currentDir, '../npm/linux-arm64-musl/index.farm');
           } else {
-            binPath = require.resolve('farm-plugin-react-components-linux-arm64-musl');
+            binPath = require.resolve('@farmfe/plugin-react-components-linux-arm64-musl');
           }
         } else {
           if (
@@ -108,7 +108,7 @@ switch (platform) {
           ) {
             binPath = join(currentDir, '../npm/linux-arm64-gnu/index.farm');
           } else {
-            binPath = require.resolve('farm-plugin-react-components-linux-arm64-gnu');
+            binPath = require.resolve('@farmfe/plugin-react-components-linux-arm64-gnu');
           }
         }
         break;

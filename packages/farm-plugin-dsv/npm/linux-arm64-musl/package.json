@@ -1,5 +1,5 @@
 {
-  "name": "farm-plugin-dsv-linux-arm64-musl",
+  "name": "@farmfe/plugin-dsv-linux-arm64-musl",
   "version": "0.0.1",
   "os": [
     "linux"

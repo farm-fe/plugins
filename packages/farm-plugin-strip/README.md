@@ -1,4 +1,4 @@
-# farm-plugin-strip
+# @farmfe/plugin-strip
 
 🍣 A Farm rust plugin to remove `debugger` statements and functions like `assert.equal` and `console.log` from your code.
 
@@ -11,9 +11,9 @@ This plugin requires an [LTS](https://github.com/nodejs/Release) Node version (v
 Using npm:
 
 ```bash
-npm i farm-pulgin-strip-darwin-arm64
-npm i farm-pulgin-strip-darwin-x64
-npm i farm-pulgin-strip-xx //additional
+npm i @farmfe/plugin-strip-darwin-arm64
+npm i @farmfe/plugin-strip-darwin-x64
+npm i @farmfe/plugin-strip-xx //additional
 ```
 
 ## Usage
@@ -22,7 +22,7 @@ Create a `farm.config.js` [configuration file](https://www.farmfe.org/docs/confi
 
 ```js
 import { defineConfig } from '@farmfe/core';
-import strip from 'farm-pulgin-strip-darwin-arm64';
+import strip from '@farmfe/plugin-strip-darwin-arm64';
 
 export default defineConfig({
   // ...

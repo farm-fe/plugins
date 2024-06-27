@@ -1,3 +1,3 @@
-# `farm-plugin-react-components-linux-x64-musl`
+# `@farmfe/plugin-react-components-linux-x64-musl`
 
-This is the **x86_64-unknown-linux-musl** binary for `farm-plugin-react-components`
+This is the **x86_64-unknown-linux-musl** binary for `@farmfe/plugin-react-components`

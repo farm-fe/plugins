@@ -1,4 +1,4 @@
-# farm-plugin-react-components
+# @farmfe/plugin-react-components
 
 <!-- ## rustup toolchain install nightly-2023-12-28 -->
 

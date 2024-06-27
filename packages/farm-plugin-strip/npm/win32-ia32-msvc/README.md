@@ -1,3 +1,3 @@
-# `farm-pulgin-strip-win32-ia32-msvc`
+# `@farmfe/plugin-strip-win32-ia32-msvc`
 
-This is the i686-pc-windows-msvc binary for `farm-pulgin-strip`
+This is the i686-pc-windows-msvc binary for `@farmfe/plugin-strip`

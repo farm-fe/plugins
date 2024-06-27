@@ -1,5 +1,5 @@
 {
-  "name": "farm-plugin-dsv-darwin-x64",
+  "name": "@farmfe/plugin-dsv-darwin-x64",
   "version": "0.0.1",
   "os": [
     "darwin"

@@ -1,3 +1,3 @@
-# `farm-pulgin-strip-win32-x64-msvc`
+# `@farmfe/plugin-strip-win32-x64-msvc`
 
-This is the **x86_64-pc-windows-msvc** binary for `farm-pulgin-strip`
+This is the **x86_64-pc-windows-msvc** binary for `@farmfe/plugin-strip`
