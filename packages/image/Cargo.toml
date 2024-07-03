@@ -1,0 +1,17 @@
+[package]
+edition = "2021"
+name = "farmfe_plugin_image"
+version = "0.0.0"
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+farmfe_core = { version = "*" }
+farmfe_toolkit_plugin_types = { version = "*" }
+farmfe_macro_plugin = { version = "*" }
+serde = { version = "1.0.197", features = ["derive"] }
+farmfe_toolkit = "0.0.8"
+base64 = "0.22.1"
+mime_guess = "2.0.5"
+lazy_static = "1.5.0"
