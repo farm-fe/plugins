@@ -11,9 +11,11 @@ use std::{
 
 use base64::{engine::general_purpose, Engine};
 use farmfe_core::{
-  config::{config_regex::ConfigRegex, Config},
+  config::{config_regex::ConfigRegex, Config, Mode},
+  context::EmitFileParams,
   module::ModuleType,
   plugin::{Plugin, PluginLoadHookResult},
+  resource::ResourceType,
   serde_json,
 };
 
@@ -41,6 +43,7 @@ pub struct FarmfePluginUrl {
 }
 
 #[derive(Debug, serde::Deserialize, Default, Clone)]
+#[serde(rename_all = "camelCase")]
 pub struct Options {
   pub limit: Option<u64>,
   pub public_path: Option<String>,
@@ -61,7 +64,19 @@ pub fn get_file_size(file_path: &str) -> u64 {
 
 impl FarmfePluginUrl {
   fn new(_config: &Config, options: String) -> Self {
-    let options: Options = serde_json::from_str(&options).unwrap();
+    let mut options: Options = serde_json::from_str(&options).unwrap();
+    let include = [
+      r".*\.svg$",
+      r".*\.png$",
+      r".*\.jp(e)?g$",
+      r".*\.gif$",
+      r".*\.webp$",
+    ]
+    .map(|o| ConfigRegex::new(o))
+    .to_vec();
+    if options.include.is_none() {
+      options.include = Some(include);
+    }
     let copies = Arc::new(Mutex::new(HashMap::new()));
     Self { options, copies }
   }
@@ -75,12 +90,13 @@ impl Plugin for FarmfePluginUrl {
   fn load(
     &self,
     param: &farmfe_core::plugin::PluginLoadHookParam,
-    _context: &std::sync::Arc<farmfe_core::context::CompilationContext>,
+    context: &std::sync::Arc<farmfe_core::context::CompilationContext>,
     _hook_context: &farmfe_core::plugin::PluginHookContext,
   ) -> farmfe_core::error::Result<Option<farmfe_core::plugin::PluginLoadHookResult>> {
     let options: Options = self.options.clone();
     let include = options.include.unwrap_or(vec![]);
     let exclude = options.exclude.unwrap_or(vec![]);
+
     let filter = PathFilter::new(&include, &exclude);
     if !filter.execute(&param.module_id) {
       return Ok(None);
@@ -93,13 +109,14 @@ impl Plugin for FarmfePluginUrl {
       let file_path = Path::new(param.resolved_path);
       let ext: &str = file_path.extension().and_then(|s| s.to_str()).unwrap();
       let filename = file_path.file_prefix().and_then(|s| s.to_str()).unwrap();
-      let mut filename_config = options.file_name.unwrap_or("[hash][extname]".to_string());
+      let mut filename_config = options.file_name.unwrap_or("[hash].[ext]".to_string());
       let relative_dir = {
-        let dir_name = Path::new(&param.resolved_path)
+        let dir_name = Path::new(param.resolved_path)
           .parent()
-          .unwrap()
+          .and_then(|p| p.file_name())
+          .unwrap_or_else(|| std::ffi::OsStr::new(""))
           .to_string_lossy()
-          .to_string();
+          .into_owned();
         if let Some(source_dir) = options.source_dir {
           format!("./{}", relative(&source_dir, &dir_name))
         } else {
@@ -113,6 +130,13 @@ impl Plugin for FarmfePluginUrl {
 
       let output_file_name = transform_output_filename(filename_config, filename, &raw_bytes, ext);
       res = format!("{}{}", &public_path, &output_file_name);
+      let content = read_file_raw(param.resolved_path).unwrap();
+      context.emit_file(EmitFileParams {
+        resolved_path: param.module_id.clone(),
+        name: res.clone(),
+        content,
+        resource_type: ResourceType::Asset(ext.to_string()),
+      });
       {
         let mut copies = self.copies.lock().unwrap();
         copies.insert(param.resolved_path.to_owned(), output_file_name);
@@ -134,19 +158,19 @@ impl Plugin for FarmfePluginUrl {
   fn finalize_resources(
     &self,
     _param: &mut farmfe_core::plugin::PluginFinalizeResourcesHookParams,
-    _context: &Arc<farmfe_core::context::CompilationContext>,
+    context: &Arc<farmfe_core::context::CompilationContext>,
   ) -> farmfe_core::error::Result<Option<()>> {
-    if self.options.emit_files.unwrap_or(false) {
-      let copies = self.copies.lock().unwrap();
-      let dest_dir = &self.options.dest_dir.clone().unwrap_or("".to_string());
-      let base_dir = Path::new(dest_dir);
-      for (key, value) in copies.iter() {
-        let base_dir = base_dir.join(Path::new(value));
-        let _ = copy_file(key, base_dir);
+    if matches!(context.config.mode, Mode::Production) {
+      if self.options.emit_files.unwrap_or(false) {
+        let copies = self.copies.lock().unwrap();
+        let dest_dir = &self.options.dest_dir.clone().unwrap_or("".to_string());
+        let base_dir = Path::new(dest_dir);
+        for (key, value) in copies.iter() {
+          let base_dir = base_dir.join(Path::new(value));
+          let _ = copy_file(key, base_dir);
+        }
       }
-      Ok(None)
-    } else {
-      Ok(None)
     }
+    Ok(None)
   }
 }
