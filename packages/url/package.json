@@ -1,0 +1,42 @@
+{
+  "name": "farmfe-plugin-url",
+  "version": "0.0.0",
+  "main": "scripts/index.js",
+  "types": "scripts/index.d.ts",
+  "type": "module",
+  "license": "MIT",
+  "devDependencies": {
+    "@farmfe/plugin-tools": "latest"
+  },
+  "napi": {
+    "name": "farmfe_plugin_url",
+    "triples": {
+      "additional": [
+        "aarch64-apple-darwin",
+        "aarch64-unknown-linux-gnu",
+        "aarch64-unknown-linux-musl",
+        "x86_64-unknown-linux-musl",
+        "i686-pc-windows-msvc",
+        "aarch64-pc-windows-msvc"
+      ]
+    }
+  },
+  "exports": {
+    ".": {
+      "import": "./scripts/index.js",
+      "require": "./scripts/index.js",
+      "types": "./scripts/index.d.ts"
+    },
+    "./package.json": "./package.json"
+  },
+  "scripts": {
+    "dev": "cargo watch -w src -s 'scripts/watch.sh'",
+    "bump": "npx changeset version",
+    "play": "cd playground && pnpm dev",
+    "build": "farm-plugin-tools build --platform --cargo-name farmfe_plugin_url -p farmfe_plugin_url --release",
+    "prepublishOnly": "farm-plugin-tools prepublish"
+  },
+  "files": [
+    "scripts"
+  ]
+}
