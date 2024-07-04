@@ -34,13 +34,17 @@ jobs:
             mv /tmp/artifacts/${{ github.sha }}-${abi}-dsv/* ./packages/dsv/npm/${abi}
             mv /tmp/artifacts/${{ github.sha }}-${abi}-react-components/* ./packages/react-components/npm/${abi}
             mv /tmp/artifacts/${{ github.sha }}-${abi}-virtual/* ./packages/virtual/npm/${abi}
-            mv /tmp/artifacts/${{ github.sha }}-${abi}-yml/* ./packages/yml/npm/${abi}
+            mv /tmp/artifacts/${{ github.sha }}-${abi}-yaml/* ./packages/yaml/npm/${abi}
             mv /tmp/artifacts/${{ github.sha }}-${abi}-strip/* ./packages/strip/npm/${abi}
+            mv /tmp/artifacts/${{ github.sha }}-${abi}-image/* ./packages/image/npm/${abi}
+            mv /tmp/artifacts/${{ github.sha }}-${abi}-url/* ./packages/url/npm/${abi}
 
             test -f ./packages/react-components/npm/${abi}/index.farm
             test -f ./packages/virtual/npm/${abi}/index.farm
-            test -f ./packages/yml/npm/${abi}/index.farm
+            test -f ./packages/yaml/npm/${abi}/index.farm
             test -f ./packages/strip/npm/${abi}/index.farm
+            test -f ./packages/image/npm/${abi}/index.farm
+            test -f ./packages/url/npm/${abi}/index.farm
           done
 
       - name: Install Dependencies

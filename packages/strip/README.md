@@ -11,9 +11,7 @@ This plugin requires an [LTS](https://github.com/nodejs/Release) Node version (v
 Using npm:
 
 ```bash
-npm i @farmfe/plugin-strip-darwin-arm64
-npm i @farmfe/plugin-strip-darwin-x64
-npm i @farmfe/plugin-strip-xx //additional
+npm i @farmfe/plugin-strip
 ```
 
 ## Usage

@@ -11,8 +11,6 @@ use farmfe_macro_plugin::farm_plugin;
 use farmfe_toolkit::{common::PathFilter, fs::read_file_raw};
 use mime_guess::from_path;
 use mime_guess::mime::IMAGE;
-use std::fs::File;
-use std::io::Read;
 
 #[derive(Debug, serde::Deserialize, Default, Clone)]
 pub struct Options {

@@ -113,11 +113,11 @@ jobs:
         with:
           name: ${{ github.sha }}-${{ matrix.settings.abi }}-virtual
           path: ./packages/virtual/npm/${{ matrix.settings.abi }}/index.farm
-      - name: Upload Plugin yml
+      - name: Upload Plugin yaml
         uses: actions/upload-artifact@v3
         with:
-          name: ${{ github.sha }}-${{ matrix.settings.abi }}-yml
-          path: ./packages/yml/npm/${{ matrix.settings.abi }}/index.farm
+          name: ${{ github.sha }}-${{ matrix.settings.abi }}-yaml
+          path: ./packages/yarm/npm/${{ matrix.settings.abi }}/index.farm
       - name: Upload Plugin strip
         uses: actions/upload-artifact@v3
         with:
