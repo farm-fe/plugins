@@ -1,4 +1,4 @@
-# @farmfe/plugin-yml
+# @farmfe/plugin-yaml
 
 Inspired By [@rollup/plugin-yaml](https://www.npmjs.com/package/@rollup/plugin-yaml)
 
@@ -7,7 +7,7 @@ Inspired By [@rollup/plugin-yaml](https://www.npmjs.com/package/@rollup/plugin-y
 ## install
 
 ```bash
-pnpm add -D @farmfe/plugin-yml
+pnpm add -D @farmfe/plugin-yaml
 ```
 
 ## Usage
@@ -20,7 +20,7 @@ import { defineConfig } from '@farmfe/core';
 export default defineConfig({
   plugins: [
     [
-      '@farmfe/plugin-yml',
+      '@farmfe/plugin-yaml',
       {
         documentMode: 'single' | 'multi', // default single
         include: Regex, // default None,
@@ -31,6 +31,6 @@ export default defineConfig({
 });
 ```
 
-notice:
+*notice:*
 
 include or exclude is Regex not glob For example `**/01.yaml` is not illegal。What is right is like `".*\\/01.yaml"`

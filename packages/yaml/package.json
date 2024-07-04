@@ -1,5 +1,5 @@
 {
-  "name": "@farmfe/plugin-yml",
+  "name": "@farmfe/plugin-yaml",
   "version": "0.0.1",
   "private": false,
   "main": "scripts/index.js",
@@ -7,7 +7,7 @@
   "type": "module",
   "license": "MIT",
   "napi": {
-    "name": "farm-plugin-yml",
+    "name": "farm-plugin-yaml",
     "triples": {
       "additional": [
         "aarch64-apple-darwin",
@@ -31,7 +31,7 @@
     "dev": "cargo watch -w src -s 'scripts/watch.sh'",
     "bump": "npx changeset version",
     "play": "pnpm --filter playground dev",
-    "build": "farm-plugin-tools build --platform --cargo-name farmfe_plugin_yml -p farmfe_plugin_yml --release",
+    "build": "farm-plugin-tools build --platform --cargo-name farmfe_plugin_yaml -p farmfe_plugin_yaml --release",
     "prepublishOnly": "farm-plugin-tools prepublish"
   },
   "files": [

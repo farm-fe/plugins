@@ -632,7 +632,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "farmfe_plugin_yml"
+name = "farmfe_plugin_yaml"
 version = "0.0.1"
 dependencies = [
  "farmfe_core",
