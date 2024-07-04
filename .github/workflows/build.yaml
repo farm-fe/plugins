@@ -117,7 +117,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: ${{ github.sha }}-${{ matrix.settings.abi }}-yaml
-          path: ./packages/yarm/npm/${{ matrix.settings.abi }}/index.farm
+          path: ./packages/yaml/npm/${{ matrix.settings.abi }}/index.farm
       - name: Upload Plugin strip
         uses: actions/upload-artifact@v3
         with:
