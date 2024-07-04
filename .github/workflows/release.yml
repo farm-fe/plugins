@@ -39,6 +39,7 @@ jobs:
             mv /tmp/artifacts/${{ github.sha }}-${abi}-image/* ./packages/image/npm/${abi}
             mv /tmp/artifacts/${{ github.sha }}-${abi}-url/* ./packages/url/npm/${abi}
 
+            test -f ./packages/dsv/npm/${abi}/index.farm
             test -f ./packages/react-components/npm/${abi}/index.farm
             test -f ./packages/virtual/npm/${abi}/index.farm
             test -f ./packages/yaml/npm/${abi}/index.farm
