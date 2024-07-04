@@ -1,5 +1,5 @@
 {
-  "name": "farmfe-plugin-image",
+  "name": "@farmfe/plugin-image",
   "version": "0.0.0",
   "main": "scripts/index.js",
   "types": "scripts/index.d.ts",
