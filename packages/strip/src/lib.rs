@@ -22,6 +22,7 @@ use farmfe_toolkit::{
 };
 
 #[derive(serde::Deserialize, Clone)]
+#[serde(rename_all = "camelCase")]
 pub struct Options {
   pub include: Option<Vec<ConfigRegex>>,
   pub exclude: Option<Vec<ConfigRegex>>,

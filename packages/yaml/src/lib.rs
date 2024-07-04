@@ -17,8 +17,9 @@ fn is_yaml_file(file_name: &String) -> bool {
 }
 
 #[derive(Debug, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct FarmPluginYamlOptions {
-  documentMode: Option<String>,
+  document_mode: Option<String>,
   include: Option<String>,
   exclude: Option<String>,
 }
@@ -36,7 +37,7 @@ impl FarmPluginYaml {
     let mut document_mode: String = String::from("single");
     let mut include: String = String::from("");
     let mut exclude: String = String::from("");
-    if let Some(mode) = yaml_options.documentMode {
+    if let Some(mode) = yaml_options.document_mode {
       document_mode = mode
     }
     if let Some(inc) = yaml_options.include {

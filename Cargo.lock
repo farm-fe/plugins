@@ -569,7 +569,7 @@ dependencies = [
 
 [[package]]
 name = "farmfe_plugin_image"
-version = "0.0.0"
+version = "0.0.1"
 dependencies = [
  "base64 0.22.1",
  "farmfe_core",
@@ -609,7 +609,7 @@ dependencies = [
 
 [[package]]
 name = "farmfe_plugin_url"
-version = "0.0.0"
+version = "0.0.1"
 dependencies = [
  "base64 0.22.1",
  "farmfe_core",
@@ -633,7 +633,7 @@ dependencies = [
 
 [[package]]
 name = "farmfe_plugin_yml"
-version = "0.0.0"
+version = "0.0.1"
 dependencies = [
  "farmfe_core",
  "farmfe_macro_plugin",

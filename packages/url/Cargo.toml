@@ -1,7 +1,9 @@
 [package]
 edition = "2021"
 name = "farmfe_plugin_url"
-version = "0.0.0"
+version = "0.0.1"
+authors = ["CCherry07 <c_chenjunguang@163.com>"]
+license = "MIT"
 
 [lib]
 crate-type = ["cdylib", "rlib"]
