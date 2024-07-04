@@ -123,3 +123,13 @@ jobs:
         with:
           name: ${{ github.sha }}-${{ matrix.settings.abi }}-strip
           path: ./packages/strip/npm/${{ matrix.settings.abi }}/index.farm
+      - name: Upload Plugin image
+        uses: actions/upload-artifact@v3
+        with:
+          name: ${{ github.sha }}-${{ matrix.settings.abi }}-image
+          path: ./packages/image/npm/${{ matrix.settings.abi }}/index.farm
+      - name: Upload Plugin url
+        uses: actions/upload-artifact@v3
+        with:
+          name: ${{ github.sha }}-${{ matrix.settings.abi }}-url
+          path: ./packages/url/npm/${{ matrix.settings.abi }}/index.farm
