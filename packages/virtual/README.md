@@ -2,7 +2,7 @@
 
 Inspired By [@rollup/plugin-virtual](https://www.npmjs.com/package/@rollup/plugin-virtual)
 
-A rust plugin for farm to easily use virtual module
+🍣 A Rollup plugin which loads virtual modules from memory
 
 ## install
 
