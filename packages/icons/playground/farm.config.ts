@@ -10,5 +10,8 @@ export default defineConfig({
   },
   plugins: [
     ["@farmfe/plugin-react", { runtime: "automatic" }],
+    ["@farmfe/plugin-icons", {
+      autoInstall: true,
+    }],
   ],
 });

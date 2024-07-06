@@ -17,6 +17,7 @@ pub fn default_auto_install() -> Option<bool> {
 }
 
 #[derive(Debug, serde::Deserialize, Default, Clone)]
+#[serde(rename_all = "camelCase")]
 pub struct Options {
   #[serde(default = "default_scale")]
   pub scale: Option<f32>,
