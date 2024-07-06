@@ -568,6 +568,19 @@ dependencies = [
 ]
 
 [[package]]
+name = "farmfe_plugin_icons"
+version = "0.0.0"
+dependencies = [
+ "farmfe_core",
+ "farmfe_macro_plugin",
+ "farmfe_toolkit",
+ "farmfe_toolkit_plugin_types",
+ "rand",
+ "serde",
+ "serde_json",
+]
+
+[[package]]
 name = "farmfe_plugin_image"
 version = "0.0.1"
 dependencies = [
