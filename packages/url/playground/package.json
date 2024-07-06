@@ -12,7 +12,7 @@
   "dependencies": {
     "@types/node": "^20.14.9",
     "clsx": "^1.2.1",
-    "farmfe-plugin-url": "workspace:*",
+    "@farmfe/plugin-url": "workspace:*",
     "react": "18",
     "react-dom": "18"
   },
