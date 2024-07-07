@@ -1,4 +1,5 @@
 use farmfe_core::regex::{self, Regex};
+use serde_json::Value;
 use std::{
   fs::File,
   io::BufReader,
@@ -87,32 +88,25 @@ pub struct GetIconPathDataParams {
   pub auto_install: bool,
 }
 
-pub fn get_icon_path_data(opt: GetIconPathDataParams) -> String {
-  let resolved = resolve_icons_path(&opt.path);
+pub fn get_icon_path_data(opt: GetIconPathDataParams) -> Value {
+  let ResolveResult { collection, icon } = resolve_icons_path(&opt.path);
   let all_icon_path = build_icon_path(&opt.project_dir, "@iconify/json/json");
-  let icons_path = build_icon_path(
-    &opt.project_dir,
-    &format!("@iconify-json/{}", resolved.collection),
-  );
+  let icons_path = build_icon_path(&opt.project_dir, &format!("@iconify-json/{}", collection));
   if !all_icon_path.exists() && !icons_path.exists() {
     if opt.auto_install {
-      install_icon_package(&opt.project_dir, &resolved.collection);
+      install_icon_package(&opt.project_dir, &collection);
     } else {
-      return String::new();
+      return Value::Null;
     }
   }
-  let icon_collection_path = all_icon_path.join(format!("{}.json", resolved.collection));
+  let icon_collection_path = all_icon_path.join(format!("{}.json", collection));
   if icon_collection_path.exists() {
     let json = read_json_from_file(icon_collection_path.to_str().unwrap());
-    if let Some(body) = json
-      .get("icons")
-      .and_then(|icons| icons.get(&resolved.icon))
-      .and_then(|icon| icon.get("body"))
-    {
-      return body.as_str().unwrap_or("").to_string();
+    if let Some(body) = json.get("icons").and_then(|icons| icons.get(icon)) {
+      return body.clone();
     }
   }
-  String::new()
+  return Value::Null;
 }
 
 fn read_json_from_file(file_path: &str) -> serde_json::Value {
@@ -147,16 +141,17 @@ fn install_icon_package(project_dir: &str, collection: &str) {
 }
 
 pub fn get_package_manager(project_dir: &str) -> String {
-  find_package_manager_in_current_or_parent(Path::new(project_dir)).unwrap_or_else(|| "pnpm".to_string())
+  find_package_manager_in_current_or_parent(Path::new(project_dir))
+    .unwrap_or_else(|| "pnpm".to_string())
 }
 
 fn find_package_manager_in_current_or_parent(dir: &Path) -> Option<String> {
   if let Some(manager) = check_lock_files(dir) {
-      return Some(manager);
+    return Some(manager);
   }
 
   if let Some(parent) = dir.parent() {
-      return check_lock_files(parent);
+    return check_lock_files(parent);
   }
 
   None
@@ -168,12 +163,12 @@ fn check_lock_files(dir: &Path) -> Option<String> {
   let yarn_lock = dir.join("yarn.lock");
 
   if npm_lock.exists() {
-      Some("npm".to_string())
+    Some("npm".to_string())
   } else if pnpm_lock.exists() {
-      Some("pnpm".to_string())
+    Some("pnpm".to_string())
   } else if yarn_lock.exists() {
-      Some("yarn".to_string())
+    Some("yarn".to_string())
   } else {
-      None
+    None
   }
 }

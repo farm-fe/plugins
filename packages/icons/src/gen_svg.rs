@@ -2,12 +2,15 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct GenSvgElement {
+  pub path: Option<String>,
   pub fill: Option<String>,
   pub stroke: Option<String>,
-  pub stroke_width: Option<f32>,
-  pub width: Option<u32>,
-  pub height: Option<u32>,
-  pub path: Option<String>,
+  pub stroke_width: Option<String>,
+  pub width: Option<String>,
+  pub height: Option<String>,
+  pub class: Option<String>,
+  pub style: Option<String>,
+  pub scale: Option<f32>,
 }
 
 impl GenSvgElement {
@@ -22,9 +25,13 @@ impl GenSvgElement {
       self.stroke.as_ref().map(|v| format!(r#" stroke="{}""#, v)),
       self
         .stroke_width
+        .as_ref()
         .map(|v| format!(r#" stroke-width="{}""#, v)),
-      self.width.map(|v| format!(r#" width="{}""#, v)),
-      self.height.map(|v| format!(r#" height="{}""#, v)),
+      self.width.clone().map(|v| format!(r#" width="{}""#, v)),
+      self.height.clone().map(|v| format!(r#" height="{}""#, v)),
+      self.class.as_ref().map(|v| format!(r#" class="{}""#, v)),
+      self.style.as_ref().map(|v| format!(r#" style="{}""#, v)),
+      self.scale.map(|v| format!(r#" transform="scale({})""#, v)),
     ];
 
     for attr in attributes.iter().flatten() {

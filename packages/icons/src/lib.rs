@@ -1,21 +1,25 @@
 #![deny(clippy::all)]
 mod common;
+mod compiler;
 mod gen_svg;
 mod options;
-mod svg_id;
+// mod svg_id;
+
+use std::collections::HashMap;
 
 use common::{get_icon_path_data, get_icon_path_meta, is_icon_path, GetIconPathDataParams};
+use compiler::{get_compiler, get_module_type_by_path, CompilerParams, GetCompilerParams};
 use farmfe_core::{
   config::Config,
   module::ModuleType,
   plugin::{Plugin, PluginLoadHookResult, PluginResolveHookResult},
   serde_json,
 };
+
 use farmfe_macro_plugin::farm_plugin;
 use farmfe_utils::parse_query;
 use gen_svg::GenSvgElement;
 use options::Options;
-use svgr_rs::transform as svgr_transform;
 
 const PUBLIC_ICON_PREFIX: &str = "virtual:__FARM_ICON_ASSET__:";
 
@@ -93,28 +97,74 @@ impl Plugin for FarmfePluginIcons {
     _hook_context: &farmfe_core::plugin::PluginHookContext,
   ) -> farmfe_core::error::Result<Option<farmfe_core::plugin::PluginLoadHookResult>> {
     if let Some(source) = param.resolved_path.strip_prefix(PUBLIC_ICON_PREFIX) {
-      let raw = get_icon_path_data(GetIconPathDataParams {
+      let root_path = self
+        .options
+        .collections_node_resolve_path
+        .clone()
+        .unwrap_or_default();
+      let data = get_icon_path_data(GetIconPathDataParams {
         path: source.to_string(),
-        project_dir: self
-          .options
-          .collections_node_resolve_path
-          .clone()
-          .unwrap_or_default(),
+        project_dir: root_path.clone(),
         auto_install: self.options.auto_install.unwrap_or_default(),
       });
+
+      if data.is_null() {
+        return Ok(Some(PluginLoadHookResult {
+          content: String::new(),
+          module_type: ModuleType::Js,
+          source_map: None,
+        }));
+      }
+
+      let svg_path_str: Option<String> =
+        data.get("body").and_then(|v| v.as_str().map(String::from));
+      let svg_data_height: Option<String> = data
+        .get("height")
+        .and_then(|v| v.as_number().map(|v| v.to_string()));
+      let svg_data_width: Option<String> = data
+        .get("width")
+        .and_then(|v| v.as_number().map(|v| v.to_string()));
+      let query_map = param.query.iter().cloned().collect::<HashMap<_, _>>();
       let svg_el_builder = gen_svg::GenSvgElement::new(GenSvgElement {
-        fill: None,
-        stroke: None,
-        stroke_width: None,
-        width: None,
-        height: None,
-        path: Some(raw),
+        fill: query_map.get("fill").and_then(|v| v.parse().ok()),
+        stroke: query_map.get("stroke").and_then(|v| v.parse().ok()),
+        stroke_width: query_map.get("stroke-width").and_then(|v| v.parse().ok()),
+        width: query_map
+          .get("width")
+          .and_then(|v| v.parse().ok())
+          .or(svg_data_width),
+        height: query_map
+          .get("height")
+          .and_then(|v| v.parse().ok())
+          .or(svg_data_height),
+        class: self.options.default_class.clone(),
+        style: self.options.default_style.clone(),
+        scale: self.options.scale,
+        path: svg_path_str,
       });
-      let el = svg_el_builder.apply_to_svg();
-      let code = svgr_transform(el, Default::default(), Default::default()).unwrap();
+      let svg_el = svg_el_builder.apply_to_svg();
+      if query_map.contains_key("raw") {
+        return Ok(Some(PluginLoadHookResult {
+          content: svg_el,
+          module_type: ModuleType::Asset,
+          source_map: None,
+        }));
+      }
+
+      let code = get_compiler(GetCompilerParams {
+        jsx: self.options.jsx.clone().unwrap_or_default(),
+        path: source.to_string(),
+      })(CompilerParams {
+        svg: svg_el,
+        root_path,
+      });
+      let module_type = get_module_type_by_path(GetCompilerParams {
+        jsx: self.options.jsx.clone().unwrap_or_default(),
+        path: source.to_string(),
+      });
       Ok(Some(PluginLoadHookResult {
         content: code,
-        module_type: ModuleType::Jsx,
+        module_type,
         source_map: None,
       }))
     } else {

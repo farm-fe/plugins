@@ -733,6 +733,7 @@ dependencies = [
  "farmfe_toolkit",
  "farmfe_toolkit_plugin_types",
  "farmfe_utils",
+ "once_cell",
  "rand",
  "serde",
  "serde_json",
