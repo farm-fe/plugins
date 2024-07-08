@@ -25,7 +25,7 @@ pub fn default_compiler() -> Option<String> {
 pub struct Options {
   #[serde(default = "default_scale")]
   pub scale: Option<f32>,
-  pub default_style: Option<String>,
+  pub default_style: Option<Value>,
   pub default_class: Option<String>,
   #[serde(default = "default_compiler")]
   pub compiler: Option<String>,

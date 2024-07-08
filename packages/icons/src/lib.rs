@@ -128,6 +128,7 @@ impl Plugin for FarmfePluginIcons {
         .get("width")
         .and_then(|v| v.as_number().map(|v| v.to_string()));
       let query_map = param.query.iter().cloned().collect::<HashMap<_, _>>();
+      
       let svg_el_builder = gen_svg::GenSvgElement::new(GenSvgElement {
         fill: query_map.get("fill").and_then(|v| v.parse().ok()),
         stroke: query_map.get("stroke").and_then(|v| v.parse().ok()),

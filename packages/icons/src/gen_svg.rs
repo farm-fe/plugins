@@ -1,4 +1,5 @@
 use serde::{Deserialize, Serialize};
+use serde_json::Value;
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct GenSvgElement {
@@ -9,7 +10,7 @@ pub struct GenSvgElement {
   pub width: Option<String>,
   pub height: Option<String>,
   pub class: Option<String>,
-  pub style: Option<String>,
+  pub style: Option<Value>,
   pub scale: Option<f32>,
 }
 
@@ -30,7 +31,24 @@ impl GenSvgElement {
       self.width.clone().map(|v| format!(r#" width="{}""#, v)),
       self.height.clone().map(|v| format!(r#" height="{}""#, v)),
       self.class.as_ref().map(|v| format!(r#" class="{}""#, v)),
-      self.style.as_ref().map(|v| format!(r#" style="{}""#, v)),
+      self.style.as_ref().map(|v| {
+        let style_str = if let Some(obj) = v.as_object() {
+          let parts: Vec<String> = obj
+            .iter()
+            .map(|(key, value)| {
+              format!(
+                "{}:{};",
+                key,
+                value.as_str().unwrap_or("").replace("\"", "")
+              )
+            })
+            .collect();
+          parts.join("")
+        } else {
+          String::new()
+        };
+        format!(r#" style="{}""#, style_str)
+      }),
       self.scale.map(|v| format!(r#" transform="scale({})""#, v)),
     ];
 
