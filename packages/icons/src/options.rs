@@ -30,7 +30,7 @@ pub struct Options {
   #[serde(default = "default_compiler")]
   pub compiler: Option<String>,
   pub jsx: Option<String>,
-  pub custom_collections: Option<Value>,
+  // pub custom_collections: Option<Value>,
   #[serde(default = "default_auto_install")]
   pub auto_install: Option<bool>,
   pub collections_node_resolve_path: Option<String>,
