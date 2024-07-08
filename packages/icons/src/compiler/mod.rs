@@ -7,19 +7,19 @@ pub mod svelte;
 pub mod vue;
 
 pub struct GetCompilerParams {
-  pub path: String,
   pub jsx: String,
+  pub compiler: String,
 }
 
 pub struct CompilerParams {
   pub svg: String,
+  pub svg_name: String,
   pub root_path: String,
 }
 
 pub fn get_compiler(param: GetCompilerParams) -> impl Fn(CompilerParams) -> String {
-  let GetCompilerParams { path, jsx } = param;
-  let ext = path.split('.').last().unwrap();
-  match ext {
+  let GetCompilerParams { compiler, jsx } = param;
+  match compiler.as_str() {
     "jsx" => {
       if jsx == "react" {
         react::react_complier
@@ -29,25 +29,18 @@ pub fn get_compiler(param: GetCompilerParams) -> impl Fn(CompilerParams) -> Stri
     }
     "svelte" => svelte::svelte_compiler,
     "vue" => vue::vue_compiler,
-    "tsx" => solid::solid_compiler,
-    _ => panic!("Unsupported extension: {}", ext),
+    "solid" => solid::solid_compiler,
+    _ => panic!("Unsupported extension: {}", compiler),
   }
 }
 
 pub fn get_module_type_by_path(param: GetCompilerParams) -> ModuleType {
-  let GetCompilerParams { path, jsx } = param;
-  let ext = path.split('.').last().unwrap();
-  match ext {
-    "jsx" => {
-      if jsx == "react" {
-        ModuleType::Jsx
-      } else {
-        ModuleType::Jsx
-      }
-    }
+  let GetCompilerParams { compiler, .. } = param;
+  match compiler.as_str() {
+    "jsx" => ModuleType::Jsx,
     "svelte" => ModuleType::Js,
     "vue" => ModuleType::Js,
-    "tsx" => ModuleType::Js,
-    _ => panic!("Unsupported extension: {}", ext),
+    "solid" => ModuleType::Js,
+    _ => panic!("Unsupported extension: {}", compiler),
   }
 }

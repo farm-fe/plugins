@@ -7,7 +7,7 @@ use std::sync::Mutex;
 static SVELTE_RUNES: Lazy<Mutex<Option<bool>>> = Lazy::new(|| Mutex::new(None));
 
 pub fn svelte_compiler(param: CompilerParams) -> String {
-  let CompilerParams { svg, root_path } = param;
+  let CompilerParams { svg, root_path, .. } = param;
   let mut svelte_runes = SVELTE_RUNES.lock().unwrap();
   if svelte_runes.is_none() {
     *svelte_runes = match get_svelte_version(&root_path) {

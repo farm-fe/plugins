@@ -4,10 +4,11 @@ mod compiler;
 mod gen_svg;
 mod options;
 // mod svg_id;
-
 use std::collections::HashMap;
 
-use common::{get_icon_path_data, get_icon_path_meta, is_icon_path, GetIconPathDataParams};
+use common::{
+  get_icon_path_data, get_icon_path_meta, is_icon_path, resolve_icons_path, GetIconPathDataParams,
+};
 use compiler::{get_compiler, get_module_type_by_path, CompilerParams, GetCompilerParams};
 use farmfe_core::{
   config::Config,
@@ -78,6 +79,7 @@ impl Plugin for FarmfePluginIcons {
         "jsx" => format!("{}.jsx", res),
         "svelte" => format!("{}.svelte", res),
         "solid" => format!("{}.tsx", res),
+        "vue" => format!("{}.js", res),
         _ => res.clone(),
       };
       return Ok(Some(PluginResolveHookResult {
@@ -116,6 +118,7 @@ impl Plugin for FarmfePluginIcons {
         }));
       }
 
+      let meta = resolve_icons_path(source);
       let svg_path_str: Option<String> =
         data.get("body").and_then(|v| v.as_str().map(String::from));
       let svg_data_height: Option<String> = data
@@ -150,17 +153,17 @@ impl Plugin for FarmfePluginIcons {
           source_map: None,
         }));
       }
-
       let code = get_compiler(GetCompilerParams {
         jsx: self.options.jsx.clone().unwrap_or_default(),
-        path: source.to_string(),
+        compiler: self.options.compiler.clone().unwrap_or_default(),
       })(CompilerParams {
         svg: svg_el,
         root_path,
+        svg_name: meta.icon,
       });
       let module_type = get_module_type_by_path(GetCompilerParams {
         jsx: self.options.jsx.clone().unwrap_or_default(),
-        path: source.to_string(),
+        compiler: self.options.compiler.clone().unwrap_or_default(),
       });
       Ok(Some(PluginLoadHookResult {
         content: code,

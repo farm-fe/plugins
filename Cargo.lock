@@ -362,10 +362,48 @@ dependencies = [
 ]
 
 [[package]]
+name = "byteorder"
+version = "1.5.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "1fd0f2584146f6f2ef48085050886acf353beff7305ebd1ae69500e27c67f64b"
+
+[[package]]
 name = "bytes"
 version = "1.6.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "514de17de45fdb8dc022b1a7975556c53c86f9f0aa5f534b98977b171857c2c9"
+
+[[package]]
+name = "camino"
+version = "1.1.7"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "e0ec6b951b160caa93cc0c7b209e5a3bff7aae9062213451ac99493cd844c239"
+dependencies = [
+ "serde",
+]
+
+[[package]]
+name = "cargo-platform"
+version = "0.1.8"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "24b1f0365a6c6bb4020cd05806fd0d33c44d38046b8bd7f0e40814b9763cabfc"
+dependencies = [
+ "serde",
+]
+
+[[package]]
+name = "cargo_metadata"
+version = "0.18.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "2d886547e41f740c616ae73108f6eb70afe6d940c7bc697cb30f13daec073037"
+dependencies = [
+ "camino",
+ "cargo-platform",
+ "semver 1.0.23",
+ "serde",
+ "serde_json",
+ "thiserror",
+]
 
 [[package]]
 name = "cc"
@@ -733,6 +771,7 @@ dependencies = [
  "farmfe_toolkit",
  "farmfe_toolkit_plugin_types",
  "farmfe_utils",
+ "fervid",
  "once_cell",
  "rand",
  "serde",
@@ -886,10 +925,107 @@ dependencies = [
 ]
 
 [[package]]
+name = "fervid"
+version = "0.2.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "9acfc7565ae927dc4fb427431b0de10ec3c857eb1dd821d4f6bcab5b3662bfc0"
+dependencies = [
+ "fervid_codegen",
+ "fervid_core",
+ "fervid_parser",
+ "fervid_transform",
+ "fxhash",
+ "lazy_static",
+ "nom",
+ "phf 0.11.2",
+ "regex",
+ "swc_core 0.90.37",
+ "swc_ecma_codegen 0.148.18",
+ "swc_ecma_parser 0.143.16",
+]
+
+[[package]]
+name = "fervid_codegen"
+version = "0.2.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "cb36679478a92224735ea0da6146c08c03b8a1610ec3d8dd515b75a2f27764f3"
+dependencies = [
+ "fervid_core",
+ "fervid_transform",
+ "flagset",
+ "fxhash",
+ "lazy_static",
+ "regex",
+ "smallvec",
+ "swc_core 0.90.37",
+ "swc_ecma_codegen 0.148.18",
+]
+
+[[package]]
+name = "fervid_core"
+version = "0.2.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "adcc3c52cf276ce1c0ed3dc02d9ab1680c6f182e3620832739132492b93d3240"
+dependencies = [
+ "flagset",
+ "fxhash",
+ "phf 0.11.2",
+ "smallvec",
+ "swc_core 0.90.37",
+]
+
+[[package]]
+name = "fervid_css"
+version = "0.2.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "424ba3cb004f370025e327defeb1c0849a4c171ca44b87319d8b1a7f14d6263a"
+dependencies = [
+ "fervid_core",
+ "swc_core 0.90.37",
+ "swc_css_ast",
+ "swc_css_codegen",
+ "swc_css_parser",
+]
+
+[[package]]
+name = "fervid_parser"
+version = "0.2.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "5858b4aadfbb4eda3858189e40b61b716cac7e3ea9c4565ab9ca6e6b1130ab98"
+dependencies = [
+ "fervid_core",
+ "swc_core 0.90.37",
+ "swc_ecma_parser 0.143.16",
+ "swc_html_ast",
+ "swc_html_parser",
+]
+
+[[package]]
+name = "fervid_transform"
+version = "0.2.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "89574b1ceb7fca99fa946612eb6e3eb30b41bf8640714c8a082d51b67510a0a6"
+dependencies = [
+ "fervid_core",
+ "fervid_css",
+ "fxhash",
+ "lazy_static",
+ "phf 0.11.2",
+ "smallvec",
+ "swc_core 0.90.37",
+]
+
+[[package]]
 name = "fixedbitset"
 version = "0.4.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "0ce7134b9999ecaf8bcd65542e436736ef32ddca1b3e06094cb6ec5755203b80"
+
+[[package]]
+name = "flagset"
+version = "0.4.5"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "cdeb3aa5e95cf9aabc17f060cfa0ced7b83f042390760ca53bf09df9968acaa1"
 
 [[package]]
 name = "form_urlencoded"
@@ -916,6 +1052,15 @@ name = "funty"
 version = "2.0.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "e6d5a32815ae3f33302d95fdcb2ce17862f8c65363dcfd29360480ba1001fc9c"
+
+[[package]]
+name = "fxhash"
+version = "0.2.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "c31b6d751ae2c7f11320402d34e41349dd1016f8d5d45e48c4312bc8625af50c"
+dependencies = [
+ "byteorder",
+]
 
 [[package]]
 name = "generic-array"
@@ -2356,7 +2501,7 @@ dependencies = [
  "linked_hash_set",
  "regex",
  "serde",
- "swc_core",
+ "swc_core 0.74.6",
  "swc_xml",
 ]
 
@@ -2532,7 +2677,21 @@ dependencies = [
  "swc_ecma_parser 0.132.6",
  "swc_ecma_transforms_base 0.125.1",
  "swc_ecma_visit 0.88.5",
- "vergen",
+ "vergen 7.5.1",
+]
+
+[[package]]
+name = "swc_core"
+version = "0.90.37"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "ecbbbf25e5d035165bde87f2388f9fbe6d5ce38ddd2c6cb9f24084823a9c0044"
+dependencies = [
+ "swc_atoms 0.6.7",
+ "swc_common 0.33.26",
+ "swc_ecma_ast 0.112.8",
+ "swc_ecma_transforms_base 0.137.21",
+ "swc_ecma_visit 0.98.7",
+ "vergen 8.3.1",
 ]
 
 [[package]]
@@ -4024,6 +4183,18 @@ dependencies = [
  "rustversion",
  "thiserror",
  "time",
+]
+
+[[package]]
+name = "vergen"
+version = "8.3.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "e27d6bdd219887a9eadd19e1c34f32e47fa332301184935c6d9bca26f3cca525"
+dependencies = [
+ "anyhow",
+ "cargo_metadata",
+ "regex",
+ "rustversion",
 ]
 
 [[package]]

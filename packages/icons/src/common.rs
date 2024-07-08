@@ -99,13 +99,20 @@ pub fn get_icon_path_data(opt: GetIconPathDataParams) -> Value {
       return Value::Null;
     }
   }
+  let icon_collection_path_by_sign = icons_path.join(format!("icons.json"));
   let icon_collection_path = all_icon_path.join(format!("{}.json", collection));
-  if icon_collection_path.exists() {
+  if icon_collection_path_by_sign.exists() {
+    let json = read_json_from_file(icon_collection_path_by_sign.to_str().unwrap());
+    if let Some(body) = json.get("icons").and_then(|icons| icons.get(icon)) {
+      return body.clone();
+    }
+  } else if icon_collection_path.exists() {
     let json = read_json_from_file(icon_collection_path.to_str().unwrap());
     if let Some(body) = json.get("icons").and_then(|icons| icons.get(icon)) {
       return body.clone();
     }
   }
+
   return Value::Null;
 }
 

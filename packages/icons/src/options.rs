@@ -16,6 +16,10 @@ pub fn default_auto_install() -> Option<bool> {
   Some(false)
 }
 
+pub fn default_compiler() -> Option<String> {
+  Some(String::from("jsx"))
+}
+
 #[derive(Debug, serde::Deserialize, Default, Clone)]
 #[serde(rename_all = "camelCase")]
 pub struct Options {
@@ -23,6 +27,7 @@ pub struct Options {
   pub scale: Option<f32>,
   pub default_style: Option<String>,
   pub default_class: Option<String>,
+  #[serde(default = "default_compiler")]
   pub compiler: Option<String>,
   pub jsx: Option<String>,
   pub custom_collections: Option<Value>,
@@ -43,6 +48,9 @@ pub fn guess_jsx(root_path: &str) -> String {
       },
     )
     .unwrap();
-  let preact = package_json.raw_map().get("preact").and_then(|v| v.as_str());
+  let preact = package_json
+    .raw_map()
+    .get("preact")
+    .and_then(|v| v.as_str());
   preact.map_or("react".to_string(), |_| "preact".to_string())
 }
