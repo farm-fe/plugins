@@ -10,15 +10,16 @@
     "clean": "farm clean"
   },
   "dependencies": {
-    "@types/node": "^20.14.9",
+    "@farmfe/plugin-icons": "workspace:*",
+    "@iconify-json/carbon": "^1.1.36",
+    "@iconify/json": "^2.2.225",
     "clsx": "^1.2.1",
-    "@farmfe/plugin-url": "workspace:*",
     "react": "18",
     "react-dom": "18"
   },
   "devDependencies": {
     "@farmfe/cli": "^1.0.0",
-    "@farmfe/core": "^1.0.24",
+    "@farmfe/core": "^1.0.22",
     "@farmfe/plugin-react": "^1.0.1",
     "@types/react": "18",
     "@types/react-dom": "18",

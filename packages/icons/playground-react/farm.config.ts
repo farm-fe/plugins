@@ -1,5 +1,5 @@
 import { defineConfig } from "@farmfe/core";
-import { resolve } from "path"
+
 export default defineConfig({
   compilation: {
     input: {
@@ -10,8 +10,14 @@ export default defineConfig({
   },
   plugins: [
     ["@farmfe/plugin-react", { runtime: "automatic" }],
-    [
-      "@farmfe/plugin-url", { limit: 10 * 1024, public_path: "output/", emit_files: true, dest_dir: resolve(__dirname, "./dist/assets") }
-    ]
+    ["@farmfe/plugin-icons", {
+      autoInstall: true,
+      compiler: "jsx",
+      defaultStyle: {
+        width: "2em",
+        height: "2em",
+      },
+      defaultClass:"icon"
+    }],
   ],
 });
