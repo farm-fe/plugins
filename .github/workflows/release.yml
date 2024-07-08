@@ -38,6 +38,7 @@ jobs:
             mv /tmp/artifacts/${{ github.sha }}-${abi}-strip/* ./packages/strip/npm/${abi}
             mv /tmp/artifacts/${{ github.sha }}-${abi}-image/* ./packages/image/npm/${abi}
             mv /tmp/artifacts/${{ github.sha }}-${abi}-url/* ./packages/url/npm/${abi}
+            mv /tmp/artifacts/${{ github.sha }}-${abi}-icons/* ./packages/icons/npm/${abi}
 
             test -f ./packages/dsv/npm/${abi}/index.farm
             test -f ./packages/react-components/npm/${abi}/index.farm
@@ -46,6 +47,7 @@ jobs:
             test -f ./packages/strip/npm/${abi}/index.farm
             test -f ./packages/image/npm/${abi}/index.farm
             test -f ./packages/url/npm/${abi}/index.farm
+            test -f ./packages/icons/npm/${abi}/index.farm
           done
 
       - name: Install Dependencies

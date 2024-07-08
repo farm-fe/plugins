@@ -133,3 +133,8 @@ jobs:
         with:
           name: ${{ github.sha }}-${{ matrix.settings.abi }}-url
           path: ./packages/url/npm/${{ matrix.settings.abi }}/index.farm
+      - name: Upload Plugin icons
+        uses: actions/upload-artifact@v3
+        with:
+          name: ${{ github.sha }}-${{ matrix.settings.abi }}-icons
+          path: ./packages/icons/npm/${{ matrix.settings.abi }}/index.farm

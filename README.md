@@ -13,6 +13,7 @@
 | [strip](packages/strip)                       | Remove `debugger` statements and functions like `assert.equal` from your code. |
 | [url](packages/url)                           | Imports files as data-URIs or ES Modules.                                      |
 | [virtual](packages/virtual)                   | Load virtual modules from memory                                               |
+| [icons](packages/icons)                   | Load Access thousands of icons as components on-demand universally. (Inspired by [unplugin-icons](https://github.com/unplugin/unplugin-icons))                                               |
 |                                               |                                                                                |
 
 ## Credits
