@@ -1,4 +1,6 @@
 use farmfe_core::regex::{self, Regex};
+use farmfe_toolkit::fs::read_file_utf8;
+use reqwest::Client;
 use serde_json::Value;
 use std::{
   fs::File,
@@ -6,6 +8,8 @@ use std::{
   path::{Path, PathBuf},
   process::Command,
 };
+use tokio::runtime::Runtime;
+use walkdir::WalkDir;
 
 pub const URL_PREFIXES: [&str; 4] = ["/~icons/", "~icons/", "virtual:icons/", "virtual/icons/"];
 
@@ -82,16 +86,81 @@ pub fn get_icon_path_meta(path: &str) -> PathMate {
 }
 
 #[derive(Debug)]
+pub struct GetIconCustomCollectionPathDataParams {
+  pub custom_collection_path: String,
+  pub icon: String,
+  pub project_dir: String,
+}
+
 pub struct GetIconPathDataParams {
   pub path: String,
   pub project_dir: String,
   pub auto_install: bool,
 }
 
+pub fn get_icon_path_data_by_custom_collections(
+  opt: GetIconCustomCollectionPathDataParams,
+) -> String {
+  let GetIconCustomCollectionPathDataParams {
+    custom_collection_path,
+    icon,
+    project_dir,
+  } = opt;
+  if is_valid_icon_path(&custom_collection_path) {
+    let mut svg_raw = String::new();
+    let custom_collection_path = custom_collection_path.replace("[iconname]", &icon);
+    let rt = Runtime::new().unwrap();
+    rt.block_on(async {
+      if let Ok(res) = fetch_icon_from_url(&custom_collection_path).await {
+        svg_raw = res;
+      }
+    });
+    return svg_raw;
+  }
+  let icons_collection_path = Path::new(&project_dir).join(custom_collection_path);
+  let walker = WalkDir::new(icons_collection_path).into_iter();
+  let filtered_entries = walker.filter_map(Result::ok).filter(|e| {
+    e.file_type().is_file()
+      && e.path().extension().is_some()
+      && e.path().extension().unwrap() == "svg"
+  });
+
+  for entry in filtered_entries {
+    let path = entry.path();
+    let svg_raw = read_file_utf8(path.to_str().unwrap()).unwrap();
+    return svg_raw;
+  }
+
+  String::new()
+}
+
+fn is_valid_icon_path(icon_path: &str) -> bool {
+  icon_path.contains("[iconname]") && icon_path.contains("http")
+}
+
+async fn fetch_icon_from_url(url: &str) -> Result<String, reqwest::Error> {
+  let client = Client::new();
+  let res = client.get(url).send().await;
+  match res {
+    Ok(response) => {
+      if response.status().is_success() {
+        let text = response.text().await?;
+        Ok(text)
+      } else {
+        println!("{} icon fetch err: {:?}", url, response.status());
+        Ok(String::new())
+      }
+    }
+    Err(e) => {
+      panic!("icon fetch err: {:?}", e);
+    }
+  }
+}
 pub fn get_icon_path_data(opt: GetIconPathDataParams) -> Value {
   let ResolveResult { collection, icon } = resolve_icons_path(&opt.path);
   let all_icon_path = build_icon_path(&opt.project_dir, "@iconify/json/json");
   let icons_path = build_icon_path(&opt.project_dir, &format!("@iconify-json/{}", collection));
+
   if !all_icon_path.exists() && !icons_path.exists() {
     if opt.auto_install {
       install_icon_package(&opt.project_dir, &collection);
