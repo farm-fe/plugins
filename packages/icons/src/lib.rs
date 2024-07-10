@@ -3,11 +3,13 @@ mod common;
 mod compiler;
 mod gen_svg;
 mod options;
+mod update_svg;
 // mod svg_id;
 use std::collections::HashMap;
 
 use common::{
-  get_icon_path_data, get_icon_path_meta, is_icon_path, resolve_icons_path, GetIconPathDataParams,
+  get_icon_path_data, get_icon_path_data_by_custom_collections, get_icon_path_meta, is_icon_path,
+  resolve_icons_path, GetIconCustomCollectionPathDataParams, GetIconPathDataParams,
 };
 use compiler::{get_compiler, get_module_type_by_path, CompilerParams, GetCompilerParams};
 use farmfe_core::{
@@ -16,11 +18,12 @@ use farmfe_core::{
   plugin::{Plugin, PluginLoadHookResult, PluginResolveHookResult},
   serde_json,
 };
-
 use farmfe_macro_plugin::farm_plugin;
 use farmfe_utils::parse_query;
 use gen_svg::GenSvgElement;
 use options::Options;
+use serde_json::Value;
+use update_svg::SvgModifier;
 
 const PUBLIC_ICON_PREFIX: &str = "virtual:__FARM_ICON_ASSET__:";
 
@@ -104,52 +107,85 @@ impl Plugin for FarmfePluginIcons {
         .collections_node_resolve_path
         .clone()
         .unwrap_or_default();
-      let data = get_icon_path_data(GetIconPathDataParams {
-        path: source.to_string(),
-        project_dir: root_path.clone(),
-        auto_install: self.options.auto_install.unwrap_or_default(),
-      });
 
-      if data.is_null() {
-        return Ok(Some(PluginLoadHookResult {
-          content: String::new(),
-          module_type: ModuleType::Js,
-          source_map: None,
-        }));
-      }
+      let mut svg_raw = String::new();
 
       let meta = resolve_icons_path(source);
-      let svg_path_str: Option<String> =
-        data.get("body").and_then(|v| v.as_str().map(String::from));
-      let svg_data_height: Option<String> = data
-        .get("height")
-        .and_then(|v| v.as_number().map(|v| v.to_string()));
-      let svg_data_width: Option<String> = data
-        .get("width")
-        .and_then(|v| v.as_number().map(|v| v.to_string()));
       let query_map = param.query.iter().cloned().collect::<HashMap<_, _>>();
-      
-      let svg_el_builder = gen_svg::GenSvgElement::new(GenSvgElement {
-        fill: query_map.get("fill").and_then(|v| v.parse().ok()),
-        stroke: query_map.get("stroke").and_then(|v| v.parse().ok()),
-        stroke_width: query_map.get("stroke-width").and_then(|v| v.parse().ok()),
-        width: query_map
-          .get("width")
-          .and_then(|v| v.parse().ok())
-          .or(svg_data_width),
-        height: query_map
+      let custom_collections = self
+        .options
+        .custom_collections
+        .clone()
+        .unwrap_or(Value::Null);
+      let custom_collection_path = custom_collections
+        .get(&meta.collection)
+        .and_then(|v| v.as_str());
+
+      if custom_collection_path.is_some() {
+        svg_raw = get_icon_path_data_by_custom_collections(GetIconCustomCollectionPathDataParams {
+          custom_collection_path: custom_collection_path.unwrap().to_string(),
+          icon: meta.icon.clone(),
+          project_dir: root_path.clone(),
+        });
+
+        if !svg_raw.is_empty() {
+          svg_raw = SvgModifier::new(SvgModifier {
+            fill: query_map.get("fill").and_then(|v| v.parse().ok()),
+            stroke: query_map.get("stroke").and_then(|v| v.parse().ok()),
+            stroke_width: query_map.get("stroke-width").and_then(|v| v.parse().ok()),
+            width: query_map.get("width").and_then(|v| v.parse().ok()),
+            height: query_map.get("height").and_then(|v| v.parse().ok()),
+            class: self.options.default_class.clone(),
+            style: self.options.default_style.clone(),
+          })
+          .apply_to_svg(&svg_raw);
+        }
+      } else {
+        let data = get_icon_path_data(GetIconPathDataParams {
+          path: source.to_string(),
+          project_dir: root_path.clone(),
+          auto_install: self.options.auto_install.unwrap_or_default(),
+        });
+
+        if data.is_null() {
+          return Ok(Some(PluginLoadHookResult {
+            content: String::new(),
+            module_type: ModuleType::Js,
+            source_map: None,
+          }));
+        }
+
+        let svg_path_str: Option<String> =
+          data.get("body").and_then(|v| v.as_str().map(String::from));
+        let svg_data_height: Option<String> = data
           .get("height")
-          .and_then(|v| v.parse().ok())
-          .or(svg_data_height),
-        class: self.options.default_class.clone(),
-        style: self.options.default_style.clone(),
-        scale: self.options.scale,
-        path: svg_path_str,
-      });
-      let svg_el = svg_el_builder.apply_to_svg();
+          .and_then(|v| v.as_number().map(|v| v.to_string()));
+        let svg_data_width: Option<String> = data
+          .get("width")
+          .and_then(|v| v.as_number().map(|v| v.to_string()));
+
+        let svg_el_builder = gen_svg::GenSvgElement::new(GenSvgElement {
+          fill: query_map.get("fill").and_then(|v| v.parse().ok()),
+          stroke: query_map.get("stroke").and_then(|v| v.parse().ok()),
+          stroke_width: query_map.get("stroke-width").and_then(|v| v.parse().ok()),
+          width: query_map
+            .get("width")
+            .and_then(|v| v.parse().ok())
+            .or(svg_data_width),
+          height: query_map
+            .get("height")
+            .and_then(|v| v.parse().ok())
+            .or(svg_data_height),
+          class: self.options.default_class.clone(),
+          style: self.options.default_style.clone(),
+          scale: self.options.scale,
+          path: svg_path_str,
+        });
+        svg_raw = svg_el_builder.apply_to_svg();
+      }
       if query_map.contains_key("raw") {
         return Ok(Some(PluginLoadHookResult {
-          content: svg_el,
+          content: svg_raw,
           module_type: ModuleType::Asset,
           source_map: None,
         }));
@@ -158,7 +194,7 @@ impl Plugin for FarmfePluginIcons {
         jsx: self.options.jsx.clone().unwrap_or_default(),
         compiler: self.options.compiler.clone().unwrap_or_default(),
       })(CompilerParams {
-        svg: svg_el,
+        svg: svg_raw,
         root_path,
         svg_name: meta.icon,
       });

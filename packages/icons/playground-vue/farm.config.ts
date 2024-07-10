@@ -14,9 +14,13 @@ export default defineConfig({
       // 支持本地 svg 
       autoInstall: true,
       compiler: 'vue',
-      defaultStyle:{
-        width:"2em",
-        height:"2em",
+      // defaultStyle: {
+      //   width: "2em",
+      //   height: "2em",
+      // },
+      customCollections: {
+        "local": './src/assets',
+        remote:"https://cdn.simpleicons.org/[iconname]/"
       }
     }],
   ]
