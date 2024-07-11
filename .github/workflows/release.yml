@@ -35,10 +35,8 @@ jobs:
           do
              for package in dsv react-components virtual yaml strip image url icons
               do
-                if [ -z "$(ls -A /tmp/artifacts/${{github.sha}}-${abi}-${package})" ]; then
-                  echo "Folder is empty"
-                else
-                  echo "Folder is not empty"
+                folder_path="/tmp/artifacts/${{github.sha}}-${abi}-${package}"
+                if [ -d "${folder_path}"] && [ -n "$(ls -A $folder_path)"]; then
                   mv /tmp/artifacts/${{ github.sha }}-${abi}-${package}/* ./packages/${package}/npm/${abi}
                 fi
               done
