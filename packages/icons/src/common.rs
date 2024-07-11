@@ -3,6 +3,7 @@ use farmfe_toolkit::fs::read_file_utf8;
 use reqwest::Client;
 use serde_json::Value;
 use std::{
+  default,
   fs::File,
   io::BufReader,
   path::{Path, PathBuf},
@@ -162,29 +163,43 @@ pub fn get_icon_path_data(opt: GetIconPathDataParams) -> Value {
   let icons_path = build_icon_path(&opt.project_dir, &format!("@iconify-json/{}", collection));
 
   if !all_icon_path.exists() && !icons_path.exists() {
-    if opt.auto_install {
-      install_icon_package(&opt.project_dir, &collection);
-    } else {
-      return Value::Null;
-    }
-  }
-  let icon_collection_path_by_sign = icons_path.join(format!("icons.json"));
-  let icon_collection_path = all_icon_path.join(format!("{}.json", collection));
-  if icon_collection_path_by_sign.exists() {
-    let json = read_json_from_file(icon_collection_path_by_sign.to_str().unwrap());
-    if let Some(body) = json.get("icons").and_then(|icons| icons.get(icon)) {
-      return body.clone();
-    }
-  } else if icon_collection_path.exists() {
-    let json = read_json_from_file(icon_collection_path.to_str().unwrap());
-    if let Some(body) = json.get("icons").and_then(|icons| icons.get(icon)) {
-      return body.clone();
-    }
+      if opt.auto_install {
+          install_icon_package(&opt.project_dir, &collection);
+      } else {
+          return Value::Null;
+      }
   }
 
-  return Value::Null;
+  let icon_collection_path_by_sign = icons_path.join("icons.json");
+  let icon_collection_path = all_icon_path.join(format!("{}.json", collection));
+
+  if let Some(body) = get_icon_body(&icon_collection_path_by_sign, &icon) {
+      return body;
+  } else if let Some(body) = get_icon_body(&icon_collection_path, &icon) {
+      return body;
+  }
+
+  Value::Null
 }
 
+fn get_icon_body(path: &std::path::Path, icon: &str) -> Option<Value> {
+  if path.exists() {
+      let json = read_json_from_file(path.to_str().unwrap());
+      if let Some(body) = json.get("icons").and_then(|icons| icons.get(icon)) {
+          let mut body = body.clone();
+          if body.get("height").is_none() {
+              let default_height = json.get("height").and_then(|v| v.as_i64());
+              body["height"] = Value::Number(default_height.unwrap_or(24).into());
+          }
+          if body.get("width").is_none() {
+              let default_width = json.get("width").and_then(|v| v.as_i64());
+              body["width"] = Value::Number(default_width.unwrap_or(24).into());
+          }
+          return Some(body);
+      }
+  }
+  None
+}
 fn read_json_from_file(file_path: &str) -> serde_json::Value {
   let file = File::open(file_path).expect("Failed to open file");
   let reader = BufReader::new(file);

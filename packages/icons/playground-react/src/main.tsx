@@ -2,7 +2,8 @@ import React, { useState } from "react";
 import "./main.css";
 import reactLogo from "./assets/react.svg";
 import FarmLogo from "./assets/logo.png";
-import IconAccessibility from '~icons/fontisto/ambulance'
+import IconAmbulance from '~icons/fontisto/ambulance'
+import ReactLogo from '~icons/logos/react'
 export function Main() {
   const [count, setCount] = useState(0);
   console.log("rendering Main component")
@@ -17,7 +18,8 @@ export function Main() {
         </a>
       </div>
       <h1>Farm + React</h1>
-      <IconAccessibility color={'#0080ff'}/>
+      <IconAmbulance color={'#0080ff'}/>
+      <ReactLogo />
       <div className="card">
         <button onClick={() => setCount((count) => count + 1)}>
           count is {count}

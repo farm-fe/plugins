@@ -1,0 +1,203 @@
+use super::calculate_size::calculate_size;
+use super::struct_config::IconifyIcon;
+use serde::{Deserialize, Serialize};
+
+#[derive(Serialize, Deserialize)]
+pub struct IconifyIconCustomizations {
+  pub width: Option<String>,
+  pub height: Option<String>,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+pub struct IconifyIconBuildResult {
+  pub attributes: Attributes,
+  pub view_box: SVGViewBox,
+  pub body: String,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+pub struct Attributes {
+  pub width: Option<String>,
+  pub height: Option<String>,
+  pub view_box: String,
+}
+
+type SVGViewBox = (i32, i32, i32, i32);
+
+fn default_icon_customisations() -> IconifyIconCustomizations {
+  IconifyIconCustomizations {
+    width: None,
+    height: None,
+  }
+}
+
+fn is_unset_keyword(value: &str) -> bool {
+  value == "unset" || value == "undefined" || value == "none"
+}
+
+fn wrap_svg_content(body: &str, prefix: &str, suffix: &str) -> String {
+  format!("{}{}{}", prefix, body, suffix)
+}
+
+pub fn icon_to_svg(
+  icon: IconifyIcon,
+  customizations: Option<IconifyIconCustomizations>,
+) -> IconifyIconBuildResult {
+  let full_icon = IconifyIcon {
+    left: icon.left,
+    top: icon.top,
+    width: icon.width,
+    height: icon.height,
+    body: icon.body.clone(),
+    h_flip: icon.h_flip,
+    v_flip: icon.v_flip,
+    rotate: icon.rotate,
+  };
+
+  let full_customizations = customizations.unwrap_or_else(default_icon_customisations);
+
+  let mut box_left = full_icon.left.unwrap_or(0);
+  let mut box_top = full_icon.top.unwrap_or(0);
+  let mut box_width = full_icon.width.unwrap_or(16);
+  let mut box_height = full_icon.height.unwrap_or(16);
+
+  let mut body = full_icon.body.clone();
+
+  let mut transformations: Vec<String> = Vec::new();
+  let mut rotation = full_icon.rotate.unwrap_or(0);
+
+  if full_icon.h_flip.unwrap_or(false) {
+    if full_icon.v_flip.unwrap_or(false) {
+      rotation += 2;
+    } else {
+      transformations.push(format!("translate({} {})", box_width + box_left, -box_top));
+      transformations.push("scale(-1 1)".to_string());
+      box_top = 0;
+      box_left = 0;
+    }
+  } else if full_icon.v_flip.unwrap_or(false) {
+    transformations.push(format!("translate({} {})", -box_left, box_height + box_top));
+    transformations.push("scale(1 -1)".to_string());
+    box_top = 0;
+    box_left = 0;
+  }
+
+  if rotation < 0 {
+    rotation -= (rotation / 4) * 4;
+  }
+  rotation %= 4;
+
+  match rotation {
+    1 => {
+      let temp_value = box_height / 2 + box_top;
+      transformations.insert(0, format!("rotate(90 {} {})", temp_value, temp_value));
+    }
+    2 => {
+      transformations.insert(
+        0,
+        format!(
+          "rotate(180 {} {})",
+          box_width / 2 + box_left,
+          box_height / 2 + box_top
+        ),
+      );
+    }
+    3 => {
+      let temp_value = box_width / 2 + box_left;
+      transformations.insert(0, format!("rotate(-90 {} {})", temp_value, temp_value));
+    }
+    _ => {}
+  }
+
+  if rotation % 2 == 1 {
+    if box_left != box_top {
+      let temp_value = box_left;
+      box_left = box_top;
+      box_top = temp_value;
+    }
+    if box_width != box_height {
+      let temp_value = box_width;
+      box_width = box_height;
+      box_height = temp_value;
+    }
+  }
+
+  if !transformations.is_empty() {
+    body = wrap_svg_content(
+      &body,
+      &format!("<g transform=\"{}\">", transformations.join(" ")),
+      "</g>",
+    );
+  }
+
+  let customizations_width = full_customizations.width.clone();
+  let customizations_height = full_customizations.height.clone();
+
+  let width: String;
+  let height: String;
+
+  if customizations_width.is_none() {
+    height = if customizations_height.is_none() {
+      "1em".to_string()
+    } else if customizations_height.as_deref() == Some("auto") {
+      box_height.to_string()
+    } else {
+      customizations_height.unwrap()
+    };
+    width = calculate_size(&height, box_width as f32 / box_height as f32, None);
+  } else {
+    width = if customizations_width.as_deref() == Some("auto") {
+      box_width.to_string()
+    } else {
+      customizations_width.unwrap()
+    };
+    height = if customizations_height.is_none() {
+      calculate_size(&width, box_height as f32 / box_width as f32, None)
+    } else if customizations_height.as_deref() == Some("auto") {
+      box_height.to_string()
+    } else {
+      customizations_height.unwrap()
+    };
+  }
+
+  let mut attributes = Attributes {
+    width: None,
+    height: None,
+    view_box: format!("{} {} {} {}", box_left, box_top, box_width, box_height),
+  };
+
+  if !is_unset_keyword(&width) {
+    attributes.width = Some(width);
+  }
+  if !is_unset_keyword(&height) {
+    attributes.height = Some(height);
+  }
+
+  let view_box = (box_left, box_top, box_width, box_height);
+
+  IconifyIconBuildResult {
+    attributes,
+    view_box,
+    body,
+  }
+}
+
+// fn main() {
+//     let icon = IconifyIcon {
+//         left: 0,
+//         top: 0,
+//         width: 16,
+//         height: 16,
+//         body: String::from("<path d='...' />"),
+//         h_flip: None,
+//         v_flip: None,
+//         rotate: None,
+//     };
+
+//     let customisations = None;
+
+//     let result = icon_to_svg(icon, customisations);
+
+//     println!("SVG Attributes: {:?}", result.attributes);
+//     println!("SVG Body: {}", result.body);
+// }

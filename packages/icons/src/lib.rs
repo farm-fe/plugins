@@ -2,6 +2,7 @@
 mod common;
 mod compiler;
 mod gen_svg;
+mod loader;
 mod options;
 mod update_svg;
 // mod svg_id;
@@ -20,7 +21,10 @@ use farmfe_core::{
 };
 use farmfe_macro_plugin::farm_plugin;
 use farmfe_utils::parse_query;
-use gen_svg::GenSvgElement;
+use loader::{
+  search_for_icon,
+  struct_config::{IconifyIcon, IconifyLoaderOptions},
+};
 use options::Options;
 use serde_json::Value;
 use update_svg::SvgModifier;
@@ -137,6 +141,7 @@ impl Plugin for FarmfePluginIcons {
             height: query_map.get("height").and_then(|v| v.parse().ok()),
             class: self.options.default_class.clone(),
             style: self.options.default_style.clone(),
+            view_box: None,
           })
           .apply_to_svg(&svg_raw);
         }
@@ -157,31 +162,33 @@ impl Plugin for FarmfePluginIcons {
 
         let svg_path_str: Option<String> =
           data.get("body").and_then(|v| v.as_str().map(String::from));
-        let svg_data_height: Option<String> = data
-          .get("height")
-          .and_then(|v| v.as_number().map(|v| v.to_string()));
-        let svg_data_width: Option<String> = data
-          .get("width")
-          .and_then(|v| v.as_number().map(|v| v.to_string()));
+        let svg_data_height: Option<i64> = data.get("height").and_then(|v| v.as_i64());
+        let svg_data_width: Option<i64> = data.get("width").and_then(|v| v.as_i64());
 
-        let svg_el_builder = gen_svg::GenSvgElement::new(GenSvgElement {
-          fill: query_map.get("fill").and_then(|v| v.parse().ok()),
-          stroke: query_map.get("stroke").and_then(|v| v.parse().ok()),
-          stroke_width: query_map.get("stroke-width").and_then(|v| v.parse().ok()),
-          width: query_map
-            .get("width")
-            .and_then(|v| v.parse().ok())
-            .or(svg_data_width),
-          height: query_map
-            .get("height")
-            .and_then(|v| v.parse().ok())
-            .or(svg_data_height),
-          class: self.options.default_class.clone(),
-          style: self.options.default_style.clone(),
-          scale: self.options.scale,
-          path: svg_path_str,
-        });
-        svg_raw = svg_el_builder.apply_to_svg();
+        if let Some(raw) = search_for_icon::search_for_icon(
+          Some(IconifyIcon {
+            left: None,
+            top: None,
+            width: svg_data_width.map(|w| w as i32),
+            height: svg_data_height.map(|w| w as i32),
+            body: svg_path_str.unwrap_or_default(),
+            h_flip: None,
+            v_flip: None,
+            rotate: None,
+          }),
+          Some(IconifyLoaderOptions {
+            customizations: None,
+            scale: query_map.get("scale").and_then(|v| v.parse().ok()),
+          }),
+        ) {
+          svg_raw = raw;
+        } else {
+          return Ok(Some(PluginLoadHookResult {
+            content: String::new(),
+            module_type: ModuleType::Js,
+            source_map: None,
+          }));
+        };
       }
       if query_map.contains_key("raw") {
         return Ok(Some(PluginLoadHookResult {

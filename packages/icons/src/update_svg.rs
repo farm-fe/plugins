@@ -7,6 +7,7 @@ pub struct SvgModifier {
   pub height: Option<String>,
   pub class: Option<String>,
   pub style: Option<serde_json::Value>,
+  pub view_box: Option<String>,
 }
 
 impl SvgModifier {
@@ -42,6 +43,11 @@ impl SvgModifier {
       svg_element
         .attributes
         .insert("height".to_string(), height.clone());
+    }
+    if let Some(ref view_box) = self.view_box {
+      svg_element
+        .attributes
+        .insert("viewBox".to_string(), view_box.clone());
     }
     if let Some(ref class) = self.class {
       svg_element
