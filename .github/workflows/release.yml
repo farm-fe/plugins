@@ -17,6 +17,8 @@ jobs:
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v3
+        with:
+          fetch-depth: 2
 
       - name: Setup Node.js 18.x
         uses: actions/setup-node@v3
@@ -35,7 +37,6 @@ jobs:
               do
                 if [ -z "$(ls -A /tmp/artifacts/${{github.sha}}-${abi}-${package})" ]; then
                   echo "Folder is empty"
-                  echo "::set-output name=isEmpty::true"
                 else
                   echo "Folder is not empty"
                   mv /tmp/artifacts/${{ github.sha }}-${abi}-${package}/* ./packages/${package}/npm/${abi}
