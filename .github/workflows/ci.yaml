@@ -1,0 +1,9 @@
+name: Build Test
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  call-rust-build:
+    uses: ./.github/workflows/plugin-build.yaml
