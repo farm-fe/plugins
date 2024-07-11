@@ -47,4 +47,4 @@ jobs:
         run: npm install -g pnpm@9.1.0 && pnpm i --frozen-lockfile
 
       - name: Publish to npm
-        run: npm set //registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }} && npm config set access public && pnpm "[HEAD^]" publish --no-git-checks
+        run: npm set //registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }} && npm config set access public && pnpm --filter "[HEAD^]" publish --no-git-checks
