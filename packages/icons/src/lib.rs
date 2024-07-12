@@ -1,7 +1,6 @@
 #![deny(clippy::all)]
 mod common;
 mod compiler;
-mod gen_svg;
 mod loader;
 mod options;
 mod update_svg;
@@ -14,7 +13,7 @@ use common::{
 };
 use compiler::{get_compiler, get_module_type_by_path, CompilerParams, GetCompilerParams};
 use farmfe_core::{
-  config::{custom, Config},
+  config::Config,
   module::ModuleType,
   plugin::{Plugin, PluginLoadHookResult, PluginResolveHookResult},
   serde_json,
@@ -22,7 +21,7 @@ use farmfe_core::{
 use farmfe_macro_plugin::farm_plugin;
 use farmfe_utils::parse_query;
 use loader::{
-  search_for_icon,
+  handle_icon_data::gen_svg_for_icon_data,
   struct_config::{IconifyIcon, IconifyLoaderOptions},
 };
 use options::Options;
@@ -174,7 +173,7 @@ impl Plugin for FarmfePluginIcons {
           ..Default::default()
         };
 
-        if let Some(raw) = search_for_icon::search_for_icon(
+        if let Some(raw) = gen_svg_for_icon_data(
           Some(IconifyIcon {
             width: svg_data_width.map(|w| w as i32),
             height: svg_data_height.map(|w| w as i32),

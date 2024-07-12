@@ -4,9 +4,8 @@ use super::{
   icon_to_svg::{icon_to_svg, IconifyIconBuildResult},
   struct_config::IconifyIcon,
 };
-use serde::{Deserialize, Serialize};
 
-pub fn search_for_icon(
+pub fn gen_svg_for_icon_data(
   icon_data: Option<IconifyIcon>,
   options: Option<IconifyLoaderOptions>,
 ) -> Option<String> {
@@ -35,31 +34,3 @@ pub fn search_for_icon(
     None
   }
 }
-
-#[derive(Serialize, Deserialize)]
-struct Attributes {
-  width: Option<f64>,
-  height: Option<f64>,
-  // 其他属性
-}
-
-// #[tokio::main]
-// async fn main() {
-//     // 初始化日志
-//     env_logger::init();
-
-//     // 示例调用search_for_icon函数
-//     let icon_set = IconifyJSON {};
-//     let collection = "example_collection";
-//     let ids = vec!["icon1", "icon2"];
-//     let options = Some(IconifyLoaderOptions {
-//         customizations: None,
-//         scale: Some(1.0),
-//     });
-
-//     if let Some(svg) = search_for_icon(icon_set, collection, ids, options).await {
-//         println!("Found SVG: {}", svg);
-//     } else {
-//         println!("Icon not found");
-//     }
-// }

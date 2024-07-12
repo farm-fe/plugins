@@ -39,31 +39,20 @@ pub fn icon_to_svg(
   icon: IconifyIcon,
   customizations: Option<IconifyIconCustomizations>,
 ) -> IconifyIconBuildResult {
-  let full_icon = IconifyIcon {
-    left: icon.left,
-    top: icon.top,
-    width: icon.width,
-    height: icon.height,
-    body: icon.body.clone(),
-    h_flip: icon.h_flip,
-    v_flip: icon.v_flip,
-    rotate: icon.rotate,
-  };
-
   let full_customizations = customizations.unwrap_or_else(default_icon_customisations);
 
-  let mut box_left = full_icon.left.unwrap_or(0);
-  let mut box_top = full_icon.top.unwrap_or(0);
-  let mut box_width = full_icon.width.unwrap_or(16);
-  let mut box_height = full_icon.height.unwrap_or(16);
+  let mut box_left = icon.left.unwrap_or(0);
+  let mut box_top = icon.top.unwrap_or(0);
+  let mut box_width = icon.width.unwrap_or(16);
+  let mut box_height = icon.height.unwrap_or(16);
 
-  let mut body = full_icon.body.clone();
+  let mut body = icon.body.clone();
 
   let mut transformations: Vec<String> = Vec::new();
-  let mut rotation = full_icon.rotate.unwrap_or(0);
+  let mut rotation = icon.rotate.unwrap_or(0);
 
-  if full_icon.h_flip.unwrap_or(false) {
-    if full_icon.v_flip.unwrap_or(false) {
+  if icon.h_flip.unwrap_or(false) {
+    if icon.v_flip.unwrap_or(false) {
       rotation += 2;
     } else {
       transformations.push(format!("translate({} {})", box_width + box_left, -box_top));
@@ -71,7 +60,7 @@ pub fn icon_to_svg(
       box_top = 0;
       box_left = 0;
     }
-  } else if full_icon.v_flip.unwrap_or(false) {
+  } else if icon.v_flip.unwrap_or(false) {
     transformations.push(format!("translate({} {})", -box_left, box_height + box_top));
     transformations.push("scale(1 -1)".to_string());
     box_top = 0;
