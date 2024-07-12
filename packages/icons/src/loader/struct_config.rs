@@ -1,13 +1,13 @@
-use std::collections::HashMap;
-
+use crate::update_svg::SvgModifier;
 use serde::{Deserialize, Serialize};
+use std::collections::HashMap;
 
 #[derive(Serialize, Deserialize)]
 pub struct IconifyJSON {
   pub icons: HashMap<String, IconifyIcon>,
 }
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, Default, Clone)]
 pub struct IconifyIcon {
   pub left: Option<i32>,
   pub top: Option<i32>,
@@ -19,14 +19,8 @@ pub struct IconifyIcon {
   pub rotate: Option<i32>,
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Deserialize, Default)]
 pub struct IconifyLoaderOptions {
-  pub customizations: Option<IconifyIconCustomisations>,
-  pub scale: Option<f64>,
-}
-
-#[derive(Serialize, Deserialize)]
-pub struct IconifyIconCustomisations {
-  pub width: Option<String>,
-  pub height: Option<String>,
+  pub customizations: Option<SvgModifier>,
+  pub scale: Option<f32>,
 }

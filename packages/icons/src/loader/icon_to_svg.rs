@@ -31,10 +31,6 @@ fn default_icon_customisations() -> IconifyIconCustomizations {
   }
 }
 
-fn is_unset_keyword(value: &str) -> bool {
-  value == "unset" || value == "undefined" || value == "none"
-}
-
 fn wrap_svg_content(body: &str, prefix: &str, suffix: &str) -> String {
   format!("{}{}{}", prefix, body, suffix)
 }
@@ -133,45 +129,50 @@ pub fn icon_to_svg(
   let customizations_width = full_customizations.width.clone();
   let customizations_height = full_customizations.height.clone();
 
-  let width: String;
-  let height: String;
+  let mut width: Option<String> = None;
+  let mut height: Option<String> = None;
 
   if customizations_width.is_none() {
     height = if customizations_height.is_none() {
-      "1em".to_string()
+      Some("1em".to_string())
     } else if customizations_height.as_deref() == Some("auto") {
-      box_height.to_string()
+      Some(box_height.to_string())
     } else {
-      customizations_height.unwrap()
+      Some(customizations_height.unwrap())
     };
-    width = calculate_size(&height, box_width as f32 / box_height as f32, None);
+    width = if height.is_none() {
+      None
+    } else {
+      Some(calculate_size(
+        &height.clone().unwrap(),
+        box_width as f32 / box_height as f32,
+        None,
+      ))
+    }
   } else {
     width = if customizations_width.as_deref() == Some("auto") {
-      box_width.to_string()
+      Some(box_width.to_string())
     } else {
-      customizations_width.unwrap()
+      Some(customizations_width.unwrap())
     };
     height = if customizations_height.is_none() {
-      calculate_size(&width, box_height as f32 / box_width as f32, None)
+      Some(calculate_size(
+        &width.clone().unwrap(),
+        box_height as f32 / box_width as f32,
+        None,
+      ))
     } else if customizations_height.as_deref() == Some("auto") {
-      box_height.to_string()
+      Some(box_height.to_string())
     } else {
-      customizations_height.unwrap()
+      Some(customizations_height.unwrap())
     };
   }
 
-  let mut attributes = Attributes {
-    width: None,
-    height: None,
+  let attributes = Attributes {
+    width,
+    height,
     view_box: format!("{} {} {} {}", box_left, box_top, box_width, box_height),
   };
-
-  if !is_unset_keyword(&width) {
-    attributes.width = Some(width);
-  }
-  if !is_unset_keyword(&height) {
-    attributes.height = Some(height);
-  }
 
   let view_box = (box_left, box_top, box_width, box_height);
 
@@ -181,23 +182,3 @@ pub fn icon_to_svg(
     body,
   }
 }
-
-// fn main() {
-//     let icon = IconifyIcon {
-//         left: 0,
-//         top: 0,
-//         width: 16,
-//         height: 16,
-//         body: String::from("<path d='...' />"),
-//         h_flip: None,
-//         v_flip: None,
-//         rotate: None,
-//     };
-
-//     let customisations = None;
-
-//     let result = icon_to_svg(icon, customisations);
-
-//     println!("SVG Attributes: {:?}", result.attributes);
-//     println!("SVG Body: {}", result.body);
-// }

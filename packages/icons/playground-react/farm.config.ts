@@ -1,5 +1,6 @@
 import { defineConfig } from "@farmfe/core";
-
+import farmJsPluginPostcss from '@farmfe/js-plugin-postcss';
+import visualizer from '@farmfe/js-plugin-visualizer'
 export default defineConfig({
   compilation: {
     input: {
@@ -9,15 +10,12 @@ export default defineConfig({
     progress: false,
   },
   plugins: [
+    farmJsPluginPostcss(),
+    visualizer(),
     ["@farmfe/plugin-react", { runtime: "automatic" }],
     ["@farmfe/plugin-icons", {
       autoInstall: true,
       compiler: "jsx",
-      defaultStyle: {
-        width: "2em",
-        height: "2em",
-      },
-      defaultClass:"icon"
     }],
   ],
 });

@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import "./main.css";
 import reactLogo from "./assets/react.svg";
 import FarmLogo from "./assets/logo.png";
-import IconAmbulance from '~icons/fontisto/ambulance'
+// import 'virtual:uno.css'
 import ReactLogo from '~icons/logos/react'
 export function Main() {
   const [count, setCount] = useState(0);
@@ -16,10 +16,12 @@ export function Main() {
         <a href="https://react.dev" target="_blank">
           <img src={reactLogo} className="logo react" alt="React logo" />
         </a>
+        <div style={{display:'flex',alignItems:"center"}}>
+        <div><ReactLogo className=" text-100px text-#00D8FF"/></div>
+        <div className="i-logos-react  text-100px text-#00D8FF"></div>
+        </div>
       </div>
       <h1>Farm + React</h1>
-      <IconAmbulance color={'#0080ff'}/>
-      <ReactLogo />
       <div className="card">
         <button onClick={() => setCount((count) => count + 1)}>
           count is {count}

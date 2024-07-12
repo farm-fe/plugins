@@ -14,7 +14,7 @@ use common::{
 };
 use compiler::{get_compiler, get_module_type_by_path, CompilerParams, GetCompilerParams};
 use farmfe_core::{
-  config::Config,
+  config::{custom, Config},
   module::ModuleType,
   plugin::{Plugin, PluginLoadHookResult, PluginResolveHookResult},
   serde_json,
@@ -165,20 +165,25 @@ impl Plugin for FarmfePluginIcons {
         let svg_data_height: Option<i64> = data.get("height").and_then(|v| v.as_i64());
         let svg_data_width: Option<i64> = data.get("width").and_then(|v| v.as_i64());
 
+        let customizations = SvgModifier {
+          fill: query_map.get("fill").and_then(|v| v.parse().ok()),
+          stroke: query_map.get("stroke").and_then(|v| v.parse().ok()),
+          stroke_width: query_map.get("stroke-width").and_then(|v| v.parse().ok()),
+          class: self.options.default_class.clone(),
+          style: self.options.default_style.clone(),
+          ..Default::default()
+        };
+
         if let Some(raw) = search_for_icon::search_for_icon(
           Some(IconifyIcon {
-            left: None,
-            top: None,
             width: svg_data_width.map(|w| w as i32),
             height: svg_data_height.map(|w| w as i32),
             body: svg_path_str.unwrap_or_default(),
-            h_flip: None,
-            v_flip: None,
-            rotate: None,
+            ..Default::default()
           }),
           Some(IconifyLoaderOptions {
-            customizations: None,
-            scale: query_map.get("scale").and_then(|v| v.parse().ok()),
+            scale: self.options.scale,
+            customizations: Some(customizations),
           }),
         ) {
           svg_raw = raw;

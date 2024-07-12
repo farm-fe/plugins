@@ -1,7 +1,8 @@
 use super::super::update_svg::SvgModifier;
+use super::struct_config::IconifyLoaderOptions;
 use super::{
   icon_to_svg::{icon_to_svg, IconifyIconBuildResult},
-  struct_config::{IconifyIcon, IconifyLoaderOptions},
+  struct_config::IconifyIcon,
 };
 use serde::{Deserialize, Serialize};
 
@@ -14,41 +15,26 @@ pub fn search_for_icon(
       mut attributes,
       body,
       ..
-    } = icon_to_svg(icon, None);
-    let scale = options.as_ref().and_then(|opts| opts.scale);
+    } = icon_to_svg(icon.clone(), None);
+    let scale = options.as_ref().and_then(|o| o.scale);
     if let Some(s) = scale {
-      if attributes.height.is_none() {
-        attributes.height = Some(format!("{}{}", s, "em"));
-      }
-      if attributes.width.is_none() {
-        attributes.width = Some(format!("{}{}", s, "em"));
-      }
+      attributes.height = Some(format!("{}{}", s, "em"));
+      attributes.width = Some(format!("{}{}", s, "em"));
     }
     let svg = SvgModifier::new(SvgModifier {
-      fill: None,
-      stroke: None,
-      stroke_width: None,
       width: attributes.width,
       height: attributes.height,
-      class: None,
-      style: None,
       view_box: Some(attributes.view_box),
+      ..options
+        .as_ref()
+        .and_then(|o| o.customizations.clone())
+        .unwrap_or_default()
     });
     return Some(svg.apply_to_svg(&format!("<svg>{}</svg>", body)));
   } else {
     None
   }
 }
-
-// fn get_icon_data(icon_set: &IconifyJSON, id: &str) -> Option<IconifyIcon> {
-//   // 实现获取图标数据的逻辑
-//   None
-// }
-
-// fn merge_icon_props(svg: &str, collection: &str, scale: Option<f64>) -> String {
-//   // 实现合并图标属性的逻辑
-//   svg.to_string()
-// }
 
 #[derive(Serialize, Deserialize)]
 struct Attributes {
