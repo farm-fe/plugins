@@ -799,7 +799,7 @@ dependencies = [
 
 [[package]]
 name = "farmfe_plugin_icons"
-version = "0.0.0"
+version = "0.0.1"
 dependencies = [
  "farmfe_core",
  "farmfe_macro_plugin",
@@ -808,7 +808,6 @@ dependencies = [
  "farmfe_utils",
  "fervid",
  "once_cell",
- "rand",
  "reqwest",
  "serde",
  "serde_json",

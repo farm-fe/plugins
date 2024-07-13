@@ -11,12 +11,12 @@
   "dependencies": {
     "@farmfe/plugin-icons": "workspace:*",
     "@iconify-json/fontisto": "^1.1.8",
-    "vue": "^3.4.0"
+    "vue": "^3.4.31"
   },
   "devDependencies": {
     "@farmfe/cli": "^1.0.2",
-    "@farmfe/core": "^1.1.13",
-    "@vitejs/plugin-vue": "^5.0.4",
-    "core-js": "^3.30.1"
+    "@farmfe/core": "^1.2.8",
+    "@vitejs/plugin-vue": "^5.0.5",
+    "core-js": "^3.37.1"
   }
 }

@@ -34,7 +34,7 @@ pub fn get_compiler(param: GetCompilerParams) -> impl Fn(CompilerParams) -> Stri
   }
 }
 
-pub fn get_module_type_by_path(param: GetCompilerParams) -> ModuleType {
+pub fn get_module_type_by_compiler(param: GetCompilerParams) -> ModuleType {
   let GetCompilerParams { compiler, .. } = param;
   match compiler.as_str() {
     "jsx" => ModuleType::Jsx,

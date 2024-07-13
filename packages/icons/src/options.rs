@@ -5,7 +5,7 @@ use farmfe_toolkit::resolve::package_json_loader::{
   Options as PackageJsonLoaderOptions, PackageJsonLoader,
 };
 
-use std::{collections::HashMap, path::Path};
+use std::path::Path;
 
 use serde_json::Value;
 pub fn default_scale() -> Option<f32> {
@@ -35,22 +35,6 @@ pub struct Options {
   #[serde(default = "default_auto_install")]
   pub auto_install: Option<bool>,
   pub collections_node_resolve_path: Option<String>,
-}
-
-#[derive(Debug, serde::Deserialize)]
-pub struct CustomCollections {
-  pub collections: HashMap<String, Value>,
-}
-
-pub fn default_recursion() -> Option<bool> {
-  Some(true)
-}
-
-#[derive(Debug, serde::Deserialize)]
-pub struct SvgPatterns {
-  pub dir: String,
-  #[serde(default = "default_recursion")]
-  pub recursion: Option<bool>,
 }
 
 pub fn guess_jsx(root_path: &str) -> String {

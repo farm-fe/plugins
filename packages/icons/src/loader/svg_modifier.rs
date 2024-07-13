@@ -1,4 +1,7 @@
+use serde::Deserialize;
 use xmltree::Element;
+
+#[derive(Deserialize, Default, Clone)]
 pub struct SvgModifier {
   pub fill: Option<String>,
   pub stroke: Option<String>,
@@ -7,13 +10,12 @@ pub struct SvgModifier {
   pub height: Option<String>,
   pub class: Option<String>,
   pub style: Option<serde_json::Value>,
+  pub view_box: Option<String>,
 }
 
 impl SvgModifier {
   pub fn new(parmas: SvgModifier) -> Self {
-    Self {
-      ..parmas
-    }
+    Self { ..parmas }
   }
   pub fn apply_to_svg(&self, svg_content: &str) -> String {
     let mut svg_element = Element::parse(svg_content.as_bytes()).unwrap();
@@ -42,6 +44,11 @@ impl SvgModifier {
       svg_element
         .attributes
         .insert("height".to_string(), height.clone());
+    }
+    if let Some(ref view_box) = self.view_box {
+      svg_element
+        .attributes
+        .insert("viewBox".to_string(), view_box.clone());
     }
     if let Some(ref class) = self.class {
       svg_element
