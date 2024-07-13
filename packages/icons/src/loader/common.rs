@@ -135,7 +135,10 @@ pub fn get_svg_by_custom_collections(opt: GetSvgByCustomCollectionsParams) -> St
 fn is_valid_icon_path(icon_path: &str) -> bool {
   icon_path.contains("[iconname]") && icon_path.contains("http")
 }
-
+pub fn get_svg_by_local_path(path: &str) -> String {
+  let svg_raw = read_file_utf8(path).unwrap();
+  svg_raw
+}
 async fn get_svg_by_url(url: &str) -> Result<String, reqwest::Error> {
   let client = Client::new();
   let res = client.get(url).send().await;
@@ -154,7 +157,7 @@ async fn get_svg_by_url(url: &str) -> Result<String, reqwest::Error> {
     }
   }
 }
-pub fn get_icon_data_by_local(opt: GetIconPathDataParams) -> Value {
+pub fn get_icon_data_by_iconify(opt: GetIconPathDataParams) -> Value {
   let ResolveResult { collection, icon } = resolve_icons_path(&opt.path);
   let all_icon_path = build_icon_path(&opt.project_dir, "@iconify/json/json");
   let icons_path = build_icon_path(&opt.project_dir, &format!("@iconify-json/{}", collection));

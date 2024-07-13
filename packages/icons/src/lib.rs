@@ -14,8 +14,8 @@ use farmfe_macro_plugin::farm_plugin;
 use farmfe_utils::parse_query;
 use loader::{
   common::{
-    get_icon_data_by_local, get_path_meta, get_svg_by_custom_collections, is_icon_path,
-    resolve_icons_path, GetIconPathDataParams, GetSvgByCustomCollectionsParams,
+    get_icon_data_by_iconify, get_path_meta, get_svg_by_custom_collections, get_svg_by_local_path,
+    is_icon_path, resolve_icons_path, GetIconPathDataParams, GetSvgByCustomCollectionsParams,
   },
   icon_data::gen_svg_for_icon_data,
   struct_config::{IconifyIcon, IconifyLoaderOptions},
@@ -63,10 +63,23 @@ impl Plugin for FarmfePluginIcons {
     _context: &std::sync::Arc<farmfe_core::context::CompilationContext>,
     _hook_context: &farmfe_core::plugin::PluginHookContext,
   ) -> farmfe_core::error::Result<Option<farmfe_core::plugin::PluginResolveHookResult>> {
-    if is_icon_path(&param.source) {
-      let meta = get_path_meta(&param.source);
+    let meta = get_path_meta(&param.source);
+    let query = parse_query(&meta.query);
+    if query.iter().any(|(k, _)| k == "component") {
       let res = meta.base_path.clone();
-      let query = parse_query(&meta.query);
+      if res.ends_with(".svg") {
+        return Ok(Some(PluginResolveHookResult {
+          resolved_path: format!("{PUBLIC_ICON_PREFIX}{}", res),
+          external: false,
+          side_effects: false,
+          query,
+          ..Default::default()
+        }));
+      }
+    }
+
+    if is_icon_path(&param.source) {
+      let res = meta.base_path.clone();
       let compiler = {
         if query.iter().any(|(k, _)| k == "raw") {
           "raw".to_string()
@@ -89,7 +102,7 @@ impl Plugin for FarmfePluginIcons {
         resolved_path: format!("{PUBLIC_ICON_PREFIX}{}", resolved_path),
         external: false,
         side_effects: false,
-        query: parse_query(&meta.query),
+        query,
         ..Default::default()
       }));
     }
@@ -107,16 +120,49 @@ impl Plugin for FarmfePluginIcons {
         .collections_node_resolve_path
         .clone()
         .unwrap_or_default();
-
-      let mut svg_raw = String::new();
-
+      let compiler = get_compiler(GetCompilerParams {
+        jsx: self.options.jsx.clone().unwrap_or_default(),
+        compiler: self.options.compiler.clone().unwrap_or_default(),
+      });
       let meta = resolve_icons_path(source);
       let query_map = param.query.iter().cloned().collect::<HashMap<_, _>>();
+      let svg_builder = SvgModifier::new(SvgModifier {
+        fill: query_map.get("fill").and_then(|v| v.parse().ok()),
+        stroke: query_map.get("stroke").and_then(|v| v.parse().ok()),
+        stroke_width: query_map.get("stroke-width").and_then(|v| v.parse().ok()),
+        width: query_map.get("width").and_then(|v| v.parse().ok()),
+        height: query_map.get("height").and_then(|v| v.parse().ok()),
+        class: self.options.default_class.clone(),
+        style: self.options.default_style.clone(),
+        view_box: None,
+      });
+
+      if query_map.contains_key("component") {
+        let svg = svg_builder.apply_to_svg(&get_svg_by_local_path(&param.resolved_path));
+        let code = compiler(CompilerParams {
+          svg,
+          root_path,
+          svg_name: meta.icon,
+        });
+        let module_type = get_module_type_by_compiler(GetCompilerParams {
+          jsx: self.options.jsx.clone().unwrap_or_default(),
+          compiler: self.options.compiler.clone().unwrap_or_default(),
+        });
+        return Ok(Some(PluginLoadHookResult {
+          content: code,
+          module_type,
+          source_map: None,
+        }));
+      }
+
+      let mut svg_raw = String::new();
       let custom_collections = self
         .options
         .custom_collections
         .clone()
         .unwrap_or(Value::Null);
+
+      // determine whether it is a custom icon collection
       let custom_collection_path = custom_collections
         .get(&meta.collection)
         .and_then(|v| v.as_str());
@@ -129,31 +175,17 @@ impl Plugin for FarmfePluginIcons {
         });
 
         if !svg_raw.is_empty() {
-          svg_raw = SvgModifier::new(SvgModifier {
-            fill: query_map.get("fill").and_then(|v| v.parse().ok()),
-            stroke: query_map.get("stroke").and_then(|v| v.parse().ok()),
-            stroke_width: query_map.get("stroke-width").and_then(|v| v.parse().ok()),
-            width: query_map.get("width").and_then(|v| v.parse().ok()),
-            height: query_map.get("height").and_then(|v| v.parse().ok()),
-            class: self.options.default_class.clone(),
-            style: self.options.default_style.clone(),
-            view_box: None,
-          })
-          .apply_to_svg(&svg_raw);
+          svg_raw = svg_builder.apply_to_svg(&svg_raw);
         }
       } else {
-        let data = get_icon_data_by_local(GetIconPathDataParams {
+        let data = get_icon_data_by_iconify(GetIconPathDataParams {
           path: source.to_string(),
           project_dir: root_path.clone(),
           auto_install: self.options.auto_install.unwrap_or_default(),
         });
 
         if data.is_null() {
-          return Ok(Some(PluginLoadHookResult {
-            content: String::new(),
-            module_type: ModuleType::Js,
-            source_map: None,
-          }));
+          panic!("Icon data is missing");
         }
 
         let svg_path_str: Option<String> =
@@ -183,13 +215,7 @@ impl Plugin for FarmfePluginIcons {
           }),
         ) {
           svg_raw = raw;
-        } else {
-          return Ok(Some(PluginLoadHookResult {
-            content: String::new(),
-            module_type: ModuleType::Js,
-            source_map: None,
-          }));
-        };
+        }
       }
       if query_map.contains_key("raw") {
         return Ok(Some(PluginLoadHookResult {
@@ -198,10 +224,7 @@ impl Plugin for FarmfePluginIcons {
           source_map: None,
         }));
       }
-      let code = get_compiler(GetCompilerParams {
-        jsx: self.options.jsx.clone().unwrap_or_default(),
-        compiler: self.options.compiler.clone().unwrap_or_default(),
-      })(CompilerParams {
+      let code = compiler(CompilerParams {
         svg: svg_raw,
         root_path,
         svg_name: meta.icon,
