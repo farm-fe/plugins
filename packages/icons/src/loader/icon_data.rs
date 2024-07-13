@@ -1,4 +1,4 @@
-use super::super::update_svg::SvgModifier;
+use super::svg_modifier::SvgModifier;
 use super::struct_config::IconifyLoaderOptions;
 use super::{
   icon_to_svg::{icon_to_svg, IconifyIconBuildResult},
@@ -17,8 +17,10 @@ pub fn gen_svg_for_icon_data(
     } = icon_to_svg(icon.clone(), None);
     let scale = options.as_ref().and_then(|o| o.scale);
     if let Some(s) = scale {
-      attributes.height = Some(format!("{}{}", s, "em"));
-      attributes.width = Some(format!("{}{}", s, "em"));
+      if s != 0.0 {
+        attributes.height = Some(format!("{}{}", s, "em"));
+        attributes.width = Some(format!("{}{}", s, "em"));
+      }
     }
     let svg = SvgModifier::new(SvgModifier {
       width: attributes.width,
@@ -31,6 +33,7 @@ pub fn gen_svg_for_icon_data(
     });
     return Some(svg.apply_to_svg(&format!("<svg>{}</svg>", body)));
   } else {
-    None
+    panic!("Icon data is missing");
   }
 }
+

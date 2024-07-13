@@ -3,7 +3,6 @@ use farmfe_toolkit::fs::read_file_utf8;
 use reqwest::Client;
 use serde_json::Value;
 use std::{
-  default,
   fs::File,
   io::BufReader,
   path::{Path, PathBuf},
@@ -58,7 +57,7 @@ pub struct PathMate {
   pub query: String,
 }
 
-pub fn get_icon_path_meta(path: &str) -> PathMate {
+pub fn get_path_meta(path: &str) -> PathMate {
   let normalized_id = remove_prefix(path);
   let query_index = normalized_id.find('?').unwrap_or(normalized_id.len());
 
@@ -87,7 +86,7 @@ pub fn get_icon_path_meta(path: &str) -> PathMate {
 }
 
 #[derive(Debug)]
-pub struct GetIconCustomCollectionPathDataParams {
+pub struct GetSvgByCustomCollectionsParams {
   pub custom_collection_path: String,
   pub icon: String,
   pub project_dir: String,
@@ -99,10 +98,8 @@ pub struct GetIconPathDataParams {
   pub auto_install: bool,
 }
 
-pub fn get_icon_path_data_by_custom_collections(
-  opt: GetIconCustomCollectionPathDataParams,
-) -> String {
-  let GetIconCustomCollectionPathDataParams {
+pub fn get_svg_by_custom_collections(opt: GetSvgByCustomCollectionsParams) -> String {
+  let GetSvgByCustomCollectionsParams {
     custom_collection_path,
     icon,
     project_dir,
@@ -112,7 +109,7 @@ pub fn get_icon_path_data_by_custom_collections(
     let custom_collection_path = custom_collection_path.replace("[iconname]", &icon);
     let rt = Runtime::new().unwrap();
     rt.block_on(async {
-      if let Ok(res) = fetch_icon_from_url(&custom_collection_path).await {
+      if let Ok(res) = get_svg_by_url(&custom_collection_path).await {
         svg_raw = res;
       }
     });
@@ -139,7 +136,7 @@ fn is_valid_icon_path(icon_path: &str) -> bool {
   icon_path.contains("[iconname]") && icon_path.contains("http")
 }
 
-async fn fetch_icon_from_url(url: &str) -> Result<String, reqwest::Error> {
+async fn get_svg_by_url(url: &str) -> Result<String, reqwest::Error> {
   let client = Client::new();
   let res = client.get(url).send().await;
   match res {
@@ -157,26 +154,26 @@ async fn fetch_icon_from_url(url: &str) -> Result<String, reqwest::Error> {
     }
   }
 }
-pub fn get_icon_path_data(opt: GetIconPathDataParams) -> Value {
+pub fn get_icon_data_by_local(opt: GetIconPathDataParams) -> Value {
   let ResolveResult { collection, icon } = resolve_icons_path(&opt.path);
   let all_icon_path = build_icon_path(&opt.project_dir, "@iconify/json/json");
   let icons_path = build_icon_path(&opt.project_dir, &format!("@iconify-json/{}", collection));
 
   if !all_icon_path.exists() && !icons_path.exists() {
-      if opt.auto_install {
-          install_icon_package(&opt.project_dir, &collection);
-      } else {
-          return Value::Null;
-      }
+    if opt.auto_install {
+      install_icon_package(&opt.project_dir, &collection);
+    } else {
+      return Value::Null;
+    }
   }
 
   let icon_collection_path_by_sign = icons_path.join("icons.json");
   let icon_collection_path = all_icon_path.join(format!("{}.json", collection));
 
   if let Some(body) = get_icon_body(&icon_collection_path_by_sign, &icon) {
-      return body;
+    return body;
   } else if let Some(body) = get_icon_body(&icon_collection_path, &icon) {
-      return body;
+    return body;
   }
 
   Value::Null
@@ -184,19 +181,19 @@ pub fn get_icon_path_data(opt: GetIconPathDataParams) -> Value {
 
 fn get_icon_body(path: &std::path::Path, icon: &str) -> Option<Value> {
   if path.exists() {
-      let json = read_json_from_file(path.to_str().unwrap());
-      if let Some(body) = json.get("icons").and_then(|icons| icons.get(icon)) {
-          let mut body = body.clone();
-          if body.get("height").is_none() {
-              let default_height = json.get("height").and_then(|v| v.as_i64());
-              body["height"] = Value::Number(default_height.unwrap_or(24).into());
-          }
-          if body.get("width").is_none() {
-              let default_width = json.get("width").and_then(|v| v.as_i64());
-              body["width"] = Value::Number(default_width.unwrap_or(24).into());
-          }
-          return Some(body);
+    let json = read_json_from_file(path.to_str().unwrap());
+    if let Some(body) = json.get("icons").and_then(|icons| icons.get(icon)) {
+      let mut body = body.clone();
+      if body.get("height").is_none() {
+        let default_height = json.get("height").and_then(|v| v.as_i64());
+        body["height"] = Value::Number(default_height.unwrap_or(24).into());
       }
+      if body.get("width").is_none() {
+        let default_width = json.get("width").and_then(|v| v.as_i64());
+        body["width"] = Value::Number(default_width.unwrap_or(24).into());
+      }
+      return Some(body);
+    }
   }
   None
 }

@@ -1,17 +1,9 @@
 #![deny(clippy::all)]
-mod common;
 mod compiler;
 mod loader;
 mod options;
-mod update_svg;
 // mod svg_id;
-use std::collections::HashMap;
-
-use common::{
-  get_icon_path_data, get_icon_path_data_by_custom_collections, get_icon_path_meta, is_icon_path,
-  resolve_icons_path, GetIconCustomCollectionPathDataParams, GetIconPathDataParams,
-};
-use compiler::{get_compiler, get_module_type_by_path, CompilerParams, GetCompilerParams};
+use compiler::{get_compiler, get_module_type_by_compiler, CompilerParams, GetCompilerParams};
 use farmfe_core::{
   config::Config,
   module::ModuleType,
@@ -21,12 +13,17 @@ use farmfe_core::{
 use farmfe_macro_plugin::farm_plugin;
 use farmfe_utils::parse_query;
 use loader::{
-  handle_icon_data::gen_svg_for_icon_data,
+  common::{
+    get_icon_data_by_local, get_path_meta, get_svg_by_custom_collections, is_icon_path,
+    resolve_icons_path, GetIconPathDataParams, GetSvgByCustomCollectionsParams,
+  },
+  icon_data::gen_svg_for_icon_data,
   struct_config::{IconifyIcon, IconifyLoaderOptions},
+  svg_modifier::SvgModifier,
 };
 use options::Options;
 use serde_json::Value;
-use update_svg::SvgModifier;
+use std::collections::HashMap;
 
 const PUBLIC_ICON_PREFIX: &str = "virtual:__FARM_ICON_ASSET__:";
 
@@ -67,7 +64,7 @@ impl Plugin for FarmfePluginIcons {
     _hook_context: &farmfe_core::plugin::PluginHookContext,
   ) -> farmfe_core::error::Result<Option<farmfe_core::plugin::PluginResolveHookResult>> {
     if is_icon_path(&param.source) {
-      let meta = get_icon_path_meta(&param.source);
+      let meta = get_path_meta(&param.source);
       let res = meta.base_path.clone();
       let query = parse_query(&meta.query);
       let compiler = {
@@ -125,7 +122,7 @@ impl Plugin for FarmfePluginIcons {
         .and_then(|v| v.as_str());
 
       if custom_collection_path.is_some() {
-        svg_raw = get_icon_path_data_by_custom_collections(GetIconCustomCollectionPathDataParams {
+        svg_raw = get_svg_by_custom_collections(GetSvgByCustomCollectionsParams {
           custom_collection_path: custom_collection_path.unwrap().to_string(),
           icon: meta.icon.clone(),
           project_dir: root_path.clone(),
@@ -145,7 +142,7 @@ impl Plugin for FarmfePluginIcons {
           .apply_to_svg(&svg_raw);
         }
       } else {
-        let data = get_icon_path_data(GetIconPathDataParams {
+        let data = get_icon_data_by_local(GetIconPathDataParams {
           path: source.to_string(),
           project_dir: root_path.clone(),
           auto_install: self.options.auto_install.unwrap_or_default(),
@@ -209,7 +206,7 @@ impl Plugin for FarmfePluginIcons {
         root_path,
         svg_name: meta.icon,
       });
-      let module_type = get_module_type_by_path(GetCompilerParams {
+      let module_type = get_module_type_by_compiler(GetCompilerParams {
         jsx: self.options.jsx.clone().unwrap_or_default(),
         compiler: self.options.compiler.clone().unwrap_or_default(),
       });

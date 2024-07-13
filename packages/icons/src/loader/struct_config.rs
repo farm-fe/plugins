@@ -1,4 +1,4 @@
-use crate::update_svg::SvgModifier;
+use super::svg_modifier::SvgModifier;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 
