@@ -1,6 +1,6 @@
-# Farm + React
+# Farm + Vue
 
-This template should help you start developing using React and TypeScript in Farm.
+This template should help you start developing using Vue and TypeScript in Farm.
 
 ## Setup
 

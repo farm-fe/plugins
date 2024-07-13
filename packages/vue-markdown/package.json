@@ -5,9 +5,7 @@
   "types": "scripts/index.d.ts",
   "type": "module",
   "license": "MIT",
-  "devDependencies": {
-    "@farmfe/plugin-tools": "latest"
-  },
+  "devDependencies": {},
   "napi": {
     "name": "farmfe_plugin_vue_markdown",
     "triples": {
