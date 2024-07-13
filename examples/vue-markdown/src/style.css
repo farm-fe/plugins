@@ -16,11 +16,11 @@
 
 a {
   font-weight: 500;
-  color: #9f1a8f;
+  color: #9F1A8F;
   text-decoration: inherit;
 }
 a:hover {
-  color: #9f1a8f;
+  color: #535bf2;
 }
 
 body {
@@ -48,11 +48,22 @@ button {
   transition: border-color 0.25s;
 }
 button:hover {
-  border-color: #9f1a8f;
+  border-color: #9F1A8F;
 }
 button:focus,
 button:focus-visible {
   outline: 4px auto -webkit-focus-ring-color;
+}
+
+.card {
+  padding: 2em;
+}
+
+#app {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 2rem;
+  text-align: center;
 }
 
 @media (prefers-color-scheme: light) {

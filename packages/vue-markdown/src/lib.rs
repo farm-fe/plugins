@@ -1,5 +1,8 @@
 #![deny(clippy::all)]
 
+mod utils;
+mod options;
+mod plugin_component;
 use farmfe_core::{config::Config, plugin::Plugin};
 
 use farmfe_macro_plugin::farm_plugin;
