@@ -7,8 +7,9 @@ version = "0.0.0"
 crate-type = ["cdylib", "rlib"]
 
 [dependencies]
-farmfe_core = { version = "*" }
-farmfe_toolkit_plugin_types = { version = "*" }
-farmfe_macro_plugin = { version = "*" }
-markdown-it = "0.6.1"
+farmfe_core = {version = "*"}
+farmfe_macro_plugin = {version = "*"}
+farmfe_toolkit = "0.0.8"
+farmfe_toolkit_plugin_types = {version = "*"}
 lazy_static = "1.5.0"
+markdown-it = {version = "0.6.1", features = ["linkify"]}
