@@ -17,4 +17,9 @@ pub struct Options {
   pub escape_code_tag_interpolation: Option<bool>,
   pub include: Option<Regex>,
   pub exclude: Option<Regex>,
+  pub wrapper_class: Option<String>,
+  pub head_enabled: Option<bool>,
+
+  
+
 }

@@ -1,25 +1,30 @@
 #![deny(clippy::all)]
 
-mod options;
-mod plugin_component;
-mod utils;
 mod core;
+mod plugin_component;
+
+use core::markdown::create_markdown;
+use core::options::Options;
 
 use farmfe_core::{
   config::Config,
   module::ModuleType,
-  plugin::{Plugin, PluginLoadHookResult},
+  plugin::{Plugin, PluginLoadHookResult, PluginTransformHookResult},
 };
 
 use farmfe_macro_plugin::farm_plugin;
 use farmfe_toolkit::fs::read_file_utf8;
 
 #[farm_plugin]
-pub struct VueMarkdown {}
+pub struct VueMarkdown {
+  options: Options,
+}
 
 impl VueMarkdown {
   fn new(config: &Config, options: String) -> Self {
-    Self {}
+    Self {
+      ..Default::default()
+    }
   }
 }
 
@@ -54,5 +59,14 @@ impl Plugin for VueMarkdown {
     if param.module_type != ModuleType::Custom("vue-markdown".to_string()) {
       return Ok(None);
     }
+
+    let transformed_content = create_markdown(&param.content, &self.options);
+
+    Ok(Some(PluginTransformHookResult {
+      content: transformed_content,
+      source_map: None,
+      module_type: Some(ModuleType::Jsx),
+      ignore_previous_source_map: false,
+    }))
   }
 }
