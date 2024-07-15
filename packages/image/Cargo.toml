@@ -9,11 +9,11 @@ license = "MIT"
 crate-type = ["cdylib", "rlib"]
 
 [dependencies]
-farmfe_core = { version = "*" }
-farmfe_toolkit_plugin_types = { version = "*" }
-farmfe_macro_plugin = { version = "*" }
+farmfe_core = { version = "0.6.2" }
+farmfe_toolkit_plugin_types = { version = "0.0.18" }
+farmfe_macro_plugin = { version = "0.0.4" }
 serde = { version = "1.0.197", features = ["derive"] }
-farmfe_toolkit = "0.0.8"
+farmfe_toolkit = "0.0.11"
 base64 = "0.22.1"
 mime_guess = "2.0.5"
 lazy_static = "1.5.0"

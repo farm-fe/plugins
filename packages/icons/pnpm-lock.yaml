@@ -16,7 +16,7 @@ importers:
     dependencies:
       '@farmfe/js-plugin-postcss':
         specifier: ^1.7.0
-        version: 1.7.0(@farmfe/core@1.2.8)(postcss@8.4.39)
+        version: 1.7.0(@farmfe/core@1.3.0(bufferutil@4.0.8)(utf-8-validate@6.0.4))(postcss@8.4.39)
       '@farmfe/js-plugin-visualizer':
         specifier: ^1.0.0
         version: 1.0.0(monaco-editor@0.50.0)
@@ -52,8 +52,8 @@ importers:
         specifier: ^1.0.2
         version: 1.0.2
       '@farmfe/core':
-        specifier: ^1.2.8
-        version: 1.2.8
+        specifier: latest
+        version: 1.3.0(bufferutil@4.0.8)(utf-8-validate@6.0.4)
       '@farmfe/plugin-react':
         specifier: ^1.1.0
         version: 1.1.0
@@ -74,7 +74,7 @@ importers:
         version: 0.14.2
       unocss:
         specifier: ^0.61.3
-        version: 0.61.3(postcss@8.4.39)(vite@5.3.3)
+        version: 0.61.3(postcss@8.4.39)(rollup@4.18.1)(vite@5.3.3(@types/node@20.14.10))
 
   playground-vue:
     dependencies:
@@ -92,11 +92,11 @@ importers:
         specifier: ^1.0.2
         version: 1.0.2
       '@farmfe/core':
-        specifier: ^1.2.8
-        version: 1.2.8
+        specifier: latest
+        version: 1.3.0(bufferutil@4.0.8)(utf-8-validate@6.0.4)
       '@vitejs/plugin-vue':
         specifier: ^5.0.5
-        version: 5.0.5(vite@5.3.3)(vue@3.4.31)
+        version: 5.0.5(vite@5.3.3(@types/node@20.14.10))(vue@3.4.31)
       core-js:
         specifier: ^3.37.1
         version: 3.37.1
@@ -443,62 +443,64 @@ packages:
     engines: {node: '>= 16'}
     hasBin: true
 
-  '@farmfe/core-darwin-arm64@1.2.8':
-    resolution: {integrity: sha512-L6b5HHZmHW7df2mbCzdTS/Jw5qn3LFtfUUbmnIbHKEJtujSR6QF2gpNiiYbJRX3/0zh+SUSrOYjSsiPo6j3u9A==}
+  '@farmfe/core-darwin-arm64@1.3.0':
+    resolution: {integrity: sha512-L2TQYUpH2rBonfxVDBqdLudCOLSDtOIU0yMbww0SsjdJb9JtgDCg5gUbYXV235xe+mC2v7v6byUHomqhqpJM0w==}
     engines: {node: '>= 10'}
     cpu: [arm64]
     os: [darwin]
 
-  '@farmfe/core-darwin-x64@1.2.8':
-    resolution: {integrity: sha512-yXHoZWozTAaRYcLp6unbwv0JSf1rMimUAkzc8YPXR4xCGBzbJe7h5dCXTcbqqx9BVh7cYJppy5U9Ht1k6L2s8w==}
+  '@farmfe/core-darwin-x64@1.3.0':
+    resolution: {integrity: sha512-XQ7yQ0nddlhQwBN2iky6St77UepEzlxNLmelo6AZcIUgOHTv6mzmCVNXt9giceK7acTc7q9OXmU3JaRR27FjeA==}
     engines: {node: '>= 10'}
     cpu: [x64]
     os: [darwin]
 
-  '@farmfe/core-linux-arm64-gnu@1.2.8':
-    resolution: {integrity: sha512-2v5zRwSAyrW3PyvOGjE26ALl8nolGx5Jl2FYt8v6x567MYEp2MpC2lhYLwJnsdcoOdp0wDsvRO52jxfxhyP/cw==}
+  '@farmfe/core-linux-arm64-gnu@1.3.0':
+    resolution: {integrity: sha512-oRyBk6TkMDhedNK+043P2+JsvYD+/4EBBHRstzaTJolIYT/n7NbW6gOor+zksTZBK6uXM6033CCFAOYE9r3Dgw==}
     engines: {node: '>= 10'}
     cpu: [arm64]
     os: [linux]
 
-  '@farmfe/core-linux-arm64-musl@1.2.8':
-    resolution: {integrity: sha512-Y4DqR4l/I/VjAhwYxH6Vt/84FgESfEz/USSkVwHuOdgkj+cx6tzp0qUTZbXArPlAkksnO2NzfWM4tjKbGSCKUw==}
+  '@farmfe/core-linux-arm64-musl@1.3.0':
+    resolution: {integrity: sha512-NtDl1K8X9xahsJ1d0IFn9vju6wV3yLiAuow1dFJQvuAQ17AvTZZqT66GAdoMXMInAe9HdVdQWXVwmR/vpEqmlA==}
     engines: {node: '>= 10'}
     cpu: [arm64]
     os: [linux]
 
-  '@farmfe/core-linux-x64-gnu@1.2.8':
-    resolution: {integrity: sha512-GYiyN+CVBIhK4ukXY33NlfgBbBgE3plhuxu+O7womygpBjA+xqAjevF3kG5Gmf052fFcFEW9R0YRpR92qbLStw==}
+  '@farmfe/core-linux-x64-gnu@1.3.0':
+    resolution: {integrity: sha512-F2ElUwTlWdAQe7waEhGzJVHNlAf3vI6BfK/70n1S0/rNietGih6RpQ5X45Q0Dl8TQIq9lqt7Fzi6a/JXYFjstQ==}
     engines: {node: '>= 10'}
     cpu: [x64]
     os: [linux]
+    libc: [glibc]
 
-  '@farmfe/core-linux-x64-musl@1.2.8':
-    resolution: {integrity: sha512-+ncq7JLmM/zSeTQkZhBQO15c/2Svv/75t20G3bqD9bHcUWYwb5sUDs1Nxt69aJqp1zY29Q8VT9DREAYkOSJdew==}
+  '@farmfe/core-linux-x64-musl@1.3.0':
+    resolution: {integrity: sha512-dRrJ6aJvv/MZL3C2CI5JL6WUf0lP4zaP7keQ8v9EF4RvWs4WTx8wn9m1uSNX5YpePwvdtJcz6nTS3sF6kErPOw==}
     engines: {node: '>= 10'}
     cpu: [x64]
     os: [linux]
+    libc: [musl]
 
-  '@farmfe/core-win32-arm64-msvc@1.2.8':
-    resolution: {integrity: sha512-5qLKljphERE0dJLehL9s4UeIBSCYfBzdzuCZ249fgZoJQ62p0/VcnHUf6uT0ayQCX1hU6LD43S2Mha2s5ZVyHA==}
+  '@farmfe/core-win32-arm64-msvc@1.3.0':
+    resolution: {integrity: sha512-DTCQkvLHw3tUStuufWsO55oywJSw0qc07bUOkL/rfZf4OoJ2599BaM4uLgTWWzRbly3UTIqGHccgiCrRT+Sw6Q==}
     engines: {node: '>= 10'}
     cpu: [arm64]
     os: [win32]
 
-  '@farmfe/core-win32-ia32-msvc@1.2.8':
-    resolution: {integrity: sha512-uLcyLbWXX/IeV7a7kIZRHB+3RTRZXp3LiNg17pfI80RycBDvEh4qL8kC/qRSV8f58afMYoxQD6ZkgRMW5TFZ6g==}
+  '@farmfe/core-win32-ia32-msvc@1.3.0':
+    resolution: {integrity: sha512-aaV9rmv5bGmVNV6T+cn7kUOFpbXiTxk1aHURadCwLXBgOie8srqDr5xbFgt4E6chEunEZ6knlTM8mQUNSVFEWQ==}
     engines: {node: '>= 10'}
     cpu: [ia32]
     os: [win32]
 
-  '@farmfe/core-win32-x64-msvc@1.2.8':
-    resolution: {integrity: sha512-tMfXJ8ekFr5cid1PQuBTzwJDph3j825M2nu/UhANbGVGPQPQ1ZCumeTvbotaia12K1ZzWG+BoMdKccWtwbHE4g==}
+  '@farmfe/core-win32-x64-msvc@1.3.0':
+    resolution: {integrity: sha512-YnVF0AGi48qZILjxJox6N0sMt8/wkql6SsucUfU+YSjLQw5fov7Qwtv2F3biVhSqjsFx4nRs1axhstEq0xhOFg==}
     engines: {node: '>= 10'}
     cpu: [x64]
     os: [win32]
 
-  '@farmfe/core@1.2.8':
-    resolution: {integrity: sha512-vHb6BKmCPE+iAwwdTcEYI25WAoFhKiUs/DUohS5b9lyzKn9XdMWkAFy0Z1DoTwIpkxa/30/Gw7FciRtje8eB4A==}
+  '@farmfe/core@1.3.0':
+    resolution: {integrity: sha512-ELVc8z0cKkTLFNlK+BUJwtfmAB7Ym9VPtVkymqzslDnSCBi9UjBFYhNMIyx4WI2wC8aSsmAYjmlvsHlaAM+dEA==}
     engines: {node: '>=16.15.1'}
 
   '@farmfe/js-plugin-postcss@1.7.0':
@@ -527,18 +529,21 @@ packages:
     engines: {node: '>= 10'}
     cpu: [arm64]
     os: [linux]
+    libc: [glibc]
 
   '@farmfe/plugin-react-linux-arm64-musl@1.1.0':
     resolution: {integrity: sha512-FPBikgThprfQylLEKtM04N843u6WRlS+Fdbu1QwbiT1MDsjAdk9ULLPP3KIj/D9gBsX7efle7F312WJGwpBkqA==}
     engines: {node: '>= 10'}
     cpu: [arm64]
     os: [linux]
+    libc: [glibc]
 
   '@farmfe/plugin-react-linux-x64-gnu@1.1.0':
     resolution: {integrity: sha512-Bu9Rcwgp/ifm+i0iDwO9zQ5MFksE8zBGqQZvGpRmlB5W9zFe5iMhnqGgs7cvcq/BcHmj4gdymSLToh7dkcGJrg==}
     engines: {node: '>= 10'}
     cpu: [x64]
     os: [linux]
+    libc: [glibc]
 
   '@farmfe/plugin-react-linux-x64-musl@1.1.0':
     resolution: {integrity: sha512-vDElYVNwKLvFVdNUkF2BlslZuZxZCgcZqZfujmaOd2E4BMUpiU8iXOl3jaH1BWjF/WTQKtUyWkfoWA33BXlIhg==}
@@ -571,14 +576,14 @@ packages:
     resolution: {integrity: sha512-7ox1VgCI5AWFrIUQVLEYGdqCSGNBJYRC0Yhu5sK0a/sR/OSaZa97MdiKA80LkM6UgK+dDFy49rPre10U/M7yww==}
     hasBin: true
 
-  '@farmfe/runtime-plugin-hmr@3.5.2':
-    resolution: {integrity: sha512-d2zvBfLtBj0iNxhaRtcLIqnNRUspQLOQTiRZ228rtGtqfZ6CPa6l6d8T530+uaWKR8KD5Rf55ZCglQrkakuPZA==}
+  '@farmfe/runtime-plugin-hmr@3.5.3':
+    resolution: {integrity: sha512-42kifit+pDDgZmLtN45YTozHUgUpM84PRK7o9cBtLKxGYQlQpppAY4laEQLbvmcAMjgDrYNASDSJyV4M31VKkg==}
 
-  '@farmfe/runtime-plugin-import-meta@0.2.1':
-    resolution: {integrity: sha512-h9r/Wa2+HmJNffaoWKJuJvCq4RknED4MSAy0Cc+PuzqA1WvSUJcFYJ/I7kdyhUawU9qOv+kD1oQWx6QWoisBng==}
+  '@farmfe/runtime-plugin-import-meta@0.2.2':
+    resolution: {integrity: sha512-xrWJOHbmhVJX+a6LtRpv5wvj/uqpPQFZIKeHfT+mqybKRSC9+JxDgOySLzYUbT8beSTtXgcxGXf55EN3Byd0ng==}
 
-  '@farmfe/runtime@0.11.2':
-    resolution: {integrity: sha512-oRcB9437RpCG4+wxc2oZyeqorj2nL/AfBXrUJmUg22em2R3YtlSoBSE4aSp/DG6xqn+buqpHgvW6Rts/WsDZgQ==}
+  '@farmfe/runtime@0.12.0':
+    resolution: {integrity: sha512-DYz/S63TXS6T7AKUhkP6BeJHAq7zTBIp5+qsejxcTTz5DL34v/XRujQfSLP5/fZbBH9aNiF5vV6oXtsxXC9zGA==}
 
   '@farmfe/utils@0.1.0':
     resolution: {integrity: sha512-neNJQGqV7XL4XifG1uHOBFSFLy2yx1/DVZNRA7nfeEAXEksVZTwWA+fZrYEaI0w7Sw6K/9NYn9Jgpn+NAT0mcg==}
@@ -701,46 +706,55 @@ packages:
     resolution: {integrity: sha512-P9bSiAUnSSM7EmyRK+e5wgpqai86QOSv8BwvkGjLwYuOpaeomiZWifEos517CwbG+aZl1T4clSE1YqqH2JRs+g==}
     cpu: [arm]
     os: [linux]
+    libc: [glibc]
 
   '@rollup/rollup-linux-arm-musleabihf@4.18.1':
     resolution: {integrity: sha512-5RnjpACoxtS+aWOI1dURKno11d7krfpGDEn19jI8BuWmSBbUC4ytIADfROM1FZrFhQPSoP+KEa3NlEScznBTyQ==}
     cpu: [arm]
     os: [linux]
+    libc: [musl]
 
   '@rollup/rollup-linux-arm64-gnu@4.18.1':
     resolution: {integrity: sha512-8mwmGD668m8WaGbthrEYZ9CBmPug2QPGWxhJxh/vCgBjro5o96gL04WLlg5BA233OCWLqERy4YUzX3bJGXaJgQ==}
     cpu: [arm64]
     os: [linux]
+    libc: [glibc]
 
   '@rollup/rollup-linux-arm64-musl@4.18.1':
     resolution: {integrity: sha512-dJX9u4r4bqInMGOAQoGYdwDP8lQiisWb9et+T84l2WXk41yEej8v2iGKodmdKimT8cTAYt0jFb+UEBxnPkbXEQ==}
     cpu: [arm64]
     os: [linux]
+    libc: [musl]
 
   '@rollup/rollup-linux-powerpc64le-gnu@4.18.1':
     resolution: {integrity: sha512-V72cXdTl4EI0x6FNmho4D502sy7ed+LuVW6Ym8aI6DRQ9hQZdp5sj0a2usYOlqvFBNKQnLQGwmYnujo2HvjCxQ==}
     cpu: [ppc64]
     os: [linux]
+    libc: [glibc]
 
   '@rollup/rollup-linux-riscv64-gnu@4.18.1':
     resolution: {integrity: sha512-f+pJih7sxoKmbjghrM2RkWo2WHUW8UbfxIQiWo5yeCaCM0TveMEuAzKJte4QskBp1TIinpnRcxkquY+4WuY/tg==}
     cpu: [riscv64]
     os: [linux]
+    libc: [glibc]
 
   '@rollup/rollup-linux-s390x-gnu@4.18.1':
     resolution: {integrity: sha512-qb1hMMT3Fr/Qz1OKovCuUM11MUNLUuHeBC2DPPAWUYYUAOFWaxInaTwTQmc7Fl5La7DShTEpmYwgdt2hG+4TEg==}
     cpu: [s390x]
     os: [linux]
+    libc: [glibc]
 
   '@rollup/rollup-linux-x64-gnu@4.18.1':
     resolution: {integrity: sha512-7O5u/p6oKUFYjRbZkL2FLbwsyoJAjyeXHCU3O4ndvzg2OFO2GinFPSJFGbiwFDaCFc+k7gs9CF243PwdPQFh5g==}
     cpu: [x64]
     os: [linux]
+    libc: [glibc]
 
   '@rollup/rollup-linux-x64-musl@4.18.1':
     resolution: {integrity: sha512-pDLkYITdYrH/9Cv/Vlj8HppDuLMDUBmgsM0+N+xLtFd18aXgM9Nyqupb/Uw+HeidhfYg2lD6CXvz6CjoVOaKjQ==}
     cpu: [x64]
     os: [linux]
+    libc: [musl]
 
   '@rollup/rollup-win32-arm64-msvc@4.18.1':
     resolution: {integrity: sha512-W2ZNI323O/8pJdBGil1oCauuCzmVd9lDmWBBqxYZcOqWD6aWqJtVBQ1dFrF4dYpZPks6F+xCZHfzG5hYlSHZ6g==}
@@ -2446,38 +2460,38 @@ snapshots:
       inquirer: 9.3.5
       walkdir: 0.4.1
 
-  '@farmfe/core-darwin-arm64@1.2.8':
+  '@farmfe/core-darwin-arm64@1.3.0':
     optional: true
 
-  '@farmfe/core-darwin-x64@1.2.8':
+  '@farmfe/core-darwin-x64@1.3.0':
     optional: true
 
-  '@farmfe/core-linux-arm64-gnu@1.2.8':
+  '@farmfe/core-linux-arm64-gnu@1.3.0':
     optional: true
 
-  '@farmfe/core-linux-arm64-musl@1.2.8':
+  '@farmfe/core-linux-arm64-musl@1.3.0':
     optional: true
 
-  '@farmfe/core-linux-x64-gnu@1.2.8':
+  '@farmfe/core-linux-x64-gnu@1.3.0':
     optional: true
 
-  '@farmfe/core-linux-x64-musl@1.2.8':
+  '@farmfe/core-linux-x64-musl@1.3.0':
     optional: true
 
-  '@farmfe/core-win32-arm64-msvc@1.2.8':
+  '@farmfe/core-win32-arm64-msvc@1.3.0':
     optional: true
 
-  '@farmfe/core-win32-ia32-msvc@1.2.8':
+  '@farmfe/core-win32-ia32-msvc@1.3.0':
     optional: true
 
-  '@farmfe/core-win32-x64-msvc@1.2.8':
+  '@farmfe/core-win32-x64-msvc@1.3.0':
     optional: true
 
-  '@farmfe/core@1.2.8':
+  '@farmfe/core@1.3.0(bufferutil@4.0.8)(utf-8-validate@6.0.4)':
     dependencies:
-      '@farmfe/runtime': 0.11.2
-      '@farmfe/runtime-plugin-hmr': 3.5.2
-      '@farmfe/runtime-plugin-import-meta': 0.2.1
+      '@farmfe/runtime': 0.12.0
+      '@farmfe/runtime-plugin-hmr': 3.5.3
+      '@farmfe/runtime-plugin-import-meta': 0.2.2
       '@farmfe/utils': 0.1.0
       '@koa/cors': 5.0.0
       '@swc/helpers': 0.5.12
@@ -2504,23 +2518,23 @@ snapshots:
       zod: 3.23.8
       zod-validation-error: 3.3.0(zod@3.23.8)
     optionalDependencies:
-      '@farmfe/core-darwin-arm64': 1.2.8
-      '@farmfe/core-darwin-x64': 1.2.8
-      '@farmfe/core-linux-arm64-gnu': 1.2.8
-      '@farmfe/core-linux-arm64-musl': 1.2.8
-      '@farmfe/core-linux-x64-gnu': 1.2.8
-      '@farmfe/core-linux-x64-musl': 1.2.8
-      '@farmfe/core-win32-arm64-msvc': 1.2.8
-      '@farmfe/core-win32-ia32-msvc': 1.2.8
-      '@farmfe/core-win32-x64-msvc': 1.2.8
+      '@farmfe/core-darwin-arm64': 1.3.0
+      '@farmfe/core-darwin-x64': 1.3.0
+      '@farmfe/core-linux-arm64-gnu': 1.3.0
+      '@farmfe/core-linux-arm64-musl': 1.3.0
+      '@farmfe/core-linux-x64-gnu': 1.3.0
+      '@farmfe/core-linux-x64-musl': 1.3.0
+      '@farmfe/core-win32-arm64-msvc': 1.3.0
+      '@farmfe/core-win32-ia32-msvc': 1.3.0
+      '@farmfe/core-win32-x64-msvc': 1.3.0
     transitivePeerDependencies:
       - bufferutil
       - supports-color
       - utf-8-validate
 
-  '@farmfe/js-plugin-postcss@1.7.0(@farmfe/core@1.2.8)(postcss@8.4.39)':
+  '@farmfe/js-plugin-postcss@1.7.0(@farmfe/core@1.3.0(bufferutil@4.0.8)(utf-8-validate@6.0.4))(postcss@8.4.39)':
     dependencies:
-      '@farmfe/core': 1.2.8
+      '@farmfe/core': 1.3.0(bufferutil@4.0.8)(utf-8-validate@6.0.4)
       postcss: 8.4.39
 
   '@farmfe/js-plugin-visualizer@1.0.0(monaco-editor@0.50.0)':
@@ -2590,15 +2604,15 @@ snapshots:
       '@napi-rs/cli': 2.18.4
       cac: 6.7.14
 
-  '@farmfe/runtime-plugin-hmr@3.5.2':
+  '@farmfe/runtime-plugin-hmr@3.5.3':
     dependencies:
       core-js: 3.37.1
 
-  '@farmfe/runtime-plugin-import-meta@0.2.1':
+  '@farmfe/runtime-plugin-import-meta@0.2.2':
     dependencies:
       core-js: 3.37.1
 
-  '@farmfe/runtime@0.11.2':
+  '@farmfe/runtime@0.12.0':
     dependencies:
       core-js: 3.37.1
 
@@ -2690,11 +2704,13 @@ snapshots:
 
   '@polka/url@1.0.0-next.25': {}
 
-  '@rollup/pluginutils@5.1.0':
+  '@rollup/pluginutils@5.1.0(rollup@4.18.1)':
     dependencies:
       '@types/estree': 1.0.5
       estree-walker: 2.0.2
       picomatch: 2.3.1
+    optionalDependencies:
+      rollup: 4.18.1
 
   '@rollup/rollup-android-arm-eabi@4.18.1':
     optional: true
@@ -2784,19 +2800,20 @@ snapshots:
     dependencies:
       '@types/node': 20.14.10
 
-  '@unocss/astro@0.61.3(vite@5.3.3)':
+  '@unocss/astro@0.61.3(rollup@4.18.1)(vite@5.3.3(@types/node@20.14.10))':
     dependencies:
       '@unocss/core': 0.61.3
       '@unocss/reset': 0.61.3
-      '@unocss/vite': 0.61.3(vite@5.3.3)
-      vite: 5.3.3
+      '@unocss/vite': 0.61.3(rollup@4.18.1)(vite@5.3.3(@types/node@20.14.10))
+    optionalDependencies:
+      vite: 5.3.3(@types/node@20.14.10)
     transitivePeerDependencies:
       - rollup
 
-  '@unocss/cli@0.61.3':
+  '@unocss/cli@0.61.3(rollup@4.18.1)':
     dependencies:
       '@ampproject/remapping': 2.3.0
-      '@rollup/pluginutils': 5.1.0
+      '@rollup/pluginutils': 5.1.0(rollup@4.18.1)
       '@unocss/config': 0.61.3
       '@unocss/core': 0.61.3
       '@unocss/preset-uno': 0.61.3
@@ -2920,10 +2937,10 @@ snapshots:
     dependencies:
       '@unocss/core': 0.61.3
 
-  '@unocss/vite@0.61.3(vite@5.3.3)':
+  '@unocss/vite@0.61.3(rollup@4.18.1)(vite@5.3.3(@types/node@20.14.10))':
     dependencies:
       '@ampproject/remapping': 2.3.0
-      '@rollup/pluginutils': 5.1.0
+      '@rollup/pluginutils': 5.1.0(rollup@4.18.1)
       '@unocss/config': 0.61.3
       '@unocss/core': 0.61.3
       '@unocss/inspector': 0.61.3
@@ -2932,13 +2949,13 @@ snapshots:
       chokidar: 3.6.0
       fast-glob: 3.3.2
       magic-string: 0.30.10
-      vite: 5.3.3
+      vite: 5.3.3(@types/node@20.14.10)
     transitivePeerDependencies:
       - rollup
 
-  '@vitejs/plugin-vue@5.0.5(vite@5.3.3)(vue@3.4.31)':
+  '@vitejs/plugin-vue@5.0.5(vite@5.3.3(@types/node@20.14.10))(vue@3.4.31)':
     dependencies:
-      vite: 5.3.3
+      vite: 5.3.3(@types/node@20.14.10)
       vue: 3.4.31
 
   '@vue/compiler-core@3.4.31':
@@ -3380,7 +3397,7 @@ snapshots:
       path-exists: 4.0.0
 
   follow-redirects@1.15.6(debug@4.3.5):
-    dependencies:
+    optionalDependencies:
       debug: 4.3.5
 
   form-data@4.0.0:
@@ -4001,10 +4018,10 @@ snapshots:
 
   universalify@2.0.1: {}
 
-  unocss@0.61.3(postcss@8.4.39)(vite@5.3.3):
+  unocss@0.61.3(postcss@8.4.39)(rollup@4.18.1)(vite@5.3.3(@types/node@20.14.10)):
     dependencies:
-      '@unocss/astro': 0.61.3(vite@5.3.3)
-      '@unocss/cli': 0.61.3
+      '@unocss/astro': 0.61.3(rollup@4.18.1)(vite@5.3.3(@types/node@20.14.10))
+      '@unocss/cli': 0.61.3(rollup@4.18.1)
       '@unocss/core': 0.61.3
       '@unocss/extractor-arbitrary-variants': 0.61.3
       '@unocss/postcss': 0.61.3(postcss@8.4.39)
@@ -4022,8 +4039,9 @@ snapshots:
       '@unocss/transformer-compile-class': 0.61.3
       '@unocss/transformer-directives': 0.61.3
       '@unocss/transformer-variant-group': 0.61.3
-      '@unocss/vite': 0.61.3(vite@5.3.3)
-      vite: 5.3.3
+      '@unocss/vite': 0.61.3(rollup@4.18.1)(vite@5.3.3(@types/node@20.14.10))
+    optionalDependencies:
+      vite: 5.3.3(@types/node@20.14.10)
     transitivePeerDependencies:
       - postcss
       - rollup
@@ -4045,12 +4063,13 @@ snapshots:
 
   vary@1.1.2: {}
 
-  vite@5.3.3:
+  vite@5.3.3(@types/node@20.14.10):
     dependencies:
       esbuild: 0.21.5
       postcss: 8.4.39
       rollup: 4.18.1
     optionalDependencies:
+      '@types/node': 20.14.10
       fsevents: 2.3.3
 
   vue-demi@0.14.8(vue@3.4.31):
@@ -4096,7 +4115,7 @@ snapshots:
       strip-ansi: 6.0.1
 
   ws@8.18.0(bufferutil@4.0.8)(utf-8-validate@6.0.4):
-    dependencies:
+    optionalDependencies:
       bufferutil: 4.0.8
       utf-8-validate: 6.0.4
 
