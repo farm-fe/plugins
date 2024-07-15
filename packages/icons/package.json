@@ -1,6 +1,6 @@
 {
   "name": "@farmfe/plugin-icons",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "main": "scripts/index.js",
   "types": "scripts/index.d.ts",
   "type": "module",
