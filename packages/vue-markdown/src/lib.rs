@@ -1,7 +1,7 @@
 #![deny(clippy::all)]
 
 mod core;
-mod plugin_component;
+// mod plugin_component;
 
 use core::markdown::create_markdown;
 use core::options::Options;
@@ -17,13 +17,13 @@ use farmfe_toolkit::fs::read_file_utf8;
 
 #[farm_plugin]
 pub struct VueMarkdown {
-  options: Options,
+  // options: Options,
 }
 
 impl VueMarkdown {
   fn new(config: &Config, options: String) -> Self {
     Self {
-      ..Default::default()
+      // ..Default::default()
     }
   }
 }
@@ -60,7 +60,14 @@ impl Plugin for VueMarkdown {
       return Ok(None);
     }
 
-    let transformed_content = create_markdown(&param.content, &self.options);
+    let transformed_content = create_markdown(
+      param.content.clone(),
+      Options {
+        vue_version: Some("2.0".to_string()),
+        wrapper_class: Some("markdown-body".to_string()),
+        head_enabled: Some(true),
+      },
+    );
 
     Ok(Some(PluginTransformHookResult {
       content: transformed_content,

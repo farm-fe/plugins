@@ -13,3 +13,4 @@ farmfe_toolkit = "0.0.11"
 farmfe_toolkit_plugin_types = {version = "*"}
 lazy_static = "1.5.0"
 markdown-it = {version = "0.6.1", features = ["linkify"]}
+regex = "1.10.5"

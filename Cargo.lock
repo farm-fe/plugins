@@ -962,6 +962,7 @@ dependencies = [
  "farmfe_toolkit_plugin_types",
  "lazy_static",
  "markdown-it",
+ "regex",
 ]
 
 [[package]]

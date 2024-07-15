@@ -2,6 +2,7 @@ use std::collections::VecDeque;
 
 use crate::core::options::Options;
 use markdown_it::MarkdownIt;
+use regex::Regex;
 
 #[derive(Debug)]
 struct ScriptMeta {
@@ -16,7 +17,7 @@ fn extract_script_setup(html: &str) -> (String, Vec<ScriptMeta>) {
 
   // 使用正则表达式替换匹配的部分，并收集脚本元数据
   let result_html = script_setup_re.replace_all(html, |caps: &regex::Captures| {
-    scripts.push_back(ScriptMeta {
+    scripts.push(ScriptMeta {
       code: caps[3].to_string(),
       attr: format!("{} {}", &caps[1], &caps[2]).trim().to_string(),
     });
@@ -26,7 +27,7 @@ fn extract_script_setup(html: &str) -> (String, Vec<ScriptMeta>) {
   (result_html.to_string(), scripts) as (String, Vec<ScriptMeta>)
 }
 
-pub fn create_markdown(content: String, options: Options) -> string {
+pub fn create_markdown(content: String, options: Options) -> String {
   let script_setup_re =
     Regex::new(r"<\sscript([^>]*?)\bsetup\b([^>]*?)>([\s\S]*?)</script>").unwrap();
 
@@ -62,10 +63,55 @@ pub fn create_markdown(content: String, options: Options) -> string {
   let (new_html, new_scripts) = extract_script_setup(&html);
   html = new_html;
 
-  let script_lines: Vec<_> = vec![];
+  let mut script_lines: Vec<_> = vec![];
 
-  let hoist_scripts_lines = new_scripts.iter().map(|item| item.code);
+  let hoist_scripts_lines: Vec<String> = new_scripts
+    .iter()
+    .map(|item| item.code.clone())
+    .collect::<Vec<_>>();
+  script_lines.extend(hoist_scripts_lines);
+  let mut attrs: String = new_scripts
+    .iter()
+    .map(|item| item.attr.clone())
+    .collect::<Vec<_>>()
+    .join(" ")
+    .trim().to_string();
 
-  script_lines
-  ""
+  if attrs != "" {
+    attrs = format!(" {}", attrs);
+  }
+
+  let mut scripts: Vec<_> = Vec::new();
+
+  if is_vue2 {
+    scripts.push(format!("<script{}>", attrs,));
+    script_lines
+      .iter_mut()
+      .for_each(|lines| scripts.push(lines.clone()));
+    scripts.push("export default { data() { return { frontmatter } } }".to_string());
+    script_lines.push("</script>".to_string())
+  } else {
+    scripts.push(format!("<script setup{}>", attrs));
+    script_lines
+      .iter_mut()
+      .for_each(|lines| scripts.push(lines.clone()));
+    scripts.push("</script>".to_string());
+
+
+  }
+
+
+
+  let template = format!("<template>\n{}\n</template>", html);
+
+
+  let scripts:String = script_lines.iter_mut().map(|script_line| {
+    script_line.trim()
+  }).collect::<Vec<&str>>().join("\n");
+
+
+  let code = format!("{}\n{}", template, scripts);
+  println!("{}", code);
+  code
+
 }
