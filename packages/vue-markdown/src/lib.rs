@@ -1,10 +1,13 @@
 #![deny(clippy::all)]
 
 mod core;
-// mod plugin_component;
-
 use core::markdown::create_markdown;
 use core::options::Options;
+use lazy_static::lazy_static;
+
+lazy_static! {
+  static ref MARKDOWN_MODULE_TYPE: String = String::from("markdown-mdx");
+}
 
 use farmfe_core::{
   config::Config,
@@ -41,11 +44,10 @@ impl Plugin for VueMarkdown {
   ) -> farmfe_core::error::Result<Option<farmfe_core::plugin::PluginLoadHookResult>> {
     if param.resolved_path.ends_with((".mdx")) || param.resolved_path.ends_with(".md") {
       let content = read_file_utf8(param.resolved_path).unwrap();
-
       return Ok(Some(PluginLoadHookResult {
         content,
         source_map: None,
-        module_type: ModuleType::Custom("vue-markdown".to_string()),
+        module_type: ModuleType::Custom(MARKDOWN_MODULE_TYPE.to_string()),
       }));
     }
     Ok(None)
@@ -56,7 +58,7 @@ impl Plugin for VueMarkdown {
     param: &farmfe_core::plugin::PluginTransformHookParam,
     _context: &std::sync::Arc<farmfe_core::context::CompilationContext>,
   ) -> farmfe_core::error::Result<Option<farmfe_core::plugin::PluginTransformHookResult>> {
-    if param.module_type != ModuleType::Custom("vue-markdown".to_string()) {
+    if param.module_type != ModuleType::Custom(MARKDOWN_MODULE_TYPE.to_string()) {
       return Ok(None);
     }
 
@@ -67,13 +69,14 @@ impl Plugin for VueMarkdown {
         wrapper_class: Some("markdown-body".to_string()),
         head_enabled: Some(true),
       },
+      param.resolved_path.clone().to_string(),
+      param.module_id.clone(),
     );
-
-    Ok(Some(PluginTransformHookResult {
-      content: transformed_content,
+    return Ok(Some(PluginTransformHookResult {
+      content: format!("{}", transformed_content),
       source_map: None,
-      module_type: Some(ModuleType::Jsx),
+      module_type: Some(ModuleType::Js),
       ignore_previous_source_map: false,
-    }))
+    }));
   }
 }

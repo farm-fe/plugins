@@ -25,7 +25,7 @@ importers:
         specifier: ^1.0.2
         version: 1.0.2
       '@farmfe/core':
-        specifier: ^1.2.4
+        specifier: ^1.3.0
         version: 1.3.0
       '@farmfe/plugin-vue-markdown':
         specifier: workspace:*

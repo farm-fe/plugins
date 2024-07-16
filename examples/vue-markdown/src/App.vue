@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import HelloWorld from './components/HelloWorld.vue'
+import MD from './01.mdx';
 </script>
 
 <template>
@@ -11,10 +11,10 @@ import HelloWorld from './components/HelloWorld.vue'
       <img src="./assets/vue.svg" class="logo vue" alt="Vue logo" />
     </a>
   </div>
-  <HelloWorld msg="Farm + Vue" />
+  <MD />
 </template>
 
-<style scoped>
+<!-- <style scoped>
 .logo {
   height: 6em;
   padding: 1.5em;
@@ -23,10 +23,10 @@ import HelloWorld from './components/HelloWorld.vue'
 }
 
 .logo:hover {
-  filter: drop-shadow(0 0 2em #9F1A8Faa);
+  filter: drop-shadow(0 0 2em #9f1a8faa);
 }
 
 .logo.vue:hover {
   filter: drop-shadow(0 0 2em #42b883aa);
 }
-</style>
+</style> -->
