@@ -7,7 +7,7 @@ pub fn vue_compiler(param: CompilerParams) -> String {
   let CompileResult { code, .. } = compile(
     &code,
     CompileOptions {
-      filename: std::borrow::Cow::Borrowed(&svg_name),
+      filename: std::borrow::Cow::Borrowed(&svg_name.unwrap_or("Index".to_string())),
       id: std::borrow::Cow::Borrowed("index"),
       is_prod: Some(true),
       ssr: Some(false),
@@ -36,8 +36,8 @@ mod tests {
 </template>"#;
     let params = CompilerParams {
       svg: svg.to_string(),
-      root_path,
-      svg_name: "abc".to_string(),
+      root_path: Some(root_path),
+      svg_name: Some("abc".to_string()),
     };
     let result = vue_compiler(params);
     println!("{}", result)

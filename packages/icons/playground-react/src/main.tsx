@@ -1,9 +1,10 @@
 import React, { useState } from "react";
 import "./main.css";
-import reactLogo from "./assets/react.svg";
 import FarmLogo from "./assets/logo.png";
-// import 'virtual:uno.css'
-import ReactLogo from '~icons/logos/react'
+import ReactLogoComponent from "./assets/react.svg?component";
+import LocalReactLogo from "~icons/local/react";
+import RemoteComponent from "~icons/remote/react";
+import ReactLogoIconify from '~icons/logos/react'
 export function Main() {
   const [count, setCount] = useState(0);
   console.log("rendering Main component")
@@ -14,11 +15,14 @@ export function Main() {
           <img src={FarmLogo} className="logo" alt="Farm logo" />
         </a>
         <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
+          {/* <img src={reactLogo} className="logo react" alt="React logo" /> */}
         </a>
-        <div style={{display:'flex',alignItems:"center"}}>
-        <div><ReactLogo className=" text-100px text-#00D8FF"/></div>
-        <div className="i-logos-react  text-100px text-#00D8FF"></div>
+        <div style={{ display: 'flex', alignItems: "center" }}>
+          <div className="i-logos-react  text-100px text-#00D8FF"></div>
+          <ReactLogoIconify className=" text-100px text-#00D8FF" />
+          <ReactLogoComponent className="text-100px h-1em w-1em" />
+          <LocalReactLogo className="text-100px h-1em w-1em" />
+          <RemoteComponent className="text-100px h-1em w-1em" />
         </div>
       </div>
       <h1>Farm + React</h1>

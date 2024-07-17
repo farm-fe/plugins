@@ -14,6 +14,7 @@ export default defineConfig({
     visualizer(),
     ["@farmfe/plugin-react", { runtime: "automatic" }],
     ["@farmfe/plugin-icons", {
+      scale: 1,
       /**
        * @description Whether to automatically install the required dependencies
        * @type {boolean}

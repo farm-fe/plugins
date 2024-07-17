@@ -23,7 +23,7 @@ use loader::{
 };
 use options::Options;
 use serde_json::Value;
-use std::collections::HashMap;
+use std::{collections::HashMap, path::Path};
 
 const PUBLIC_ICON_PREFIX: &str = "virtual:__FARM_ICON_ASSET__:";
 
@@ -40,7 +40,10 @@ impl FarmfePluginIcons {
         .collections_node_resolve_path
         .unwrap_or(config.root.clone()),
     );
-
+    println!(
+      "collections_node_resolve_path: {:?}",
+      collections_node_resolve_path
+    );
     let jsx = options::guess_jsx(&config.root);
 
     Self {
@@ -57,6 +60,9 @@ impl Plugin for FarmfePluginIcons {
   fn name(&self) -> &str {
     "FarmfePluginIcons"
   }
+  fn priority(&self) -> i32 {
+    101
+  }
   fn resolve(
     &self,
     param: &farmfe_core::plugin::PluginResolveHookParam,
@@ -65,19 +71,10 @@ impl Plugin for FarmfePluginIcons {
   ) -> farmfe_core::error::Result<Option<farmfe_core::plugin::PluginResolveHookResult>> {
     let meta = get_path_meta(&param.source);
     let query = parse_query(&meta.query);
-    if query.iter().any(|(k, _)| k == "component") {
-      let res = meta.base_path.clone();
-      if res.ends_with(".svg") {
-        return Ok(Some(PluginResolveHookResult {
-          resolved_path: format!("{PUBLIC_ICON_PREFIX}{}", res),
-          external: false,
-          side_effects: false,
-          query,
-          ..Default::default()
-        }));
-      }
+    let query_is_component = query.iter().any(|(k, _)| k == "component");
+    if query_is_component {
+      return Ok(None);
     }
-
     if is_icon_path(&param.source) {
       let res = meta.base_path.clone();
       let compiler = {
@@ -91,6 +88,13 @@ impl Plugin for FarmfePluginIcons {
             .unwrap_or_else(|| "jsx".to_string())
         }
       };
+      let mut source_path = res.clone();
+      if query_is_component {
+        let import_path = Path::new(&source_path);
+        if import_path.is_relative() {
+          source_path = format!("{}{}", import_path.to_string_lossy().to_string(), ".svg");
+        }
+      }
       let resolved_path = match compiler.as_str() {
         "jsx" => format!("{}.jsx", res),
         "svelte" => format!("{}.svelte", res),
@@ -103,9 +107,11 @@ impl Plugin for FarmfePluginIcons {
         external: false,
         side_effects: false,
         query,
+        meta: HashMap::from([("source_path".to_string(), source_path)]),
         ..Default::default()
       }));
     }
+
     Ok(None)
   }
   fn load(
@@ -114,17 +120,7 @@ impl Plugin for FarmfePluginIcons {
     _context: &std::sync::Arc<farmfe_core::context::CompilationContext>,
     _hook_context: &farmfe_core::plugin::PluginHookContext,
   ) -> farmfe_core::error::Result<Option<farmfe_core::plugin::PluginLoadHookResult>> {
-    if let Some(source) = param.resolved_path.strip_prefix(PUBLIC_ICON_PREFIX) {
-      let root_path = self
-        .options
-        .collections_node_resolve_path
-        .clone()
-        .unwrap_or_default();
-      let compiler = get_compiler(GetCompilerParams {
-        jsx: self.options.jsx.clone().unwrap_or_default(),
-        compiler: self.options.compiler.clone().unwrap_or_default(),
-      });
-      let meta = resolve_icons_path(source);
+    if param.query.iter().any(|(k, _)| k == "component") {
       let query_map = param.query.iter().cloned().collect::<HashMap<_, _>>();
       let svg_builder = SvgModifier::new(SvgModifier {
         fill: query_map.get("fill").and_then(|v| v.parse().ok()),
@@ -136,25 +132,48 @@ impl Plugin for FarmfePluginIcons {
         style: self.options.default_style.clone(),
         view_box: None,
       });
-
-      if query_map.contains_key("component") {
-        let svg = svg_builder.apply_to_svg(&get_svg_by_local_path(&param.resolved_path));
-        let code = compiler(CompilerParams {
-          svg,
-          root_path,
-          svg_name: meta.icon,
-        });
-        let module_type = get_module_type_by_compiler(GetCompilerParams {
-          jsx: self.options.jsx.clone().unwrap_or_default(),
-          compiler: self.options.compiler.clone().unwrap_or_default(),
-        });
-        return Ok(Some(PluginLoadHookResult {
-          content: code,
-          module_type,
-          source_map: None,
-        }));
-      }
-
+      let svg = svg_builder.apply_to_svg(&get_svg_by_local_path(param.resolved_path));
+      let compiler = get_compiler(GetCompilerParams {
+        jsx: self.options.jsx.clone().unwrap_or_default(),
+        compiler: self.options.compiler.clone().unwrap_or_default(),
+      });
+      let code = compiler(CompilerParams {
+        svg,
+        root_path: None,
+        svg_name: None,
+      });
+      let module_type = get_module_type_by_compiler(GetCompilerParams {
+        jsx: self.options.jsx.clone().unwrap_or_default(),
+        compiler: self.options.compiler.clone().unwrap_or_default(),
+      });
+      return Ok(Some(PluginLoadHookResult {
+        content: code,
+        module_type,
+        source_map: None,
+      }));
+    }
+    if let Some(source) = param.resolved_path.strip_prefix(PUBLIC_ICON_PREFIX) {
+      let root_path = self
+        .options
+        .collections_node_resolve_path
+        .clone()
+        .unwrap_or_default();
+      let compiler = get_compiler(GetCompilerParams {
+        jsx: self.options.jsx.clone().unwrap_or_default(),
+        compiler: self.options.compiler.clone().unwrap_or_default(),
+      });
+      let query_map = param.query.iter().cloned().collect::<HashMap<_, _>>();
+      let svg_builder = SvgModifier::new(SvgModifier {
+        fill: query_map.get("fill").and_then(|v| v.parse().ok()),
+        stroke: query_map.get("stroke").and_then(|v| v.parse().ok()),
+        stroke_width: query_map.get("stroke-width").and_then(|v| v.parse().ok()),
+        width: query_map.get("width").and_then(|v| v.parse().ok()),
+        height: query_map.get("height").and_then(|v| v.parse().ok()),
+        class: self.options.default_class.clone(),
+        style: self.options.default_style.clone(),
+        view_box: None,
+      });
+      let meta = resolve_icons_path(source);
       let mut svg_raw = String::new();
       let custom_collections = self
         .options
@@ -226,8 +245,8 @@ impl Plugin for FarmfePluginIcons {
       }
       let code = compiler(CompilerParams {
         svg: svg_raw,
-        root_path,
-        svg_name: meta.icon,
+        root_path:Some(root_path),
+        svg_name: Some(meta.icon),
       });
       let module_type = get_module_type_by_compiler(GetCompilerParams {
         jsx: self.options.jsx.clone().unwrap_or_default(),
