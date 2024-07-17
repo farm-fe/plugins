@@ -1,5 +1,3 @@
-use farmfe_core::regex::Regex;
-
 pub struct Options {
   /// - Explicitly set the Vue version
   /// - default 3

@@ -6,4 +6,7 @@ export default defineConfig({
     include: [/\.vue$/, /\.md$/],
   })],
   plugins: ["@farmfe/plugin-vue-markdown"],
+  compilation: {
+    persistentCache: false
+  }
 });

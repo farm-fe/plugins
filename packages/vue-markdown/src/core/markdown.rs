@@ -1,11 +1,12 @@
-use std::collections::VecDeque;
-
+extern crate markdown_it_front_matter;
 use crate::core::options::Options;
 use crate::core::utils::vue_compile;
-use markdown_it::MarkdownIt;
+use farmfe_core::config::html;
+use farmfe_core::serde_json;
+use markdown_it::{MarkdownIt, NodeValue};
+use markdown_it_front_matter::FrontMatter;
 use regex::Regex;
-
-use fervid::{compile, CompileOptions, CompileResult};
+use serde_yaml::Value;
 
 #[derive(Debug)]
 struct ScriptMeta {
@@ -31,8 +32,8 @@ fn extract_script_setup(html: &str) -> (String, Vec<ScriptMeta>) {
 }
 
 pub fn create_markdown(content: String, options: Options, file_name: String, id: String) -> String {
-  let script_setup_re =
-    Regex::new(r"<\sscript([^>]*?)\bsetup\b([^>]*?)>([\s\S]*?)</script>").unwrap();
+  // let script_setup_re =
+  //   Regex::new(r"<\sscript([^>]*?)\bsetup\b([^>]*?)>([\s\S]*?)</script>").unwrap();
 
   let is_vue2 = if let Some(vue_version) = options.vue_version {
     vue_version.starts_with("2.")
@@ -47,15 +48,38 @@ pub fn create_markdown(content: String, options: Options, file_name: String, id:
   markdown_it::plugins::extra::typographer::add(md);
   markdown_it::plugins::extra::add(md);
   markdown_it::plugins::sourcepos::add(md);
+  markdown_it_front_matter::add(md);
 
   let Options {
     wrapper_class,
-    head_enabled,
+    // head_enabled,
     ..
   } = options;
 
   let raw = content.trim_start();
-  let mut html = md.parse(raw).render();
+  let node = md.parse(raw);
+  let mut front_matter = String::new();
+  if let Some(content) = node
+    .children
+    .first()
+    .unwrap()
+    .node_value
+    .as_any()
+    .downcast_ref::<FrontMatter>()
+  {
+    front_matter = content.content.clone();
+  }
+
+  let front_matter = serde_yaml::from_str::<Value>(&front_matter).unwrap();
+
+  let front_matter = format!(
+    "const frontmatter = {};",
+    serde_json::to_string(&front_matter).unwrap()
+  );
+
+  println!("front_matter: {:?}", front_matter);
+
+  let mut html = node.render();
 
   if wrapper_class.is_some() {
     html = format!("<div class=\"{}\">{}</div>", wrapper_class.unwrap(), html);
@@ -88,28 +112,28 @@ pub fn create_markdown(content: String, options: Options, file_name: String, id:
   let mut scripts: Vec<_> = Vec::new();
 
   if is_vue2 {
-    // scripts.push(format!("<script{}>", attrs,));
-    script_lines
-      .iter_mut()
-      .for_each(|lines| scripts.push(lines.clone()));
+    scripts.push(format!("<script{}>", attrs));
+    scripts.push(front_matter);
+    scripts.extend(script_lines.clone());
     scripts.push("export default { data() { return { frontmatter } } }".to_string());
-    // script_lines.push("</script>".to_string())
+    script_lines.push("</script>".to_string())
   } else {
-    // scripts.push(format!("<script setup{}>", attrs));
-    script_lines
-      .iter_mut()
-      .for_each(|lines| scripts.push(lines.clone()));
-    // scripts.push("</script>".to_string());
+    scripts.push(format!("<script setup{}>", attrs));
+    scripts.push(front_matter);
+    scripts.extend(script_lines.clone());
+    scripts.push("</script>".to_string());
   }
 
   let template = format!("<template>\n{}\n</template>", html);
 
-  let scripts: String = script_lines
+  let mut code: Vec<_> = vec![template.clone()];
+  let scripts = script_lines
     .iter_mut()
-    .map(|script_line| script_line.trim())
-    .collect::<Vec<&str>>()
-    .join("\n");
+    .map(|script_line| script_line.trim().to_string())
+    .filter(|script_line| script_line != "")
+    .collect::<Vec<_>>();
+  code.extend(scripts);
 
-  let code = format!("{}\n{}", template, scripts);
-  vue_compile(&template, &file_name, &id)
+  println!("code: {:?}", &code);
+  vue_compile(&code.join("/n"), &file_name, &id)
 }

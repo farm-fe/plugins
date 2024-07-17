@@ -14,4 +14,6 @@ farmfe_toolkit_plugin_types = {version = "*"}
 fervid = "0.2.0"
 lazy_static = "1.5.0"
 markdown-it = {version = "0.6.1", features = ["linkify"]}
+markdown-it-front-matter = "0.3.0"
 regex = "1.10.5"
+serde_yaml = "0.9.34"

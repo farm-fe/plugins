@@ -963,7 +963,9 @@ dependencies = [
  "fervid",
  "lazy_static",
  "markdown-it",
+ "markdown-it-front-matter",
  "regex",
+ "serde_yaml",
 ]
 
 [[package]]
@@ -1851,6 +1853,15 @@ dependencies = [
  "stacker",
  "syntect",
  "unicode-general-category",
+]
+
+[[package]]
+name = "markdown-it-front-matter"
+version = "0.3.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "5181d76def41e21e40175078f3e4879d11f7ca93a2e781d69131f6648e4f5205"
+dependencies = [
+ "markdown-it",
 ]
 
 [[package]]

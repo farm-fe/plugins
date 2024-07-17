@@ -24,7 +24,7 @@ pub struct VueMarkdown {
 }
 
 impl VueMarkdown {
-  fn new(config: &Config, options: String) -> Self {
+  fn new(_config: &Config, _options: String) -> Self {
     Self {
       // ..Default::default()
     }
@@ -42,7 +42,7 @@ impl Plugin for VueMarkdown {
     _context: &std::sync::Arc<farmfe_core::context::CompilationContext>,
     _hook_context: &farmfe_core::plugin::PluginHookContext,
   ) -> farmfe_core::error::Result<Option<farmfe_core::plugin::PluginLoadHookResult>> {
-    if param.resolved_path.ends_with((".mdx")) || param.resolved_path.ends_with(".md") {
+    if param.resolved_path.ends_with(".mdx") || param.resolved_path.ends_with(".md") {
       let content = read_file_utf8(param.resolved_path).unwrap();
       return Ok(Some(PluginLoadHookResult {
         content,
@@ -69,9 +69,10 @@ impl Plugin for VueMarkdown {
         wrapper_class: Some("markdown-body".to_string()),
         head_enabled: Some(true),
       },
-      param.resolved_path.clone().to_string(),
+      param.resolved_path.to_string(),
       param.module_id.clone(),
     );
+
     return Ok(Some(PluginTransformHookResult {
       content: format!("{}", transformed_content),
       source_map: None,
