@@ -27,7 +27,43 @@
       "require": "./scripts/index.js",
       "types": "./scripts/index.d.ts"
     },
-    "./package.json": "./package.json"
+    "./package.json": "./package.json",
+    "./types/astro": {
+      "types": "./types/astro.d.ts"
+    },
+    "./types/preact": {
+      "types": "./types/preact.d.ts"
+    },
+    "./types/qwik": {
+      "types": "./types/qwik.d.ts"
+    },
+    "./types/raw": {
+      "types": "./types/raw.d.ts"
+    },
+    "./types/react": {
+      "types": "./types/react.d.ts"
+    },
+    "./types/solid": {
+      "types": "./types/solid.d.ts"
+    },
+    "./types/svelte": {
+      "types": "./types/svelte.d.ts"
+    },
+    "./types/svelte3": {
+      "types": "./types/svelte3.d.ts"
+    },
+    "./types/svelte4": {
+      "types": "./types/svelte4.d.ts"
+    },
+    "./types/vue": {
+      "types": "./types/vue.d.ts"
+    },
+    "./types/vue3": {
+      "types": "./types/vue3.d.ts"
+    },
+    "./types/web-components": {
+      "types": "./types/web-components.d.ts"
+    }
   },
   "scripts": {
     "dev": "cargo watch -w src -s 'scripts/watch.sh'",
@@ -38,6 +74,7 @@
     "prepublishOnly": "farm-plugin-tools prepublish"
   },
   "files": [
-    "scripts"
+    "scripts",
+    "types"
   ]
 }
