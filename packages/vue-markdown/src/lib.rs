@@ -65,13 +65,15 @@ impl Plugin for VueMarkdown {
     let transformed_content = create_markdown(
       param.content.clone(),
       Options {
-        vue_version: Some("2.0".to_string()),
+        vue_version: Some("3.0".to_string()),
         wrapper_class: Some("markdown-body".to_string()),
         head_enabled: Some(true),
       },
       param.resolved_path.to_string(),
       param.module_id.clone(),
     );
+
+    println!("transformed_content: {:?}", transformed_content);
 
     return Ok(Some(PluginTransformHookResult {
       content: format!("{}", transformed_content),

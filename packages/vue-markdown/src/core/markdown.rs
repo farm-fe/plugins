@@ -1,9 +1,8 @@
 extern crate markdown_it_front_matter;
 use crate::core::options::Options;
 use crate::core::utils::vue_compile;
-use farmfe_core::config::html;
 use farmfe_core::serde_json;
-use markdown_it::{MarkdownIt, NodeValue};
+use markdown_it::MarkdownIt;
 use markdown_it_front_matter::FrontMatter;
 use regex::Regex;
 use serde_yaml::Value;
@@ -58,16 +57,17 @@ pub fn create_markdown(content: String, options: Options, file_name: String, id:
 
   let raw = content.trim_start();
   let node = md.parse(raw);
-  let mut front_matter = String::new();
-  if let Some(content) = node
+  let mut front_matter = String::from("--- \n ---");
+  let front_matter_value = node
     .children
     .first()
     .unwrap()
     .node_value
     .as_any()
-    .downcast_ref::<FrontMatter>()
-  {
-    front_matter = content.content.clone();
+    .downcast_ref::<FrontMatter>();
+
+  if !front_matter_value.is_none() {
+    front_matter = front_matter_value.unwrap().content.clone();
   }
 
   let front_matter = serde_yaml::from_str::<Value>(&front_matter).unwrap();
@@ -76,8 +76,6 @@ pub fn create_markdown(content: String, options: Options, file_name: String, id:
     "const frontmatter = {};",
     serde_json::to_string(&front_matter).unwrap()
   );
-
-  println!("front_matter: {:?}", front_matter);
 
   let mut html = node.render();
 
@@ -112,14 +110,14 @@ pub fn create_markdown(content: String, options: Options, file_name: String, id:
   let mut scripts: Vec<_> = Vec::new();
 
   if is_vue2 {
-    scripts.push(format!("<script{}>", attrs));
-    scripts.push(front_matter);
+    scripts.push(format!("<script {}>", attrs));
+    scripts.push(front_matter.clone());
     scripts.extend(script_lines.clone());
     scripts.push("export default { data() { return { frontmatter } } }".to_string());
-    script_lines.push("</script>".to_string())
+    scripts.push("</script>".to_string())
   } else {
     scripts.push(format!("<script setup{}>", attrs));
-    scripts.push(front_matter);
+    scripts.push(front_matter.clone());
     scripts.extend(script_lines.clone());
     scripts.push("</script>".to_string());
   }
@@ -127,13 +125,13 @@ pub fn create_markdown(content: String, options: Options, file_name: String, id:
   let template = format!("<template>\n{}\n</template>", html);
 
   let mut code: Vec<_> = vec![template.clone()];
-  let scripts = script_lines
+  let scripts = scripts
     .iter_mut()
     .map(|script_line| script_line.trim().to_string())
-    .filter(|script_line| script_line != "")
+    // .filter(|script_line| script_line != "")
     .collect::<Vec<_>>();
   code.extend(scripts);
 
   println!("code: {:?}", &code);
-  vue_compile(&code.join("/n"), &file_name, &id)
+  vue_compile(&code.join("\n"), &file_name, &id)
 }
