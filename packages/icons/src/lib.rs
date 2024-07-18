@@ -11,6 +11,7 @@ use farmfe_core::{
   serde_json,
 };
 use farmfe_macro_plugin::farm_plugin;
+use farmfe_toolkit::fs::read_file_utf8;
 use farmfe_utils::parse_query;
 use loader::{
   common::{
@@ -23,7 +24,7 @@ use loader::{
 };
 use options::Options;
 use serde_json::Value;
-use std::{collections::HashMap, path::Path};
+use std::collections::HashMap;
 
 const PUBLIC_ICON_PREFIX: &str = "virtual:__FARM_ICON_ASSET__:";
 
@@ -61,7 +62,7 @@ impl Plugin for FarmfePluginIcons {
     "FarmfePluginIcons"
   }
   fn priority(&self) -> i32 {
-    101
+    105
   }
   fn resolve(
     &self,
@@ -88,26 +89,20 @@ impl Plugin for FarmfePluginIcons {
             .unwrap_or_else(|| "jsx".to_string())
         }
       };
-      let mut source_path = res.clone();
-      if query_is_component {
-        let import_path = Path::new(&source_path);
-        if import_path.is_relative() {
-          source_path = format!("{}{}", import_path.to_string_lossy().to_string(), ".svg");
-        }
-      }
+
+      println!("compiler: {:?}", compiler);
       let resolved_path = match compiler.as_str() {
         "jsx" => format!("{}.jsx", res),
         "svelte" => format!("{}.svelte", res),
         "solid" => format!("{}.tsx", res),
         "vue" => format!("{}.js", res),
-        _ => res.clone(),
+        _ => format!("{}.svg", res),
       };
       return Ok(Some(PluginResolveHookResult {
         resolved_path: format!("{PUBLIC_ICON_PREFIX}{}", resolved_path),
         external: false,
         side_effects: false,
         query,
-        meta: HashMap::from([("source_path".to_string(), source_path)]),
         ..Default::default()
       }));
     }
@@ -153,6 +148,19 @@ impl Plugin for FarmfePluginIcons {
       }));
     }
     if let Some(source) = param.resolved_path.strip_prefix(PUBLIC_ICON_PREFIX) {
+      println!("param.resolved_path: {}", param.resolved_path);
+      // let meta = get_path_meta(&param.resolved_path);
+      // let query = parse_query(&meta.query);
+      // let query_had_component = query.iter().any(|(k, _)| k == "raw");
+      // if query_had_component {
+      //   let file_utf8 = read_file_utf8(param.resolved_path).unwrap();
+      //   let content = format!("export default {:?}", file_utf8.replace("\r\n", "\n"));
+      //   return Ok(Some(PluginLoadHookResult {
+      //     content,
+      //     module_type: ModuleType::Js,
+      //     source_map: None,
+      //   }));
+      // }
       let root_path = self
         .options
         .collections_node_resolve_path
@@ -237,6 +245,7 @@ impl Plugin for FarmfePluginIcons {
         }
       }
       if query_map.contains_key("raw") {
+        println!("svg_raw: {}", svg_raw);
         return Ok(Some(PluginLoadHookResult {
           content: svg_raw,
           module_type: ModuleType::Asset,
@@ -245,7 +254,7 @@ impl Plugin for FarmfePluginIcons {
       }
       let code = compiler(CompilerParams {
         svg: svg_raw,
-        root_path:Some(root_path),
+        root_path: Some(root_path),
         svg_name: Some(meta.icon),
       });
       let module_type = get_module_type_by_compiler(GetCompilerParams {

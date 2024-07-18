@@ -1,13 +1,15 @@
 import React, { useState } from "react";
 import "./main.css";
 import FarmLogo from "./assets/logo.png";
+import VueLogoIconifyRaw from '~icons/logos/vue?raw'
+import RemoteComponent from "~icons/remote/react";
+import ReactLogoIconify from '~icons/logos/react?width=2em&height=2em'
 import ReactLogoComponent from "./assets/react.svg?component";
 import LocalReactLogo from "~icons/local/react";
-import RemoteComponent from "~icons/remote/react";
-import ReactLogoIconify from '~icons/logos/react'
 export function Main() {
   const [count, setCount] = useState(0);
   console.log("rendering Main component")
+  console.log(VueLogoIconifyRaw);
   return (
     <>
       <div>
@@ -23,6 +25,11 @@ export function Main() {
           <ReactLogoComponent className="text-100px h-1em w-1em" />
           <LocalReactLogo className="text-100px h-1em w-1em" />
           <RemoteComponent className="text-100px h-1em w-1em" />
+          <div dangerouslySetInnerHTML={
+            {
+              __html: VueLogoIconifyRaw
+            }
+          } className="text-100px h-1em w-1em"></div>
         </div>
       </div>
       <h1>Farm + React</h1>
