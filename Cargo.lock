@@ -794,6 +794,7 @@ dependencies = [
  "farmfe_utils",
  "fervid",
  "once_cell",
+ "openssl-sys",
  "reqwest",
  "serde",
  "serde_json",
