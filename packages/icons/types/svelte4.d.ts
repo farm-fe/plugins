@@ -11,3 +11,11 @@ declare module '~icons/*' {
 
   export default class extends SvelteComponent<SvelteHTMLElements['svg']> {}
 }
+
+
+declare module '*.svg?component' {
+  import { SvelteComponent } from 'svelte'
+  import type { SvelteHTMLElements } from 'svelte/elements'
+
+  export default class extends SvelteComponent<SvelteHTMLElements['svg']> {}
+}
