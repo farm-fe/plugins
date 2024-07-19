@@ -11,7 +11,6 @@ use farmfe_core::{
   serde_json,
 };
 use farmfe_macro_plugin::farm_plugin;
-use farmfe_toolkit::fs::read_file_utf8;
 use farmfe_utils::parse_query;
 use loader::{
   common::{
@@ -41,10 +40,7 @@ impl FarmfePluginIcons {
         .collections_node_resolve_path
         .unwrap_or(config.root.clone()),
     );
-    println!(
-      "collections_node_resolve_path: {:?}",
-      collections_node_resolve_path
-    );
+    
     let jsx = options::guess_jsx(&config.root);
 
     Self {
@@ -90,7 +86,6 @@ impl Plugin for FarmfePluginIcons {
         }
       };
 
-      println!("compiler: {:?}", compiler);
       let resolved_path = match compiler.as_str() {
         "jsx" => format!("{}.jsx", res),
         "svelte" => format!("{}.svelte", res),
@@ -148,19 +143,6 @@ impl Plugin for FarmfePluginIcons {
       }));
     }
     if let Some(source) = param.resolved_path.strip_prefix(PUBLIC_ICON_PREFIX) {
-      println!("param.resolved_path: {}", param.resolved_path);
-      // let meta = get_path_meta(&param.resolved_path);
-      // let query = parse_query(&meta.query);
-      // let query_had_component = query.iter().any(|(k, _)| k == "raw");
-      // if query_had_component {
-      //   let file_utf8 = read_file_utf8(param.resolved_path).unwrap();
-      //   let content = format!("export default {:?}", file_utf8.replace("\r\n", "\n"));
-      //   return Ok(Some(PluginLoadHookResult {
-      //     content,
-      //     module_type: ModuleType::Js,
-      //     source_map: None,
-      //   }));
-      // }
       let root_path = self
         .options
         .collections_node_resolve_path
@@ -245,7 +227,6 @@ impl Plugin for FarmfePluginIcons {
         }
       }
       if query_map.contains_key("raw") {
-        println!("svg_raw: {}", svg_raw);
         return Ok(Some(PluginLoadHookResult {
           content: svg_raw,
           module_type: ModuleType::Asset,

@@ -827,6 +827,7 @@ dependencies = [
  "farmfe_toolkit_plugin_types",
  "farmfe_utils",
  "glob",
+ "openssl",
  "serde",
  "walkdir",
 ]

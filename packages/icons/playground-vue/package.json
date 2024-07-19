@@ -1,5 +1,5 @@
 {
-  "name": "vue-example",
+  "name": "playground-vue",
   "version": "1.0.0",
   "scripts": {
     "dev": "farm start",
