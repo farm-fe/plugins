@@ -10,7 +10,7 @@ pub fn svelte_compiler(param: CompilerParams) -> String {
   let CompilerParams { svg, root_path, .. } = param;
   let mut svelte_runes = SVELTE_RUNES.lock().unwrap();
   if svelte_runes.is_none() {
-    *svelte_runes = match get_svelte_version(&root_path) {
+    *svelte_runes = match get_svelte_version(&root_path.unwrap()) {
       Some(version) => Some(version >= 5),
       None => Some(false),
     };

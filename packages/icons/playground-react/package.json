@@ -1,5 +1,5 @@
 {
-  "name": "playground",
+  "name": "playground-react",
   "version": "1.0.0",
   "type": "module",
   "scripts": {
@@ -24,8 +24,8 @@
   },
   "devDependencies": {
     "@farmfe/cli": "^1.0.2",
-    "@farmfe/core": "^1.3.0",
-    "@farmfe/plugin-react": "^1.1.0",
+    "@farmfe/core": "1.3.0",
+    "@farmfe/plugin-react": "^1.2.0",
     "@types/react": "^18.3.3",
     "@types/react-dom": "^18.3.0",
     "@unocss/postcss": "^0.61.3",

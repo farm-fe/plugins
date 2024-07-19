@@ -13,8 +13,8 @@ pub struct GetCompilerParams {
 
 pub struct CompilerParams {
   pub svg: String,
-  pub svg_name: String,
-  pub root_path: String,
+  pub svg_name: Option<String>,
+  pub root_path: Option<String>,
 }
 
 pub fn get_compiler(param: GetCompilerParams) -> impl Fn(CompilerParams) -> String {
