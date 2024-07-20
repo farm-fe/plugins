@@ -106,14 +106,13 @@ pub fn get_svg_by_custom_collections(opt: GetSvgByCustomCollectionsParams) -> St
   } = opt;
   if is_valid_icon_path(&custom_collection_path) {
     let svg_raw = String::new();
-    // let custom_collection_path = custom_collection_path.replace("[iconname]", &icon);
-    // let rt = Runtime::new().unwrap();
-    // rt.block_on(async {
-    //   if let Ok(res) = get_svg_by_url(&custom_collection_path).await {
-    //     svg_raw = res;
-    //   }
-    // });
-    println!("the remote path that does not support custom sets currently does");
+    let custom_collection_path = custom_collection_path.replace("[iconname]", &icon);
+    let rt = Runtime::new().unwrap();
+    rt.block_on(async {
+      if let Ok(res) = get_svg_by_url(&custom_collection_path).await {
+        svg_raw = res;
+      }
+    });
     return svg_raw;
   }
   let icons_collection_path = Path::new(&project_dir).join(custom_collection_path);
@@ -140,24 +139,24 @@ pub fn get_svg_by_local_path(path: &str) -> String {
   let svg_raw = read_file_utf8(path).unwrap();
   svg_raw
 }
-// async fn get_svg_by_url(url: &str) -> Result<String, reqwest::Error> {
-//   let client = Client::new();
-//   let res = client.get(url).send().await;
-//   match res {
-//     Ok(response) => {
-//       if response.status().is_success() {
-//         let text = response.text().await?;
-//         Ok(text)
-//       } else {
-//         println!("{} icon fetch err: {:?}", url, response.status());
-//         Ok(String::new())
-//       }
-//     }
-//     Err(e) => {
-//       panic!("icon fetch err: {:?}", e);
-//     }
-//   }
-// }
+async fn get_svg_by_url(url: &str) -> Result<String, reqwest::Error> {
+  let client = Client::new();
+  let res = client.get(url).send().await;
+  match res {
+    Ok(response) => {
+      if response.status().is_success() {
+        let text = response.text().await?;
+        Ok(text)
+      } else {
+        println!("{} icon fetch err: {:?}", url, response.status());
+        Ok(String::new())
+      }
+    }
+    Err(e) => {
+      panic!("icon fetch err: {:?}", e);
+    }
+  }
+}
 pub fn get_icon_data_by_iconify(opt: GetIconPathDataParams) -> Value {
   let ResolveResult { collection, icon } = resolve_icons_path(&opt.path);
   let all_icon_path = build_icon_path(&opt.project_dir, "@iconify/json/json");
