@@ -156,6 +156,7 @@ impl VisitMut for InsertImportModifier {
         let target_dir = match self.target_env {
           TargetEnv::Browser => "es",
           TargetEnv::Node => "lib",
+          _ => "es",
         };
         // {module}/{lib|es}/{Button}/style/index.css|js
         // module antd

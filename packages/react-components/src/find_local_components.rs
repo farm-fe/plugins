@@ -2,7 +2,7 @@ use crate::resolvers::ImportStyle;
 use farmfe_core::{
   config::config_regex::ConfigRegex,
   swc_ecma_ast::*,
-  swc_ecma_parser::{Syntax, TsConfig},
+  swc_ecma_parser::{Syntax, TsSyntax},
 };
 use farmfe_toolkit::{
   common::PathFilter,
@@ -265,7 +265,7 @@ fn gen_components_by_file(file_path: &PathBuf) -> HashSet<ComponentInfo> {
   let ParseScriptModuleResult { ast, comments: _ } = match parse_module(
     &components_path,
     &file_content,
-    Syntax::Typescript(TsConfig {
+    Syntax::Typescript(TsSyntax {
       tsx: true,
       decorators: true,
       ..Default::default()

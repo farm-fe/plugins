@@ -12,7 +12,7 @@ use farmfe_core::{
   module::ModuleType,
   plugin::{Plugin, PluginTransformHookResult},
   serde_json,
-  swc_ecma_parser::{Syntax, TsConfig},
+  swc_ecma_parser::{Syntax, TsSyntax},
 };
 
 use farmfe_macro_plugin::farm_plugin;
@@ -107,7 +107,7 @@ impl Plugin for FarmPluginReactComponents {
     let ParseScriptModuleResult { mut ast, comments } = match parse_module(
       &param.module_id,
       &param.content,
-      Syntax::Typescript(TsConfig {
+      Syntax::Typescript(TsSyntax {
         tsx: true,
         decorators: false,
         dts: false,
