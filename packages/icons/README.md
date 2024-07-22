@@ -102,6 +102,12 @@ export default defineConfig({
   plugins: [
       ["@farmfe/plugin-icons", {
       /**
+       * zie of zooming icon
+       * @type {float}
+       * @default 1.2
+       */
+      scale: 1.2,
+      /**
        * @description Whether to automatically install the required dependencies
        * @type {boolean}
        * @default true
