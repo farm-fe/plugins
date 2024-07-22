@@ -17,12 +17,6 @@ importers:
 
   packages/dsv: {}
 
-  packages/icons:
-    devDependencies:
-      '@farmfe/plugin-tools':
-        specifier: latest
-        version: 0.1.1
-
   packages/image: {}
 
   packages/react-components: {}
