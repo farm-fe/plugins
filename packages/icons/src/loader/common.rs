@@ -1,6 +1,6 @@
 use farmfe_core::regex::{self, Regex};
 use farmfe_toolkit::fs::read_file_utf8;
-// use reqwest::Client;
+use reqwest::Client;
 use serde_json::Value;
 use std::{
   fs::File,
@@ -8,7 +8,7 @@ use std::{
   path::{Path, PathBuf},
   process::Command,
 };
-// use tokio::runtime::Runtime;
+use tokio::runtime::Runtime;
 use walkdir::WalkDir;
 
 pub const URL_PREFIXES: [&str; 4] = ["/~icons/", "~icons/", "virtual:icons/", "virtual/icons/"];
