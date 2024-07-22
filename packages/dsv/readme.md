@@ -1,4 +1,4 @@
-# @farmfe/plugin-dsv
+# @farmfe/plugin-dsv 阿萨德
 
 🍣 A Farm plugin which converts `.csv` and `.tsv` files into JavaScript modules.
 

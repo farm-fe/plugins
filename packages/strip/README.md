@@ -1,4 +1,4 @@
-# @farmfe/plugin-strip
+# @farmfe/plugin-strip阿萨德
 
 🍣 A Farm rust plugin to remove `debugger` statements and functions like `assert.equal` and `console.log` from your code.
 

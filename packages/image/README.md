@@ -1,4 +1,4 @@
-# @farmfe/plugin-image
+# @farmfe/plugin-image萨达
 
 🍣 A Farm plugin which imports JPG, PNG, GIF, SVG, and WebP files.
 

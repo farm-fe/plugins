@@ -1,4 +1,4 @@
-# @farmfe/plugin-url
+# @farmfe/plugin-url撒大大啊
 
 🍣 A farm plugin which imports files as data-URIs or ES Modules.
 
