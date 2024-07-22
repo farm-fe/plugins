@@ -40,7 +40,7 @@ impl FarmfePluginIcons {
         .collections_node_resolve_path
         .unwrap_or(config.root.clone()),
     );
-    
+
     let jsx = options::guess_jsx(&config.root);
 
     Self {
