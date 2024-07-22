@@ -101,11 +101,11 @@ pub struct GetIconPathDataParams {
 pub fn get_svg_by_custom_collections(opt: GetSvgByCustomCollectionsParams) -> String {
   let GetSvgByCustomCollectionsParams {
     custom_collection_path,
-    icon: _icon,
+    icon: icon,
     project_dir,
   } = opt;
   if is_valid_icon_path(&custom_collection_path) {
-    let svg_raw = String::new();
+    let mut svg_raw = String::new();
     let custom_collection_path = custom_collection_path.replace("[iconname]", &icon);
     let rt = Runtime::new().unwrap();
     rt.block_on(async {
