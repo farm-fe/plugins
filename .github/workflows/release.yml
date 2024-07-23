@@ -38,6 +38,9 @@ jobs:
                 folder_path="/tmp/artifacts/${{github.sha}}-${abi}-${package}"
                 if [ -d "${folder_path}"] && [ -n "$(ls -A $folder_path)"]; then
                   mv /tmp/artifacts/${{ github.sha }}-${abi}-${package}/* ./packages/${package}/npm/${abi}
+                  ls -R $folder_path
+                  ls -R ./packages/${package}/npm/${abi}
+                  test -f ./packages/${package}/npm/${abi}/index.farm
                 fi
               done
           done
