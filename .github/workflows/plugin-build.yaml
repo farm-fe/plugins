@@ -98,3 +98,45 @@ jobs:
         if: ${{ !matrix.settings.docker && matrix.settings.build }}
         run: ${{ matrix.settings.build }}
         shell: bash
+      - name: Upload Plugin react-components
+        uses: actions/upload-artifact@v3
+        with:
+          name: ${{ github.sha }}-${{ matrix.settings.abi }}-react-components
+          path: ./packages/react-components/npm/${{ matrix.settings.abi }}/index.farm
+          if-no-files-found: ignore
+      - name: Upload Plugin virtual
+        uses: actions/upload-artifact@v3
+        with:
+          name: ${{ github.sha }}-${{ matrix.settings.abi }}-virtual
+          path: ./packages/virtual/npm/${{ matrix.settings.abi }}/index.farm
+          if-no-files-found: ignore
+      - name: Upload Plugin yaml
+        uses: actions/upload-artifact@v3
+        with:
+          name: ${{ github.sha }}-${{ matrix.settings.abi }}-yaml
+          path: ./packages/yaml/npm/${{ matrix.settings.abi }}/index.farm
+          if-no-files-found: ignore
+      - name: Upload Plugin strip
+        uses: actions/upload-artifact@v3
+        with:
+          name: ${{ github.sha }}-${{ matrix.settings.abi }}-strip
+          path: ./packages/strip/npm/${{ matrix.settings.abi }}/index.farm
+          if-no-files-found: ignore
+      - name: Upload Plugin image
+        uses: actions/upload-artifact@v3
+        with:
+          name: ${{ github.sha }}-${{ matrix.settings.abi }}-image
+          path: ./packages/image/npm/${{ matrix.settings.abi }}/index.farm
+          if-no-files-found: ignore
+      - name: Upload Plugin url
+        uses: actions/upload-artifact@v3
+        with:
+          name: ${{ github.sha }}-${{ matrix.settings.abi }}-url
+          path: ./packages/url/npm/${{ matrix.settings.abi }}/index.farm
+          if-no-files-found: ignore
+      - name: Upload Plugin icons
+        uses: actions/upload-artifact@v3
+        with:
+          name: ${{ github.sha }}-${{ matrix.settings.abi }}-icons
+          path: ./packages/icons/npm/${{ matrix.settings.abi }}/index.farm
+          if-no-files-found: ignore
