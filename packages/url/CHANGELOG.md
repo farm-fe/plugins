@@ -1,5 +1,11 @@
 # @farmfe/plugin-url
 
+## 0.0.4
+
+### Patch Changes
+
+- release plugins
+
 ## 0.0.3
 
 ### Patch Changes
