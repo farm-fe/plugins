@@ -4,13 +4,19 @@
   "description": "The collections of farm plugins",
   "packageManager": "pnpm@9.1.0",
   "scripts": {
-    "release": "pnpm changeset"
+    "release": "pnpm changeset",
+    "test-e2e": "vitest run -c vitest.config.e2e.ts"
   },
   "keywords": [],
+  "type": "module",
   "author": "",
   "license": "MIT",
   "devDependencies": {
     "@changesets/cli": "^2.27.7",
-    "@farmfe/plugin-tools": "latest"
+    "@farmfe/plugin-tools": "latest",
+    "@types/node": "^20.14.11",
+    "execa": "^9.3.0",
+    "playwright-chromium": "^1.45.2",
+    "vitest": "^2.0.4"
   }
 }
