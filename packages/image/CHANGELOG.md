@@ -1,5 +1,11 @@
 # @farmfe/plugin-image
 
+## 0.0.3
+
+### Patch Changes
+
+- release plugins
+
 ## 0.0.2
 
 ### Patch Changes

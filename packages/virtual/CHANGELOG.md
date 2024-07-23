@@ -1,5 +1,11 @@
 # @farmfe/plugin-virtual
 
+## 0.0.5
+
+### Patch Changes
+
+- release plugins
+
 ## 0.0.4
 
 ### Patch Changes
