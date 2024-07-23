@@ -7,7 +7,7 @@ Inspired By [@rollup/plugin-virtual](https://www.npmjs.com/package/@rollup/plugi
 ## install
 
 ```bash
-pnpm add @farmfe/plugin-virtual --save-dev # or yarn add @farmfe/plugin-virtual --dev
+pnpm add @farmfe/plugin-virtual --save-dev # or yarn add @farmfe/plugin-virtual --save-dev
 ```
 
 ## Usage
