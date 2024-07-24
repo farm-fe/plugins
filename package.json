@@ -4,7 +4,7 @@
   "description": "The collections of farm plugins",
   "packageManager": "pnpm@9.1.0",
   "scripts": {
-    "release": "pnpm changeset"
+    "release": "npx changeset && npx changeset version"
   },
   "keywords": [],
   "author": "",
