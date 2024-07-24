@@ -1,6 +1,6 @@
 {
   "name": "@farmfe/plugin-react-components",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "private": false,
   "main": "scripts/index.js",
   "types": "scripts/index.d.ts",
@@ -54,6 +54,9 @@
     "play": "cd playground && farm",
     "build": "farm-plugin-tools build --platform --cargo-name farmfe_plugin_react_components -p farmfe_plugin_react_components --release",
     "prepublishOnly": "farm-plugin-tools prepublish"
+  },
+  "devDependencies": {
+    "@farmfe/plugin-tools": "latest"
   },
   "files": [
     "scripts"
