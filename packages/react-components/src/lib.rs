@@ -36,6 +36,7 @@ pub enum ImportMode {
 #[serde(rename_all = "camelCase")]
 pub struct Options {
   pub dirs: Option<Vec<ConfigRegex>>,
+  pub filename: Option<String>,
   pub dts: Option<bool>,
   pub local: Option<bool>,
   pub import_mode: Option<ImportMode>,
@@ -64,7 +65,7 @@ impl FarmPluginReactComponents {
     let generate_dts_option = GenerateDtsOption {
       root_path: config.root.clone(),
       components: &local_components.iter().collect::<Vec<_>>(),
-      filename: "components.d.ts".to_string(),
+      filename: options.filename.clone().unwrap_or("components.d.ts".to_string()),
       resolvers_components: &resolvers_components.iter().collect::<Vec<_>>(),
       local: options.local.unwrap_or(true),
     };
