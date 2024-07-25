@@ -2,6 +2,7 @@ import { useState } from "react";
 import "./main.css";
 import FarmLogo from "./assets/logo.png";
 import reactLogo from "./assets/react.svg";
+// import TestButton from "./components/buttton"
 export function Main() {
   const [count, setCount] = useState(0);
   console.log("rendering Main component")
@@ -18,7 +19,12 @@ export function Main() {
       <h1>Farm + React</h1>
       count is {count}
       <div className="card">
-
+        <ComponentA></ComponentA>
+        <ComponentB></ComponentB>
+        <ComponentC></ComponentC>
+        <ComponentD></ComponentD>
+        <ComponentE></ComponentE>
+        <ComponentF></ComponentF>
         <AntSpace>
           <ArcoButton type="primary" onClick={() => setCount((count) => count + 1)}>arco button</ArcoButton>
           <AntButton type="primary" onClick={() => setCount((count) => count + 1)}>antd button</AntButton>

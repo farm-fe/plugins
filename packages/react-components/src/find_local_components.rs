@@ -249,7 +249,7 @@ impl Visit for ExportComponentsFinder {
       Expr::Ident(ident) => {
         let component_name = ident.sym.to_string();
         if self.is_component(&component_name) {
-          self.add_exported_components(&component_name, ExportType::Named)
+          self.add_exported_components(&component_name, ExportType::Default)
         }
       }
       _ => {}
