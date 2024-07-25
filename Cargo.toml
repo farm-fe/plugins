@@ -6,6 +6,6 @@ resolver = "2"
 [workspace.dependencies]
 farmfe_core = { version = "0.6.2" }
 farmfe_utils = { version = "0.1.5" }
-farmfe_toolkit_plugin_types = { version = "0.0.18" }
+farmfe_toolkit_plugin_types = { version = "0.0.20" }
 farmfe_macro_plugin = { version = "0.0.4" }
-farmfe_toolkit = "0.0.11"
+farmfe_toolkit = "0.0.13"

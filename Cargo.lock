@@ -678,9 +678,9 @@ checksum = "5443807d6dff69373d433ab9ef5378ad8df50ca6298caf15de6e52e24aaf54d5"
 
 [[package]]
 name = "farmfe_core"
-version = "0.6.2"
+version = "0.6.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "8ace47d8f9846d426af3462d631690d5eba8ae778f58ce4b096d410975d9df6f"
+checksum = "f371c31c35008cf5a8fc5c650b080d9c74ab3c42b5d48967cc4026ba6f03b851"
 dependencies = [
  "blake2",
  "bytecheck 0.7.0",
@@ -847,18 +847,18 @@ dependencies = [
 
 [[package]]
 name = "farmfe_testing_helpers"
-version = "0.0.11"
+version = "0.0.13"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "7221894daf03993638a8341ebe9e93d3147a7a1334247c36d7afd373ee53857c"
+checksum = "55922a95211d4dda4eefcf6db5c48df227088cd45098a06350253c4e298ad7c7"
 dependencies = [
  "farmfe_core",
 ]
 
 [[package]]
 name = "farmfe_toolkit"
-version = "0.0.11"
+version = "0.0.13"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "48d8e7981a2d15a79fb6ff1866d6aa381ad10d0427644f55599e727112e0784d"
+checksum = "162ff7524302fb3dc72d879041c30edfdabd940073f03af51b65c44d05101383"
 dependencies = [
  "anyhow",
  "farmfe_core",
@@ -892,9 +892,9 @@ dependencies = [
 
 [[package]]
 name = "farmfe_toolkit_plugin_types"
-version = "0.0.18"
+version = "0.0.20"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "2b9933e059e6d28fb4c81e78aabfd1ca9288feb7a9e2c0516b4f08ca8b2d5c80"
+checksum = "9d5882be852e52918bcd914507b69c25c1ffb0af4acf7d23549bc9a1275f25de"
 dependencies = [
  "farmfe_core",
  "lazy_static",
