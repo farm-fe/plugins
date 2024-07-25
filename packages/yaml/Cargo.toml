@@ -7,9 +7,9 @@ version = "0.0.1"
 crate-type = ["cdylib", "rlib"]
 
 [dependencies]
-farmfe_core = { version = "0.6.2" }
-farmfe_toolkit_plugin_types = { version = "0.0.18" }
-farmfe_macro_plugin = { version = "0.0.4" }
+farmfe_core = { workspace = true }
+farmfe_toolkit_plugin_types = { workspace = true }
+farmfe_macro_plugin = { workspace = true }
 serde_yaml = "0.9.34"
 lazy_static = "1.5.0"
 serde = "1.0.203"
