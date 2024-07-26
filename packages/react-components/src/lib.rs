@@ -67,15 +67,16 @@ impl FarmPluginReactComponents {
       .unwrap_or("components.d.ts".to_string());
     let dirs = options.dirs.clone().unwrap_or(vec![]);
     let root_path = config.root.clone();
-    let components = finish_components(FinishComponentsParams {
+    let components = Arc::new(Mutex::new(HashSet::new()));
+    finish_components(FinishComponentsParams {
       root_path,
       resolvers,
       dirs,
       filename,
       local: options.local.unwrap_or(true),
       dts: options.dts.unwrap_or(true),
+      context_components: &components,
     });
-    let components = Arc::new(Mutex::new(components));
     Self {
       options,
       components,
@@ -179,15 +180,16 @@ impl Plugin for FarmPluginReactComponents {
       .unwrap_or("components.d.ts".to_string());
     let dirs = self.options.dirs.clone().unwrap_or(vec![]);
     let root_path = context.config.root.clone();
-    let components = finish_components(FinishComponentsParams {
-      root_path,
+    finish_components(FinishComponentsParams {
+      root_path: root_path.clone(),
       resolvers,
       dirs,
       filename,
       local: self.options.local.unwrap_or(true),
       dts: self.options.dts.unwrap_or(true),
+      context_components: &self.components,
     });
-    self.components.lock().unwrap().extend(components);
+
     Ok(None)
   }
 }

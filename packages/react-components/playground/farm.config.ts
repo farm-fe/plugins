@@ -13,9 +13,8 @@ export default defineConfig({
     less(),
     ["@farmfe/plugin-react", { runtime: "automatic" }],
     ["@farmfe/plugin-react-components", {
-      dts: true,
-      local: true,
       filename: "src/types/components.d.ts",
+      dirs:["src/components"],
       resolvers: [
         {
           module: "antd",

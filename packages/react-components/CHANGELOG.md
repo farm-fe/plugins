@@ -1,5 +1,11 @@
 # @farmfe/plugin-react-components
 
+## 1.0.4
+
+### Patch Changes
+
+- fix: repaly gen components dts
+
 ## 1.0.3
 
 ### Patch Changes
