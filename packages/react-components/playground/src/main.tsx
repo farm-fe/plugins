@@ -25,6 +25,7 @@ export function Main() {
         <ComponentD></ComponentD>
         <ComponentE></ComponentE>
         <ComponentF></ComponentF>
+        <ComponentX></ComponentX>
         <AntSpace>
           <ArcoButton type="primary" onClick={() => setCount((count) => count + 1)}>arco button</ArcoButton>
           <AntButton type="primary" onClick={() => setCount((count) => count + 1)}>antd button</AntButton>

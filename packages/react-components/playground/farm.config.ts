@@ -15,7 +15,7 @@ export default defineConfig({
     ["@farmfe/plugin-react-components", {
       dts: true,
       local: true,
-      filename: "./src/types/components.d.ts",
+      filename: "src/types/components.d.ts",
       resolvers: [
         {
           module: "antd",

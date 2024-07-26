@@ -94,10 +94,7 @@ fn create_file<P: AsRef<Path>>(file_path: P) -> io::Result<File> {
 #[cfg(test)]
 mod tests {
   use super::*;
-  use crate::{
-    find_local_components::find_local_components,
-    resolvers::{get_resolvers_result, ImportStyle, ResolverOption},
-  };
+  use crate::{find_local_components::find_local_components, resolvers::get_resolvers_result};
   use std::env;
   #[test]
   fn test_generate_dts() {

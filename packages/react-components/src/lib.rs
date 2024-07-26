@@ -1,11 +1,16 @@
 #![deny(clippy::all)]
 #![feature(box_patterns)]
 pub mod find_local_components;
+pub mod finish_components;
 pub mod generate_dts;
 pub mod insert_import;
 pub mod resolvers;
 
-use std::{collections::HashSet, path::PathBuf, sync::Arc};
+use std::{
+  collections::HashSet,
+  path::PathBuf,
+  sync::{Arc, Mutex},
+};
 
 use farmfe_core::{
   config::{config_regex::ConfigRegex, Config},
@@ -21,10 +26,10 @@ use farmfe_toolkit::{
   script::{codegen_module, parse_module, CodeGenCommentsConfig, ParseScriptModuleResult},
   swc_ecma_visit::VisitMutWith,
 };
-use find_local_components::{find_local_components, ComponentInfo};
-use generate_dts::{generate_dts, GenerateDtsOption};
+use find_local_components::ComponentInfo;
+use finish_components::{finish_components, FinishComponentsParams};
 use insert_import::{ImportModifier, InsertImportModifier};
-use resolvers::{get_resolvers_result, ResolverOption};
+use resolvers::ResolverOption;
 
 #[derive(serde::Deserialize, serde::Serialize, Clone, Debug)]
 pub enum ImportMode {
@@ -49,31 +54,28 @@ pub struct Options {
 #[farm_plugin]
 pub struct FarmPluginReactComponents {
   options: Options,
-  components: HashSet<ComponentInfo>,
+  components: Arc<Mutex<HashSet<ComponentInfo>>>,
 }
 
 impl FarmPluginReactComponents {
   pub fn new(config: &Config, options: String) -> Self {
     let options: Options = serde_json::from_str(&options).unwrap();
-    let mut components =
-      find_local_components(&config.root, options.dirs.clone().unwrap_or(vec![]));
-    let resolvers_components = get_resolvers_result(
-      &config.root.clone(),
-      options.resolvers.clone().unwrap_or(vec![]),
-    );
-    let local_components = components.clone();
-    let generate_dts_option = GenerateDtsOption {
-      root_path: config.root.clone(),
-      components: &local_components.iter().collect::<Vec<_>>(),
-      filename: options.filename.clone().unwrap_or("components.d.ts".to_string()),
-      resolvers_components: &resolvers_components.iter().collect::<Vec<_>>(),
+    let resolvers = options.resolvers.clone().unwrap_or(vec![]);
+    let filename = options
+      .filename
+      .clone()
+      .unwrap_or("components.d.ts".to_string());
+    let dirs = options.dirs.clone().unwrap_or(vec![]);
+    let root_path = config.root.clone();
+    let components = finish_components(FinishComponentsParams {
+      root_path,
+      resolvers,
+      dirs,
+      filename,
       local: options.local.unwrap_or(true),
-    };
-    let dts = options.dts.unwrap_or(true);
-    if dts {
-      generate_dts(generate_dts_option)
-    }
-    components.extend(resolvers_components);
+      dts: options.dts.unwrap_or(true),
+    });
+    let components = Arc::new(Mutex::new(components));
     Self {
       options,
       components,
@@ -163,5 +165,29 @@ impl Plugin for FarmPluginReactComponents {
       module_type: Some(param.module_type.clone()),
       ignore_previous_source_map: false,
     }))
+  }
+
+  fn update_finished(
+    &self,
+    context: &Arc<farmfe_core::context::CompilationContext>,
+  ) -> farmfe_core::error::Result<Option<()>> {
+    let resolvers = self.options.resolvers.clone().unwrap_or(vec![]);
+    let filename = self
+      .options
+      .filename
+      .clone()
+      .unwrap_or("components.d.ts".to_string());
+    let dirs = self.options.dirs.clone().unwrap_or(vec![]);
+    let root_path = context.config.root.clone();
+    let components = finish_components(FinishComponentsParams {
+      root_path,
+      resolvers,
+      dirs,
+      filename,
+      local: self.options.local.unwrap_or(true),
+      dts: self.options.dts.unwrap_or(true),
+    });
+    self.components.lock().unwrap().extend(components);
+    Ok(None)
   }
 }

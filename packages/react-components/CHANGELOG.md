@@ -1,5 +1,11 @@
 # @farmfe/plugin-react-components
 
+## 1.0.3
+
+### Patch Changes
+
+- fix auto finish_components
+
 ## 1.0.2
 
 ### Patch Changes

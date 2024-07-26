@@ -1,7 +1,11 @@
 use farmfe_core::{config::TargetEnv, swc_common::DUMMY_SP, swc_ecma_ast::*};
 use farmfe_toolkit::swc_ecma_visit::{VisitMut, VisitMutWith};
 use farmfe_utils::relative;
-use std::{collections::HashSet, path::Path};
+use std::{
+  collections::HashSet,
+  path::Path,
+  sync::{Arc, Mutex},
+};
 
 use crate::{
   find_local_components::{ComponentInfo, ExportType},
@@ -9,12 +13,12 @@ use crate::{
   ImportMode,
 };
 pub struct ImportModifier {
-  pub components: HashSet<ComponentInfo>,
+  components: Arc<Mutex<HashSet<ComponentInfo>>>,
   pub used_components: HashSet<ComponentInfo>,
 }
 
 impl ImportModifier {
-  pub fn new(components: HashSet<ComponentInfo>) -> Self {
+  pub fn new(components: Arc<Mutex<HashSet<ComponentInfo>>>) -> Self {
     Self {
       components,
       used_components: HashSet::new(),
@@ -24,13 +28,12 @@ impl ImportModifier {
 
 impl VisitMut for ImportModifier {
   fn visit_mut_import_decl(&mut self, n: &mut ImportDecl) {
+    let mut components = self.components.lock().unwrap();
     for specifier in &n.specifiers {
       match specifier {
         ImportSpecifier::Default(default_spec) => {
           let imported_name = default_spec.local.sym.as_ref();
-          self
-            .components
-            .retain(|c: &ComponentInfo| &c.name != imported_name);
+          components.retain(|c: &ComponentInfo| &c.name != imported_name);
         }
 
         ImportSpecifier::Named(named_spec) => {
@@ -41,8 +44,7 @@ impl VisitMut for ImportModifier {
             },
             None => named_spec.local.sym.as_ref(),
           };
-          self
-            .components
+          components
             .retain(|c| &c.name != imported_name || c.name != named_spec.local.sym.as_ref());
         }
         _ => {}
@@ -57,9 +59,9 @@ impl VisitMut for ImportModifier {
         .next()
         .map_or(false, |c| c.is_uppercase())
       {
-        let item = self.components.iter().find(|c| c.name == component_name);
+        let item = self.components.lock().unwrap().iter().find(|c| c.name == component_name).cloned();
         if let Some(item) = item {
-          self.used_components.insert(item.clone());
+          self.used_components.insert(item);
         }
       }
     }
