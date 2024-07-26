@@ -126,8 +126,7 @@ impl Plugin for FarmPluginReactComponents {
         panic!("Parse {} failed. See error details above.", param.module_id);
       }
     };
-    let components = self.components.clone();
-    let mut import_modifier = ImportModifier::new(components);
+    let mut import_modifier = ImportModifier::new(self.components.clone());
     ast.visit_mut_with(&mut import_modifier);
     let used_components = import_modifier.used_components;
     let mut insert_import_modifier = InsertImportModifier::new(
