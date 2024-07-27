@@ -34,7 +34,7 @@ pub enum ExportType {
 pub struct ComponentFinder {
   all_components: Vec<String>,
   #[allow(dead_code)]
-  filename: Option<String>,
+  filename: String,
   #[allow(dead_code)]
   file_path: String,
 }
@@ -43,19 +43,51 @@ pub struct ComponentFinder {
 pub struct ExportComponentsFinder {
   exported_components: HashSet<ComponentInfo>,
   all_components: Vec<String>,
-  filename: Option<String>,
+  filename: String,
   path: String,
+}
+fn to_pascal_case(s: &str) -> String {
+  if s.contains('-') || s.contains('_') {
+    s.split(|c| c == '-' || c == '_')
+      .filter(|part| !part.is_empty())
+      .map(|part| {
+        let mut chars = part.chars();
+        chars.next().unwrap().to_uppercase().collect::<String>() + chars.as_str()
+      })
+      .collect()
+  } else {
+    let mut chars = s.chars();
+    chars.next().unwrap().to_uppercase().collect::<String>() + chars.as_str()
+  }
+}
+fn is_uppercase(ident: &Ident) -> bool {
+  ident.sym.chars().next().map_or(false, |c| c.is_uppercase())
 }
 fn is_jsx_return_with_block_stmt(body: &Option<BlockStmt>) -> bool {
   if let Some(body) = body {
     body.stmts.iter().any(|stmt| {
-      matches!(
-        stmt,
-        Stmt::Return(ReturnStmt {
-          arg: Some(box Expr::JSXElement(..)),
-          ..
-        })
-      )
+      if let Stmt::Return(ReturnStmt {
+        arg: Some(boxed_expr),
+        ..
+      }) = stmt
+      {
+        let mut expr = &**boxed_expr;
+        while let Expr::Paren(ParenExpr {
+          expr: inner_expr, ..
+        }) = expr
+        {
+          expr = &**inner_expr;
+        }
+        match expr {
+          Expr::JSXElement(..) => return true,
+          Expr::JSXFragment(..) => return true,
+          Expr::JSXEmpty(..) => return true,
+          Expr::JSXMember(..) => return true,
+          Expr::JSXNamespacedName(..) => return true,
+          _ => return false,
+        }
+      }
+      false
     })
   } else {
     false
@@ -64,16 +96,47 @@ fn is_jsx_return_with_block_stmt(body: &Option<BlockStmt>) -> bool {
 fn is_jsx_return_with_block_stmt_or_expr(body: &BlockStmtOrExpr) -> bool {
   match body {
     BlockStmtOrExpr::BlockStmt(block) => block.stmts.iter().any(|stmt| {
-      matches!(
-        stmt,
-        Stmt::Return(ReturnStmt {
-          arg: Some(box Expr::JSXElement(..)),
-          ..
-        })
-      )
+      if let Stmt::Return(ReturnStmt {
+        arg: Some(boxed_expr),
+        ..
+      }) = stmt
+      {
+        let mut expr = &**boxed_expr;
+        while let Expr::Paren(ParenExpr {
+          expr: inner_expr, ..
+        }) = expr
+        {
+          expr = &**inner_expr;
+        }
+        match expr {
+          Expr::JSXElement(..) => return true,
+          Expr::JSXFragment(..) => return true,
+          Expr::JSXEmpty(..) => return true,
+          Expr::JSXMember(..) => return true,
+          Expr::JSXNamespacedName(..) => return true,
+          _ => return false,
+        }
+      } else {
+        false
+      }
     }),
-    BlockStmtOrExpr::Expr(box Expr::JSXElement(..)) => true,
-    _ => false,
+    BlockStmtOrExpr::Expr(boxed_expr) => {
+      let mut expr = &**boxed_expr;
+      while let Expr::Paren(ParenExpr {
+        expr: inner_expr, ..
+      }) = expr
+      {
+        expr = &**inner_expr;
+      }
+      match expr {
+        Expr::JSXElement(..) => return true,
+        Expr::JSXFragment(..) => return true,
+        Expr::JSXEmpty(..) => return true,
+        Expr::JSXMember(..) => return true,
+        Expr::JSXNamespacedName(..) => return true,
+        _ => return false,
+      }
+    }
   }
 }
 
@@ -103,12 +166,14 @@ impl ExportComponentsFinder {
   }
 }
 
-fn get_filename_by_path(file_path: &str) -> Option<String> {
+fn get_filename_by_path(file_path: &str) -> String {
   let path = Path::new(file_path);
-  path
+  let filename = path
     .file_stem()
     .and_then(|filename_osstr| filename_osstr.to_str())
     .map(|filename_str| filename_str.to_owned())
+    .unwrap();
+  to_pascal_case(&filename)
 }
 
 impl ComponentFinder {
@@ -128,30 +193,30 @@ impl ComponentFinder {
 impl Visit for ComponentFinder {
   fn visit_var_decl(&mut self, var_decl: &VarDecl) {
     for decl in &var_decl.decls {
-      if let Some(init) = &decl.init {
-        match &**init {
-          Expr::Arrow(arrow_expr) => {
-            if is_jsx_return_with_block_stmt_or_expr(&arrow_expr.body) {
-              if let Pat::Ident(ident) = &decl.name {
-                self.add_component(&ident.id.sym.to_string())
+      if let Some(ident) = &decl.name.as_ident() {
+        if let Some(init) = &decl.init {
+          if !is_uppercase(ident) {
+            return;
+          }
+          match &**init {
+            Expr::Arrow(arrow_expr) => {
+              if is_jsx_return_with_block_stmt_or_expr(&arrow_expr.body) {
+                self.add_component(&ident.sym.to_string());
               }
             }
-          }
-          Expr::Fn(fn_expr) => {
-            if is_jsx_return_with_block_stmt(&fn_expr.function.body) {
-              if let Pat::Ident(ident) = &decl.name {
-                self.add_component(&ident.id.sym.to_string())
+            Expr::Fn(fn_expr) => {
+              if is_jsx_return_with_block_stmt(&fn_expr.function.body) {
+                self.add_component(&ident.sym.to_string());
               }
             }
+            _ => {}
           }
-          _ => {}
         }
       }
     }
   }
-
   fn visit_fn_decl(&mut self, fn_decl: &FnDecl) {
-    if is_jsx_return_with_block_stmt(&fn_decl.function.body) {
+    if is_uppercase(&fn_decl.ident) && is_jsx_return_with_block_stmt(&fn_decl.function.body) {
       self.add_component(&fn_decl.ident.sym.to_string());
     }
   }
@@ -161,7 +226,7 @@ impl Visit for ExportComponentsFinder {
   fn visit_export_decl(&mut self, n: &ExportDecl) {
     match &n.decl {
       Decl::Fn(fn_decl) => {
-        if is_jsx_return_with_block_stmt(&fn_decl.function.body) {
+        if is_uppercase(&fn_decl.ident) && is_jsx_return_with_block_stmt(&fn_decl.function.body) {
           let sym = &fn_decl.ident.sym;
           self.add_exported_components(&sym.to_string(), ExportType::Named);
         }
@@ -173,6 +238,9 @@ impl Visit for ExportComponentsFinder {
       Decl::Var(var_decl) => {
         for var in &var_decl.decls {
           if let Pat::Ident(var_ident) = &var.name {
+            if !is_uppercase(var_ident) {
+              return;
+            }
             if let Some(init_expr) = &var.init {
               match &**init_expr {
                 Expr::Arrow(arrow_expr) => {
@@ -202,7 +270,7 @@ impl Visit for ExportComponentsFinder {
         ExportSpecifier::Named(named) => {
           if let ModuleExportName::Ident(name) = named.exported.as_ref().unwrap_or(&named.orig) {
             let component_name = name.sym.to_string();
-            if self.is_component(&component_name) {
+            if is_uppercase(name) && self.is_component(&component_name) {
               self.add_exported_components(&component_name, ExportType::Named)
             }
           };
@@ -213,7 +281,7 @@ impl Visit for ExportComponentsFinder {
   }
 
   fn visit_export_default_decl(&mut self, export_default: &ExportDefaultDecl) {
-    let component_name = self.filename.clone().unwrap_or("default".to_owned());
+    let component_name = self.filename.clone();
     match &export_default.decl {
       DefaultDecl::Fn(fn_dec) => {
         if is_jsx_return_with_block_stmt(&fn_dec.function.body) {
@@ -232,7 +300,7 @@ impl Visit for ExportComponentsFinder {
   // export default ()=>{return <div/>}
   // export default function(){return <div/>}
   fn visit_export_default_expr(&mut self, n: &ExportDefaultExpr) {
-    let component_name = self.filename.clone().unwrap_or("default".to_owned());
+    let component_name = self.filename.clone();
     match &*n.expr {
       // 处理 export default ()=>{return <div/>}
       Expr::Arrow(arrow_expr) => {
@@ -333,9 +401,12 @@ mod tests {
   #[test]
   fn test_find_local_components() {
     let current_dir = env::current_dir().unwrap();
-    let binding = current_dir.join("playground");
-    let root_path = binding.to_str().unwrap();
-    let components = find_local_components(root_path, vec![]);
+    let root_path = current_dir.join("playground").to_string_lossy().to_string();
+    let components = find_local_components(
+      &root_path,
+      vec![],
+    );
+    println!("components {:#?}", components);
     assert!(!components.is_empty(), "Components should not be empty");
   }
 }

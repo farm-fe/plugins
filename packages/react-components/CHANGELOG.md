@@ -1,5 +1,11 @@
 # @farmfe/plugin-react-components
 
+## 1.0.6
+
+### Patch Changes
+
+- fix: component judgment
+
 ## 1.0.5
 
 ### Patch Changes

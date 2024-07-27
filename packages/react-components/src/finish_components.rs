@@ -22,7 +22,7 @@ pub struct FinishComponentsResult {
   pub resolvers_components: HashSet<ComponentInfo>,
 }
 
-fn has_new_or_removed_components(
+fn maybe_has_new_or_removed_components(
   old_components: &HashSet<ComponentInfo>,
   local_components: &HashSet<ComponentInfo>,
   resolvers_components: &HashSet<ComponentInfo>,
@@ -30,8 +30,12 @@ fn has_new_or_removed_components(
   let old_len = old_components.len();
   let new_len = local_components.len() + resolvers_components.len();
   old_len != new_len
-    || local_components.iter().any(|component| !old_components.contains(component))
-    || resolvers_components.iter().any(|component| !old_components.contains(component))
+    || local_components
+      .iter()
+      .any(|component| !old_components.contains(component))
+    || resolvers_components
+      .iter()
+      .any(|component| !old_components.contains(component))
 }
 
 pub fn finish_components(params: FinishComponentsParams) {
@@ -51,8 +55,12 @@ pub fn finish_components(params: FinishComponentsParams) {
     Ok(guard) => guard,
     Err(poisoned) => poisoned.into_inner(),
   };
-
-  if has_new_or_removed_components(&context_components_guard, &local_components, &resolvers_components) && dts {
+  let has_new_or_removed_components = maybe_has_new_or_removed_components(
+    &context_components_guard,
+    &local_components,
+    &resolvers_components,
+  );
+  if has_new_or_removed_components && dts {
     let generate_dts_option = GenerateDtsOption {
       filename,
       root_path,
@@ -61,6 +69,8 @@ pub fn finish_components(params: FinishComponentsParams) {
       resolvers_components: &resolvers_components.iter().collect::<Vec<_>>(),
     };
     generate_dts(generate_dts_option);
+  }
+  if has_new_or_removed_components {
     local_components.extend(resolvers_components);
     *context_components_guard = local_components;
   }
