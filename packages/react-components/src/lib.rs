@@ -23,6 +23,7 @@ use farmfe_core::{
 use farmfe_macro_plugin::farm_plugin;
 use farmfe_toolkit::{
   common::{build_source_map, create_swc_source_map, PathFilter, Source},
+  pluginutils::normalize_path::normalize_path,
   script::{codegen_module, parse_module, CodeGenCommentsConfig, ParseScriptModuleResult},
   swc_ecma_visit::VisitMutWith,
 };
@@ -69,7 +70,7 @@ impl FarmPluginReactComponents {
     let root_path = config.root.clone();
     let components = Arc::new(Mutex::new(HashSet::new()));
     finish_components(FinishComponentsParams {
-      root_path,
+      root_path: normalize_path(&root_path),
       resolvers,
       dirs,
       filename,
@@ -180,7 +181,7 @@ impl Plugin for FarmPluginReactComponents {
     let dirs = self.options.dirs.clone().unwrap_or(vec![]);
     let root_path = context.config.root.clone();
     finish_components(FinishComponentsParams {
-      root_path: root_path.clone(),
+      root_path: normalize_path(&root_path),
       resolvers,
       dirs,
       filename,
