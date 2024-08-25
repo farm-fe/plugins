@@ -1,0 +1,14 @@
+[package]
+edition = "2021"
+name = "farmfe_plugin_react_router"
+authors = ["CCherry07 <c_chenjunguang@163.com>"]
+license = "MIT"
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+farmfe_core = { workspace = true }
+farmfe_toolkit_plugin_types = { workspace = true }
+farmfe_macro_plugin = { workspace = true }
+farmfe_toolkit = { workspace = true }

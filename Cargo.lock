@@ -796,6 +796,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "farmfe_plugin_react_router"
+version = "0.0.0"
+dependencies = [
+ "farmfe_core",
+ "farmfe_macro_plugin",
+ "farmfe_toolkit",
+ "farmfe_toolkit_plugin_types",
+]
+
+[[package]]
 name = "farmfe_plugin_strip"
 version = "0.0.1"
 dependencies = [
