@@ -1,5 +1,11 @@
 # @farmfe/plugin-react-components
 
+## 1.0.7
+
+### Patch Changes
+
+- fix(plugin-react-components): normalized_path match
+
 ## 1.0.6
 
 ### Patch Changes

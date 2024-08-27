@@ -1,6 +1,6 @@
 {
   "name": "@farmfe/plugin-react-components",
-  "version": "1.0.6",
+  "version": "1.0.7",
   "private": false,
   "main": "scripts/index.js",
   "types": "scripts/index.d.ts",
