@@ -803,6 +803,9 @@ dependencies = [
  "farmfe_macro_plugin",
  "farmfe_toolkit",
  "farmfe_toolkit_plugin_types",
+ "glob",
+ "serde",
+ "walkdir",
 ]
 
 [[package]]

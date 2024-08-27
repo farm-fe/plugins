@@ -12,3 +12,7 @@ farmfe_core = { workspace = true }
 farmfe_toolkit_plugin_types = { workspace = true }
 farmfe_macro_plugin = { workspace = true }
 farmfe_toolkit = { workspace = true }
+
+serde = { version = "1.0.197", features = ["derive"] }
+glob = "0.3.1"
+walkdir = "2.5.0"
