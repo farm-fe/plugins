@@ -6,6 +6,7 @@ use farmfe_core::{
 };
 use farmfe_toolkit::{
   common::PathFilter,
+  pluginutils::normalize_path::normalize_path,
   script::{parse_module, ParseScriptModuleResult},
   swc_ecma_visit::{Visit, VisitWith},
 };
@@ -151,7 +152,7 @@ impl ExportComponentsFinder {
   }
 
   fn is_component(&self, name: &String) -> bool {
-    self.all_components.contains(name)
+    self.all_components.contains(name) && !self.exported_components.iter().any(|c| &c.name == name)
   }
 
   fn add_exported_components(&mut self, name: &str, export_type: ExportType) {
@@ -355,10 +356,8 @@ fn gen_components_by_file(file_path: &PathBuf) -> HashSet<ComponentInfo> {
   export_components
 }
 
-pub fn is_target_file(file_path: &Path, patterns: &[Pattern]) -> bool {
-  patterns
-    .iter()
-    .any(|pattern| pattern.matches_path(file_path))
+pub fn is_target_file(file_path: &str, patterns: &[Pattern]) -> bool {
+  patterns.iter().any(|pattern| pattern.matches(file_path))
 }
 
 pub fn is_exclude_dir(entry: &DirEntry, exclude_patterns: &[Pattern]) -> bool {
@@ -380,14 +379,18 @@ pub fn find_local_components(root_path: &str, dirs: Vec<ConfigRegex>) -> HashSet
   let filtered_entries = walker
     .filter_entry(|e| !is_exclude_dir(e, &exclude_patterns))
     .filter_map(Result::ok)
-    .filter(|e| {
-      filter.execute(e.path().to_str().unwrap())
-        && e.file_type().is_file()
-        && is_target_file(e.path(), &patterns)
+    .filter_map(|e| {
+      if e.file_type().is_file() {
+        let normalized_path = normalize_path(e.path().to_str().unwrap());
+        if filter.execute(&normalized_path) && is_target_file(&normalized_path, &patterns) {
+          return Some(normalized_path);
+        }
+      }
+      None
     });
 
   for entry in filtered_entries {
-    let file_path = entry.path().to_path_buf();
+    let file_path = PathBuf::from(&entry);
     all_components.extend(gen_components_by_file(&file_path));
   }
 
@@ -402,10 +405,7 @@ mod tests {
   fn test_find_local_components() {
     let current_dir = env::current_dir().unwrap();
     let root_path = current_dir.join("playground").to_string_lossy().to_string();
-    let components = find_local_components(
-      &root_path,
-      vec![],
-    );
+    let components = find_local_components(&root_path, vec![]);
     println!("components {:#?}", components);
     assert!(!components.is_empty(), "Components should not be empty");
   }
