@@ -34,13 +34,20 @@ export const routes = [
     "children": [
       {
         "path": "recover", "lazy": () => import('../routes/auth.recover/route.lazy.tsx').then(moduleFactory),
-        "children": [{ "path": "test", "lazy": () => import('../routes/auth.recover.test.lazy.tsx').then(moduleFactory) }]
+        "children": [
+          { "path": "test", "lazy": () => import('../routes/auth.recover.test.lazy.tsx').then(moduleFactory) }
+        ]
       },
       {
-        "path": "new", "children": [{
-          "path": "without",
-          "children": [{ "path": "parent", "lazy": () => import('../routes/auth.new.without.parent.lazy.tsx').then(moduleFactory) }]
-        }]
+        "path": "new", "children": [
+          {
+            "path": "without",
+            "children": [
+              {
+                "path": "parent", "lazy": () => import('../routes/auth.new.without.parent.lazy.tsx').then(moduleFactory)
+              }]
+          }
+        ]
       },
       { "path": "forgot-pass", "lazy": () => import('../routes/auth.forgot-pass.lazy.tsx').then(moduleFactory) },
       {
@@ -48,7 +55,8 @@ export const routes = [
         "children": [{ "path": "test", "lazy": () => import('../routes/auth.deploy.test.lazy.tsx').then(moduleFactory) }]
       },
       { "index": true, "lazy": () => import('../routes/auth._index.lazy.tsx').then(moduleFactory) },
-      { "path": ":test", ...moduleFactory(route82398) }, { "path": "*", ...moduleFactory(route29280) }
+      { "path": ":test", ...moduleFactory(route82398) }, 
+      { "path": "*", ...moduleFactory(route29280) }
     ]
   },
   { "index": true, ...moduleFactory(route20320) },
@@ -57,7 +65,9 @@ export const routes = [
     "children": [{ "path": "login", ...moduleFactory(route71204) }]
   },
   {
-    "path": ":lang?", "children":
-      [{ "path": "dashboard", "lazy": () => import('../routes/($lang).dashboard.lazy.tsx').then(moduleFactory) }]
+    "path": ":lang?",
+    "children": [
+      { "path": "dashboard", "lazy": () => import('../routes/($lang).dashboard.lazy.tsx').then(moduleFactory) }
+    ]
   }]
 

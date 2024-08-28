@@ -1,7 +1,6 @@
 #![deny(clippy::all)]
 
 mod parse;
-mod interface;
 
 use farmfe_core::{config::Config, plugin::Plugin};
 
