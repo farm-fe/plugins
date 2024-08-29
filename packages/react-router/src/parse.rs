@@ -1,22 +1,77 @@
+use farmfe_core::regex::Regex;
+use farmfe_core::serde_json;
+use farmfe_toolkit::hash::sha256;
 use farmfe_toolkit::pluginutils::normalize_path::normalize_path;
-use std::{collections::HashMap, path::Path};
+use serde::de::{self, EnumAccess, MapAccess, VariantAccess, Visitor};
+use serde::ser::SerializeStruct;
+use serde::{Deserialize, Deserializer, Serialize, Serializer};
+use std::fmt;
+use std::{collections::HashSet, path::Path};
 use walkdir::WalkDir;
 
-#[derive(Debug)]
-enum Mark {
-  Clint,
-  Server,
-}
-
-#[derive(Default, Debug)]
+#[derive(Default, Debug, Deserialize, Clone)]
 struct Route {
   index: Option<bool>,
   path: String,
   component: String,
-  error_boundary: Option<String>,
-  lazy: Option<bool>,
-  mark: Option<Mark>,
-  children: Vec<Route>,
+  children: Option<Vec<Route>>,
+}
+
+impl Serialize for Route {
+  fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+  where
+    S: Serializer,
+  {
+    let mut state = serializer.serialize_struct("Route", 4)?;
+    if let Some(ref index) = self.index {
+      state.serialize_field("index", index)?;
+    }
+    if let Some(ref children) = self.children {
+      state.serialize_field("children", children)?;
+    }
+    state.serialize_field("path", &self.path)?;
+    state.serialize_field("component", &format!("{}{}{}", "$", &self.component, "$"))?;
+    state.end()
+  }
+}
+
+fn process_route_path(segment: &str) -> String {
+  let patterns = [(r"\(([^)]*)\)\??$", "$1?"), (r"\$+$", "*"), (r"^\$", ":")];
+
+  let mut segment = segment.to_string();
+  for (pat, repl) in patterns.iter() {
+    let re = Regex::new(pat).unwrap();
+    segment = re.replace_all(&segment, *repl).into_owned();
+  }
+
+  segment
+}
+
+fn process_page(
+  filtered_route_files: &[String],
+  segment: &str,
+  routes_path: &str,
+) -> (String, bool) {
+  let mut component = String::new();
+  let mut is_lazy = false;
+  for page_type in &[("", false), (".lazy", true)] {
+    let suffix = page_type.0;
+    is_lazy = page_type.1;
+
+    let page_condition = format!("{}{}.tsx", segment, suffix);
+    let route_page_condition = format!("{}/route{}.tsx", segment, suffix);
+
+    if let Some(page) = filtered_route_files
+      .iter()
+      .find(|str| str.ends_with(&page_condition) || str.ends_with(&route_page_condition))
+    {
+      let absolute_path = format!("{}/{}", routes_path, page);
+      component = absolute_path;
+      break;
+    }
+  }
+
+  (component, is_lazy)
 }
 
 fn get_route_files(dir: &Path) -> Vec<String> {
@@ -34,57 +89,97 @@ fn get_route_files(dir: &Path) -> Vec<String> {
     .collect::<Vec<String>>()
 }
 
-fn parse_routes(segments: Vec<String>, level: usize) -> Vec<Route> {
-  let mut result = Vec::new();
-  let mut route_map: HashMap<String, Route> = HashMap::new();
+fn parse(route_files: Vec<String>, routes_path: &str, level: usize) -> (Vec<Route>, String) {
+  let mut routes: Vec<Route> = Vec::new();
+  let mut imports = String::new();
+  let first_segments: HashSet<_> = route_files
+    .iter()
+    .filter_map(|str| str.split('.').nth(level))
+    .filter_map(|segment| match segment {
+      "tsx" | "lazy" => None,
+      _ => Some(segment.replace("/route", "")),
+    })
+    .collect();
+  if first_segments.is_empty() {
+    return (routes, imports);
+  }
 
-  for segment in segments {
-    let filtered_strings: Vec<String> = segments
+  let reversed_segments: Vec<_> = first_segments.into_iter().collect();
+
+  for segment in reversed_segments.into_iter().rev() {
+    let filtered_route_files: Vec<_> = route_files
       .iter()
-      .filter(|s| {
-        let parts: Vec<&str> = s.split('.').collect();
-        parts.len() > level
-          && (parts[level] == segment || parts[level] == format!("{}/route", segment))
+      .filter(|str| {
+        str
+          .split('.')
+          .nth(level)
+          .map_or(false, |s| s == segment || s == format!("{}/route", segment))
       })
+      .cloned()
       .collect();
 
-    if filtered_strings.len() < 1 {
+    let route_path = process_route_path(&segment);
+    if filtered_route_files.is_empty() {
       continue;
     }
 
-    let route_path = segment
-      .replace(r"\(([^)]*)\)\??$", "$1?")
-      .replace(r"\$+$", "*")
-      .replace(r"^\$", ":");
-
-    let is_lazy = segment.ends_with(".lazy.tsx") || segment.ends_with(".lazy.route.tsx");
-    let mut new_node = Route {
-      path: route_path.clone(),
-      index: Some(false),
-      component: format!("{}{}", route_path, ".tsx"),
-      lazy: Some(is_lazy),
-      ..Default::default()
-    };
+    let mut route = Route::default();
 
     if route_path == "_index" {
-      new_node.index = Some(true);
+      route.index = Some(true);
     } else if !route_path.starts_with('_') {
-      new_node.path = route_path;
+      route.path = route_path;
     }
 
-    let children = parse_routes(filtered_strings.clone(), level + 1);
-    if children.len() > 0 {
-      new_node.children = children;
-    }
-    for (_, route) in route_map {
-      result.push(route);
+    let (component_file_path, is_lazy) = process_page(&filtered_route_files, &segment, routes_path);
+
+    if !is_lazy {
+      let import_name = format!(
+        "{}{}",
+        "farmfe_plugin_react_router_",
+        sha256(&component_file_path.as_bytes(), 8)
+      );
+      imports.push_str(&format!(
+        "import * as {} from '{}';\n",
+        import_name, component_file_path
+      ));
+      route.component = format!("...adapter({})", import_name);
+    } else {
+      route.component = format!(
+        "lazy(() => import('{}').then(adapter))",
+        component_file_path
+      );
     }
 
-    return result;
+    let (routes_map, imps) = parse(filtered_route_files, routes_path, level + 1);
+    if !routes_map.is_empty() {
+      route.children = Some(routes_map);
+      imports.push_str(&imps);
+    }
+    routes.push(route);
   }
+
+  (routes, imports)
 }
+
+fn build_routes_virtual_code(routes: Vec<Route>, imports: String) -> String {
+  let mut code = String::new();
+  code.push_str(&imports);
+  code.push_str("\n\n");
+  code.push_str("const routes = ");
+  let re = Regex::new(r"\$(.*?)\$").unwrap();
+  let json_string = serde_json::to_string_pretty(&routes)
+    .unwrap();
+  let json_string = re.replace_all(&json_string, "$1").into_owned();
+  code.push_str(&json_string);
+  code.push_str(";\n");
+  code
+}
+
 #[cfg(test)]
 mod tests {
+  use std::fs;
+
   use super::*;
 
   #[test]
@@ -94,15 +189,22 @@ mod tests {
     );
 
     let files = get_route_files(routes_dir);
-    // 处理一下 files 的路径 home.a.b.lazy.tsx -> [home, a, b, lazy]
 
-    // let enters = files
-    //   .iter()
-    //   .map(|f| f.split('.').collect::<Vec<&str>>())
-    //   .collect::<Vec<Vec<&str>>>();
+    let (routes, imports) = parse(
+      files,
+      "/Users/cherry7/Documents/open/farm-fe/plugins/packages/react-router/playground/routes",
+      0,
+    );
+    let code = build_routes_virtual_code(routes, imports);
+    fs::write("/Users/cherry7/Documents/open/farm-fe/plugins/packages/react-router/playground/feat/plugin_code.ts", code);
+  }
 
-    let routes = parse_routes(files, 0);
-    // 有格式的输出
-    println!("{:#?}", routes);
+  #[test]
+  fn test_process_route_path() {
+    assert_eq!(process_route_path("user(id)"), "userid?");
+    assert_eq!(process_route_path("find$"), "find*");
+    assert_eq!(process_route_path("$edit"), ":edit");
+    assert_eq!(process_route_path("user(id)$"), "user(id)*");
+    assert_eq!(process_route_path("$(id)"), ":id?");
   }
 }
