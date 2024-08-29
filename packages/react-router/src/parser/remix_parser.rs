@@ -4,7 +4,7 @@ use farmfe_toolkit::hash::sha256;
 use farmfe_toolkit::pluginutils::normalize_path::normalize_path;
 use serde::ser::SerializeStruct;
 use serde::{Deserialize, Serialize, Serializer};
-use std::{collections::HashSet, path::Path};
+use std::collections::HashSet;
 use walkdir::WalkDir;
 
 #[derive(Default, Debug, Deserialize, Clone)]
@@ -80,14 +80,13 @@ fn process_page(
   (component, is_lazy)
 }
 
-pub fn get_route_files(dir: &Path) -> Vec<String> {
-  let dir_str = dir.to_str().unwrap();
+pub fn get_route_files(dir: &str) -> Vec<String> {
   WalkDir::new(dir)
     .into_iter()
     .filter_map(|e| e.ok())
     .filter_map(|e| {
       if e.path().is_file() && e.path().extension().map_or(false, |ext| ext == "tsx") {
-        Some(normalize_path(e.path().to_str().unwrap()).replace(dir_str, ""))
+        Some(normalize_path(e.path().to_str().unwrap()).replace(dir, ""))
       } else {
         None
       }
