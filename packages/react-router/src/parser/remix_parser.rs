@@ -1,20 +1,19 @@
-use farmfe_core::regex::Regex;
+use farmfe_core::regex::{Captures, Regex};
 use farmfe_core::serde_json;
 use farmfe_toolkit::hash::sha256;
 use farmfe_toolkit::pluginutils::normalize_path::normalize_path;
-use serde::de::{self, EnumAccess, MapAccess, VariantAccess, Visitor};
 use serde::ser::SerializeStruct;
-use serde::{Deserialize, Deserializer, Serialize, Serializer};
-use std::fmt;
+use serde::{Deserialize, Serialize, Serializer};
 use std::{collections::HashSet, path::Path};
 use walkdir::WalkDir;
 
 #[derive(Default, Debug, Deserialize, Clone)]
-struct Route {
-  index: Option<bool>,
+pub struct Route {
   path: String,
-  component: String,
+  index: bool,
+  spread_module: Option<String>,
   children: Option<Vec<Route>>,
+  lazy: Option<String>,
 }
 
 impl Serialize for Route {
@@ -23,14 +22,21 @@ impl Serialize for Route {
     S: Serializer,
   {
     let mut state = serializer.serialize_struct("Route", 4)?;
-    if let Some(ref index) = self.index {
-      state.serialize_field("index", index)?;
+    if !self.path.is_empty() {
+      state.serialize_field("path", &self.path)?;
+    }
+    if self.index {
+      state.serialize_field("index", &self.index)?;
+    }
+    if let Some(ref spread_module) = self.spread_module {
+      state.serialize_field("spread_module", &format!("{}{}{}", "$", spread_module, "$"))?;
+    }
+    if let Some(ref lazy) = self.lazy {
+      state.serialize_field("lazy", &format!("{}{}{}", "$", lazy, "$"))?;
     }
     if let Some(ref children) = self.children {
       state.serialize_field("children", children)?;
     }
-    state.serialize_field("path", &self.path)?;
-    state.serialize_field("component", &format!("{}{}{}", "$", &self.component, "$"))?;
     state.end()
   }
 }
@@ -41,7 +47,7 @@ fn process_route_path(segment: &str) -> String {
   let mut segment = segment.to_string();
   for (pat, repl) in patterns.iter() {
     let re = Regex::new(pat).unwrap();
-    segment = re.replace_all(&segment, *repl).into_owned();
+    segment = re.replace(&segment, *repl).into_owned();
   }
 
   segment
@@ -74,7 +80,7 @@ fn process_page(
   (component, is_lazy)
 }
 
-fn get_route_files(dir: &Path) -> Vec<String> {
+pub fn get_route_files(dir: &Path) -> Vec<String> {
   let dir_str = dir.to_str().unwrap();
   WalkDir::new(dir)
     .into_iter()
@@ -89,7 +95,7 @@ fn get_route_files(dir: &Path) -> Vec<String> {
     .collect::<Vec<String>>()
 }
 
-fn parse(route_files: Vec<String>, routes_path: &str, level: usize) -> (Vec<Route>, String) {
+pub fn parse(route_files: Vec<String>, routes_path: &str, level: usize) -> (Vec<Route>, String) {
   let mut routes: Vec<Route> = Vec::new();
   let mut imports = String::new();
   let first_segments: HashSet<_> = route_files
@@ -126,33 +132,43 @@ fn parse(route_files: Vec<String>, routes_path: &str, level: usize) -> (Vec<Rout
     let mut route = Route::default();
 
     if route_path == "_index" {
-      route.index = Some(true);
+      route.index = true;
     } else if !route_path.starts_with('_') {
       route.path = route_path;
     }
 
     let (component_file_path, is_lazy) = process_page(&filtered_route_files, &segment, routes_path);
-
-    if !is_lazy {
-      let import_name = format!(
-        "{}{}",
-        "farmfe_plugin_react_router_",
-        sha256(&component_file_path.as_bytes(), 8)
-      );
-      imports.push_str(&format!(
-        "import * as {} from '{}';\n",
-        import_name, component_file_path
-      ));
-      route.component = format!("...adapter({})", import_name);
-    } else {
-      route.component = format!(
-        "lazy(() => import('{}').then(adapter))",
-        component_file_path
-      );
+    if !component_file_path.is_empty() {
+      if !is_lazy {
+        let import_name = format!(
+          "{}{}",
+          "farmfe_plugin_react_router_",
+          sha256(&component_file_path.as_bytes(), 8)
+        );
+        imports.push_str(&format!(
+          "import * as {} from '{}';\n",
+          import_name, component_file_path
+        ));
+        route.spread_module = Some(format!("...adapter({})", import_name));
+      } else {
+        route.lazy = Some(format!(
+          "() => import('{}').then(adapter)",
+          component_file_path
+        ));
+      }
     }
 
-    let (routes_map, imps) = parse(filtered_route_files, routes_path, level + 1);
+    let (mut routes_map, imps) = parse(filtered_route_files, routes_path, level + 1);
     if !routes_map.is_empty() {
+      if segment.ends_with("_") {
+        let real_segment = &segment[..segment.len() - 1];
+        for mut route in routes_map.drain(..) {
+          if !route.index {
+            route.path = format!("{}/{}", real_segment, route.path);
+          }
+          routes.push(route);
+        }
+      }
       route.children = Some(routes_map);
       imports.push_str(&imps);
     }
@@ -162,49 +178,32 @@ fn parse(route_files: Vec<String>, routes_path: &str, level: usize) -> (Vec<Rout
   (routes, imports)
 }
 
-fn build_routes_virtual_code(routes: Vec<Route>, imports: String) -> String {
-  let mut code = String::new();
-  code.push_str(&imports);
-  code.push_str("\n\n");
-  code.push_str("const routes = ");
-  let re = Regex::new(r"\$(.*?)\$").unwrap();
-  let json_string = serde_json::to_string_pretty(&routes)
-    .unwrap();
-  let json_string = re.replace_all(&json_string, "$1").into_owned();
+pub fn build_routes_virtual_code(routes: Vec<Route>, imports: String) -> String {
+  // 定义适配器函数
+  let adapter = "function adapterModule(module) {
+      const { default: Component, clientLoader: loader, clientAction: action, loader: _loader, action: _action, Component: _Component, ...rest } = module;
+      return { Component, loader, action, ...rest };
+}\n\n";
+
+  let mut code = format!("{}\n\n{}", imports, adapter);
+
+  let re = Regex::new(r#""spread_module": "\$(.*?)\$"|"\$(.*?)\$""#).expect("Invalid regex");
+
+  let json_string = serde_json::to_string_pretty(&routes).expect("Failed to serialize routes");
+
+  let json_string = re
+    .replace_all(&json_string, |caps: &Captures| {
+      caps
+        .get(1)
+        .or_else(|| caps.get(2))
+        .map_or("", |m| m.as_str())
+        .to_owned()
+    })
+    .into_owned();
+
+  code.push_str("export const routes = ");
   code.push_str(&json_string);
   code.push_str(";\n");
+
   code
-}
-
-#[cfg(test)]
-mod tests {
-  use std::fs;
-
-  use super::*;
-
-  #[test]
-  fn test_parse_route_path() {
-    let routes_dir = Path::new(
-      "/Users/cherry7/Documents/open/farm-fe/plugins/packages/react-router/playground/routes/",
-    );
-
-    let files = get_route_files(routes_dir);
-
-    let (routes, imports) = parse(
-      files,
-      "/Users/cherry7/Documents/open/farm-fe/plugins/packages/react-router/playground/routes",
-      0,
-    );
-    let code = build_routes_virtual_code(routes, imports);
-    fs::write("/Users/cherry7/Documents/open/farm-fe/plugins/packages/react-router/playground/feat/plugin_code.ts", code);
-  }
-
-  #[test]
-  fn test_process_route_path() {
-    assert_eq!(process_route_path("user(id)"), "userid?");
-    assert_eq!(process_route_path("find$"), "find*");
-    assert_eq!(process_route_path("$edit"), ":edit");
-    assert_eq!(process_route_path("user(id)$"), "user(id)*");
-    assert_eq!(process_route_path("$(id)"), ":id?");
-  }
 }
