@@ -5,7 +5,7 @@ mod parser;
 use farmfe_core::{
   config::Config,
   module::ModuleType,
-  plugin::{Plugin, PluginLoadHookResult},
+  plugin::{Plugin, PluginLoadHookResult, PluginResolveHookResult},
   serde_json,
 };
 use farmfe_macro_plugin::farm_plugin;
@@ -46,9 +46,30 @@ impl FarmPluginReactRouter {
   }
 }
 
+const REACT_VIRTUAL_ROUTER: &str = "virtual:__REACT_VIRTUAL_ROUTER__:";
+
 impl Plugin for FarmPluginReactRouter {
   fn name(&self) -> &str {
     "FarmPluginReactRouter"
+  }
+  fn priority(&self) -> i32 {
+    105
+  }
+  fn resolve(
+    &self,
+    param: &farmfe_core::plugin::PluginResolveHookParam,
+    _context: &std::sync::Arc<farmfe_core::context::CompilationContext>,
+    _hook_context: &farmfe_core::plugin::PluginHookContext,
+  ) -> farmfe_core::error::Result<Option<farmfe_core::plugin::PluginResolveHookResult>> {
+    if param.source == "virtual:__REACT_VIRTUAL_ROUTER__" {
+      return Ok(Some(PluginResolveHookResult {
+        resolved_path: REACT_VIRTUAL_ROUTER.to_string(),
+        side_effects: false,
+        external: false,
+        ..Default::default()
+      }));
+    }
+    Ok(None)
   }
   fn load(
     &self,
@@ -56,10 +77,10 @@ impl Plugin for FarmPluginReactRouter {
     _context: &std::sync::Arc<farmfe_core::context::CompilationContext>,
     _hook_context: &farmfe_core::plugin::PluginHookContext,
   ) -> farmfe_core::error::Result<Option<farmfe_core::plugin::PluginLoadHookResult>> {
-    if param.module_id == "virtual:routes" {
+    if param.resolved_path == REACT_VIRTUAL_ROUTER {
       if matches!(self.options.mode, Some(Mode::Remix)) {
         let route_files = get_route_files(&self.options.routes_path.clone().unwrap());
-        let (routes, imports) = parse(route_files, &param.resolved_path, 0);
+        let (routes, imports) = parse(route_files, &self.options.routes_path.clone().unwrap(), 0);
         let code = build_routes_virtual_code(routes, imports);
         return Ok(Some(PluginLoadHookResult {
           content: code,

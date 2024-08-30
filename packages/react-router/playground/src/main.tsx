@@ -2,6 +2,10 @@ import React, { useState } from "react";
 import "./main.css";
 import reactLogo from "./assets/react.svg";
 import FarmLogo from "./assets/logo.png";
+// @ts-ignore
+import  { routes } from "virtual:__REACT_VIRTUAL_ROUTER__";
+console.log(routes);
+
 export function Main() {
   const [count, setCount] = useState(0);
   console.log("rendering Main component")

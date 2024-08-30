@@ -1,6 +1,6 @@
 import { defineConfig } from "@farmfe/core";
 import react from '@farmfe/plugin-react';
-import farmPlugin from 'farm-plugin-react-router';
+import pluginReactRouter from '@farmfe/plugin-react-router';
 
 export default defineConfig({
   compilation: {
@@ -12,6 +12,6 @@ export default defineConfig({
   },
   plugins: [
     react({ runtime: "automatic" }),
-    farmPlugin()
+    pluginReactRouter()
   ],
 });
