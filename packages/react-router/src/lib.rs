@@ -1,9 +1,6 @@
 #![deny(clippy::all)]
 
 mod parser;
-
-use std::path::Path;
-
 use farmfe_core::{
   config::Config,
   module::ModuleType,
@@ -28,7 +25,6 @@ enum Mode {
 pub struct Options {
   mode: Option<Mode>,
   routes_path: Option<String>,
-  emit_file: Option<String>,
 }
 
 #[farm_plugin]
@@ -44,7 +40,6 @@ impl FarmPluginReactRouter {
     let options = Options {
       mode: Some(options.mode.unwrap_or(Mode::Remix)),
       routes_path: Some(options.routes_path.unwrap_or(default_routes_path)),
-      emit_file: options.emit_file,
     };
     Self { options }
   }
@@ -60,10 +55,10 @@ impl Plugin for FarmPluginReactRouter {
   fn resolve(
     &self,
     param: &farmfe_core::plugin::PluginResolveHookParam,
-    context: &std::sync::Arc<farmfe_core::context::CompilationContext>,
-    hook_context: &farmfe_core::plugin::PluginHookContext,
+    _context: &std::sync::Arc<farmfe_core::context::CompilationContext>,
+    _hook_context: &farmfe_core::plugin::PluginHookContext,
   ) -> farmfe_core::error::Result<Option<farmfe_core::plugin::PluginResolveHookResult>> {
-    if param.source == REACT_VIRTUAL_ROUTER {
+    if param.source == "virtual:react-routes" {
       return Ok(Some(PluginResolveHookResult {
         resolved_path: REACT_VIRTUAL_ROUTER.to_string(),
         side_effects: false,

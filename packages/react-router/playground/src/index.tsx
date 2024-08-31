@@ -2,7 +2,7 @@ import React, { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import './index.css'
 // @ts-ignore
-import  { routes } from "virtual:__REACT_VIRTUAL_ROUTER__";
+import  { routes } from "virtual:react-routes";
 
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 console.log(routes);
