@@ -1,9 +1,27 @@
-import React from 'react';
+import React, { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
-import { Main } from './main';
 import './index.css'
+// @ts-ignore
+import  { routes } from "virtual:__REACT_VIRTUAL_ROUTER__";
 
-const container = document.querySelector('#root');
-const root = createRoot(container);
+import { createBrowserRouter, RouterProvider } from 'react-router-dom';
+console.log(routes);
+const router = createBrowserRouter(routes, {
+  future: {
+    v7_fetcherPersist: true,
+    v7_normalizeFormMethod: true,
+    v7_partialHydration: true,
+    v7_relativeSplatPath: true,
+    v7_skipActionErrorRevalidation: true,
+  },
+})
 
-root.render(<Main />);
+// const container = document.querySelector('#root');
+// const root = createRoot(container);
+
+// root.render(<Main />);
+export default createRoot(document.getElementById('root')!).render(
+  <StrictMode>
+    <RouterProvider router={router} />
+  </StrictMode>,
+)

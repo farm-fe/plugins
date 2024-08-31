@@ -1,38 +1,47 @@
-import React, { useState } from 'react'
-import { useLoaderData } from 'react-router-dom'
+import { useState } from "react";
+import "../main.css"
+import reactLogo from "../assets/react.svg";
+import FarmLogo from "../assets/logo.png";
+import { useLoaderData, useNavigate } from "react-router-dom";
 
-export async function clientLoader() {
-  return 'Vite + React'
+export const clientLoader = () => {
+  return {
+    name: 'asdasdas',
+    age: 19,
+  }
 }
-
-export default function Component() {
-  const [count, setCount] = useState(0)
-  const data = useLoaderData() as string
-
+export default function Main() {
+  const [count, setCount] = useState(0);
+  console.log("rendering Main Page")
+  const data = useLoaderData();
+  const navigate = useNavigate();
+  console.log(data);
   return (
     <>
-      <div className="font-sans">
+      <div>
+        <a href="https://farmfe.org/" target="_blank">
+          <img src={FarmLogo} className="logo" alt="Farm logo" />
+        </a>
+        <a href="https://react.dev" target="_blank">
+          <img src={reactLogo} className="logo react" alt="React logo" />
+        </a>
       </div>
-      <h1>{ data }</h1>
+      <h1>Farm + React</h1>
       <div className="card">
-        <button onClick={() => setCount(count => count + 1)}>
-          count is
-          {' '}
-          {count}
-          {' '}
-          <i className="tabler-123" />
+        <button onClick={() => setCount((count) => count + 1)}>
+          count is {count}
+          xxxx
+        </button>
+        <button onClick={() => navigate('login')}>
+          login
         </button>
         <p>
-          Edit
-          {' '}
-          <code>src/App.tsx</code>
-          {' '}
-          and save to test HMR
+          Edit <code>src/main.tsx</code> and save to test HMR
         </p>
       </div>
       <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
+        Click on the Farm and React logos to learn more
       </p>
     </>
-  )
+  );
 }

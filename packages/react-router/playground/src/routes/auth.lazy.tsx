@@ -6,7 +6,7 @@ import { Outlet } from 'react-router-dom'
 export default function Component() {
   return (
     <>
-      <h1>auth layout</h1>
+      <h1>BBBBB</h1>
       <Outlet />
     </>
   )

@@ -17,8 +17,8 @@ pub struct Route {
 }
 
 const ADAPTER_MODULE:&str = "function adapterModule(module) {
-  const { default: Component, clientLoader: loader, clientAction: action, loader: _loader, action: _action, Component: _Component, ...rest } = module;
-  return { Component, loader, action, ...rest };
+  const { default: Component, clientLoader: loader, clientAction: action, loader: _loader, action: _action, Component: _Component, ...other } = module;
+  return { Component, loader, action, ...other };
 }\n\n";
 
 impl Serialize for Route {
@@ -72,15 +72,12 @@ fn process_page(
     let page_condition = format!("{}{}", segment, suffix);
     let route_page_condition = format!("{}/route{}", segment, suffix);
 
-    if let Some(page) = filtered_route_files
-      .iter()
-      .find(|str: &&String|{
-        let str_ext = str.split('.').last();
-        let page_condition = format!("{}.{}", page_condition, str_ext.unwrap());
-        let route_page_condition = format!("{}.{}", route_page_condition, str_ext.unwrap());
-        str.contains(&page_condition) || str.contains(&route_page_condition)
-      })
-    {
+    if let Some(page) = filtered_route_files.iter().find(|str: &&String| {
+      let str_ext = str.split('.').last();
+      let page_condition = format!("{}.{}", page_condition, str_ext.unwrap());
+      let route_page_condition = format!("{}.{}", route_page_condition, str_ext.unwrap());
+      str.ends_with(&page_condition) || str.ends_with(&route_page_condition)
+    }) {
       let absolute_path = format!("{}/{}", routes_path, page);
       component = absolute_path;
       break;
@@ -91,7 +88,7 @@ fn process_page(
 }
 
 pub fn get_route_files(dir: &str) -> Vec<String> {
-  let mut dir =  dir.to_string();
+  let mut dir = dir.to_string();
   if !dir.ends_with('/') {
     dir.push_str("/");
   }
@@ -113,11 +110,7 @@ pub fn get_route_files(dir: &str) -> Vec<String> {
     .collect::<Vec<String>>()
 }
 
-pub fn parse(
-  route_files: Vec<String>,
-  routes_path: &str,
-  level: usize,
-) -> (Vec<Route>, String) {
+pub fn parse(route_files: Vec<String>, routes_path: &str, level: usize) -> (Vec<Route>, String) {
   let mut routes: Vec<Route> = Vec::new();
   let mut imports = String::new();
   let first_segments: HashSet<_> = route_files
@@ -159,8 +152,7 @@ pub fn parse(
       route.path = route_path;
     }
 
-    let (component_file_path, is_lazy) =
-      process_page(&filtered_route_files, &segment, routes_path);
+    let (component_file_path, is_lazy) = process_page(&filtered_route_files, &segment, routes_path);
     if !component_file_path.is_empty() {
       if !is_lazy {
         let import_name = format!(
@@ -183,6 +175,7 @@ pub fn parse(
 
     let (mut routes_map, ims) = parse(filtered_route_files, routes_path, level + 1);
     if !routes_map.is_empty() {
+      imports.push_str(&ims);
       if segment.ends_with("_") {
         let real_segment = &segment[..segment.len() - 1];
         for mut route in routes_map.drain(..) {
@@ -191,11 +184,14 @@ pub fn parse(
           }
           routes.push(route);
         }
+        route.children = Some(routes_map);
+      } else {
+        route.children = Some(routes_map);
+        routes.push(route);
       }
-      route.children = Some(routes_map);
-      imports.push_str(&ims);
+    } else {
+      routes.push(route);
     }
-    routes.push(route);
   }
 
   (routes, imports)

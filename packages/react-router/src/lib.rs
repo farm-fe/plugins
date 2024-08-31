@@ -2,6 +2,8 @@
 
 mod parser;
 
+use std::path::Path;
+
 use farmfe_core::{
   config::Config,
   module::ModuleType,
@@ -10,14 +12,19 @@ use farmfe_core::{
 };
 use farmfe_macro_plugin::farm_plugin;
 use farmfe_toolkit::pluginutils::normalize_path::normalize_path;
+use notify::{RecommendedWatcher, RecursiveMode, Result, Watcher};
 use parser::remix_parser::{build_routes_virtual_code, get_route_files, parse};
 use serde::{Deserialize, Serialize};
+
+const REACT_VIRTUAL_ROUTER: &str = "virtual:__REACT_VIRTUAL_ROUTER__";
 
 #[derive(Debug, Deserialize, Serialize, Clone)]
 enum Mode {
   Remix,
   Next,
 }
+
+// 监听 文件夹  ->  deps {} -> watcher -> deps
 
 #[derive(Deserialize, Serialize, Clone, Debug)]
 #[serde(rename_all = "camelCase")]
@@ -46,8 +53,6 @@ impl FarmPluginReactRouter {
   }
 }
 
-const REACT_VIRTUAL_ROUTER: &str = "virtual:__REACT_VIRTUAL_ROUTER__:";
-
 impl Plugin for FarmPluginReactRouter {
   fn name(&self) -> &str {
     "FarmPluginReactRouter"
@@ -58,10 +63,19 @@ impl Plugin for FarmPluginReactRouter {
   fn resolve(
     &self,
     param: &farmfe_core::plugin::PluginResolveHookParam,
-    _context: &std::sync::Arc<farmfe_core::context::CompilationContext>,
-    _hook_context: &farmfe_core::plugin::PluginHookContext,
+    context: &std::sync::Arc<farmfe_core::context::CompilationContext>,
+    hook_context: &farmfe_core::plugin::PluginHookContext,
   ) -> farmfe_core::error::Result<Option<farmfe_core::plugin::PluginResolveHookResult>> {
-    if param.source == "virtual:__REACT_VIRTUAL_ROUTER__" {
+    if param.source == REACT_VIRTUAL_ROUTER {
+      let mut watcher = notify::recommended_watcher(|res| match res {
+        Ok(event) => println!("event: {:?}", event),
+        Err(e) => println!("watch error: {:?}", e),
+      })
+      .unwrap();
+      let routes_path = self.options.routes_path.clone().unwrap();
+      println!("watching: {:?}", routes_path);
+      let routes_path = Path::new(&routes_path);
+      let _ = watcher.watch(routes_path, RecursiveMode::Recursive);
       return Ok(Some(PluginResolveHookResult {
         resolved_path: REACT_VIRTUAL_ROUTER.to_string(),
         side_effects: false,
