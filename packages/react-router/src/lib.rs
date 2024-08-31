@@ -12,7 +12,6 @@ use farmfe_core::{
 };
 use farmfe_macro_plugin::farm_plugin;
 use farmfe_toolkit::pluginutils::normalize_path::normalize_path;
-use notify::{RecommendedWatcher, RecursiveMode, Result, Watcher};
 use parser::remix_parser::{build_routes_virtual_code, get_route_files, parse};
 use serde::{Deserialize, Serialize};
 
@@ -23,8 +22,6 @@ enum Mode {
   Remix,
   Next,
 }
-
-// 监听 文件夹  ->  deps {} -> watcher -> deps
 
 #[derive(Deserialize, Serialize, Clone, Debug)]
 #[serde(rename_all = "camelCase")]
@@ -67,15 +64,6 @@ impl Plugin for FarmPluginReactRouter {
     hook_context: &farmfe_core::plugin::PluginHookContext,
   ) -> farmfe_core::error::Result<Option<farmfe_core::plugin::PluginResolveHookResult>> {
     if param.source == REACT_VIRTUAL_ROUTER {
-      let mut watcher = notify::recommended_watcher(|res| match res {
-        Ok(event) => println!("event: {:?}", event),
-        Err(e) => println!("watch error: {:?}", e),
-      })
-      .unwrap();
-      let routes_path = self.options.routes_path.clone().unwrap();
-      println!("watching: {:?}", routes_path);
-      let routes_path = Path::new(&routes_path);
-      let _ = watcher.watch(routes_path, RecursiveMode::Recursive);
       return Ok(Some(PluginResolveHookResult {
         resolved_path: REACT_VIRTUAL_ROUTER.to_string(),
         side_effects: false,
