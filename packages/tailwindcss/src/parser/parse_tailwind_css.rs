@@ -21,8 +21,11 @@ pub fn filter_tailwind_atom_css(css: Vec<String>) -> Vec<String> {
     .collect()
 }
 
-pub fn parse_tailwind_css(base: &str, contents: Vec<String>) -> String {
-  let mut tailwind = TailwindBuilder::default();
+pub fn parse_tailwind_css(
+  tw_builder: &mut TailwindBuilder,
+  base: &str,
+  contents: Vec<String>,
+) -> String {
   let sources = contents
     .iter()
     .map(|c| {
@@ -35,8 +38,7 @@ pub fn parse_tailwind_css(base: &str, contents: Vec<String>) -> String {
   let mut scanner = Scanner::new(Some(DetectSources::new(PathBuf::from(base))), Some(sources));
   let res = scanner.scan();
   let styles: String = filter_tailwind_atom_css(res).join(" ");
-  tailwind.trace(&styles, false).unwrap();
-  let bundle = tailwind.bundle().unwrap();
-  println!("bundle: {:?}", bundle);
+  tw_builder.trace(&styles, false).unwrap();
+  let bundle = tw_builder.bundle().unwrap();
   bundle
 }
