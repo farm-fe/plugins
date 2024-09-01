@@ -1,58 +1,21 @@
+use serde::{self};
 use std::collections::BTreeMap;
-
-use serde::de::{self};
-use serde::{self, Deserialize};
-use tailwind_css::{BreakPointSystem, PaletteSystem};
+use tailwind_css::{
+  BreakPointSystem, FontSystem as RsFontSystem, PaletteSystem, PreflightSystem as RsPreflightSystem,
+};
 
 use std::collections::HashMap;
 
-use serde::Deserializer;
-
-#[derive(Clone, Debug)]
-pub enum LengthUnit {
-  Fraction(u32, u32),
-  Unit(f32, &'static str),
-}
-
-#[derive(Deserialize, Clone, Debug)]
-#[serde(untagged)]
-enum LengthUnitHelper {
-  Fraction { numerator: u32, denominator: u32 },
-  Unit { value: f32, unit: String },
-}
-impl<'de> Deserialize<'de> for LengthUnit {
-  fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
-  where
-    D: Deserializer<'de>,
-  {
-    let helper = LengthUnitHelper::deserialize(deserializer)?;
-    match helper {
-      LengthUnitHelper::Fraction {
-        numerator,
-        denominator,
-      } => Ok(LengthUnit::Fraction(numerator, denominator)),
-      LengthUnitHelper::Unit { value, unit } => Ok(LengthUnit::Unit(
-        value,
-        match unit.as_str() {
-          "px" => "px",
-          "em" => "em",
-          _ => return Err(de::Error::custom(format!("unexpected unit: {}", unit))),
-        },
-      )),
-    }
-  }
-}
-
 #[derive(serde::Deserialize, Clone, Debug)]
 pub struct FontSize {
-  pub size: LengthUnit,
-  pub height: LengthUnit,
+  pub size: f32,
+  pub height: f32,
 }
 
 #[derive(serde::Deserialize, Clone, Debug)]
 pub struct FontSystem {
   pub size: BTreeMap<String, FontSize>,
-  pub family: BTreeMap<String, Vec<String>>,
+  pub family: BTreeMap<String, String>,
   pub tracking: BTreeMap<String, f32>,
 }
 
@@ -126,11 +89,18 @@ pub struct Theme {
 pub struct TailwindCssConfig {
   pub content: Option<Vec<String>>,
   pub theme: Option<Theme>,
+  // compile other config eg: inline  trace ... ?
 }
 
 pub struct TailwindRsConfig {
   pub palettes: Option<PaletteSystem>,
-  pub fonts: Option<FontSystem>,
-  pub preflight: Option<PreflightSystem>,
+  pub fonts: Option<RsFontSystem>,
+  pub preflight: Option<RsPreflightSystem>,
   pub screens: Option<BreakPointSystem>,
+}
+
+// tailwindcss_oxide config
+
+pub struct TailwindOxideConfig {
+  pub content: Option<Vec<String>>,
 }

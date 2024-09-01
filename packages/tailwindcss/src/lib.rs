@@ -9,14 +9,13 @@ use farmfe_core::{
   serde_json::{self},
 };
 use farmfe_macro_plugin::farm_plugin;
-
 #[farm_plugin]
 pub struct FarmfePluginTailwindcss {
   tw_config: TailwindCssConfig,
 }
 impl FarmfePluginTailwindcss {
   fn new(config: &Config, options: String) -> Self {
-    let tw_config: TailwindCssConfig = serde_json::from_str(&options).unwrap(); 
+    let tw_config: TailwindCssConfig = serde_json::from_str(&options).unwrap();
     Self { tw_config }
   }
 }
