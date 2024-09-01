@@ -865,9 +865,13 @@ dependencies = [
 name = "farmfe_plugin_tailwindcss"
 version = "0.0.1"
 dependencies = [
+ "css-color",
  "farmfe_core",
  "farmfe_macro_plugin",
+ "farmfe_toolkit",
  "farmfe_toolkit_plugin_types",
+ "serde",
+ "serde_json",
  "tailwind-ast",
  "tailwind-css",
  "tailwindcss-oxide",

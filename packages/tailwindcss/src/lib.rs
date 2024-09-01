@@ -1,15 +1,23 @@
 #![deny(clippy::all)]
-mod parse;
+mod config;
+mod parser;
 
-use farmfe_core::{config::Config, plugin::Plugin};
+use config::TailwindCssConfig;
+use farmfe_core::{
+  config::Config,
+  plugin::Plugin,
+  serde_json::{self},
+};
 use farmfe_macro_plugin::farm_plugin;
-use parse::parse_oxide_string;
+
 #[farm_plugin]
-pub struct FarmfePluginTailwindcss {}
+pub struct FarmfePluginTailwindcss {
+  tw_config: TailwindCssConfig,
+}
 impl FarmfePluginTailwindcss {
   fn new(config: &Config, options: String) -> Self {
-    parse_oxide_string();
-    Self {}
+    let tw_config: TailwindCssConfig = serde_json::from_str(&options).unwrap(); 
+    Self { tw_config }
   }
 }
 

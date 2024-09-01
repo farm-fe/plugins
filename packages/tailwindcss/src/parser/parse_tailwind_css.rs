@@ -2,7 +2,6 @@ use std::path::PathBuf;
 use tailwind_ast::parse_tailwind;
 use tailwind_css::{TailwindBuilder, TailwindInstruction};
 use tailwindcss_oxide::{ChangedContent, Scanner};
-
 pub fn filter_tailwind_atom_css(css: Vec<String>) -> Vec<String> {
   let need_filter = vec![
     "content".to_string(),

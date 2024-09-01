@@ -1,6 +1,6 @@
 import { defineConfig } from "@farmfe/core";
 import react from '@farmfe/plugin-react';
-import farmPlugin from '@farmfe/plugin-tailwindcss';
+import tailwindcss from '@farmfe/plugin-tailwindcss';
 
 export default defineConfig({
   compilation: {
@@ -12,6 +12,18 @@ export default defineConfig({
   },
   plugins: [
     react({ runtime: "automatic" }),
-    farmPlugin()
+    tailwindcss({
+      content: ["./src/**/*.{js,jsx,ts,tsx}"],
+      theme: {
+        colors: {
+          'primary': '#0070f3',
+          'secondary': '#0070f3',
+          'tertiary': '#0070f3',
+          'quaternary': '#0070f3',
+          'quinary': '#0070f3',
+          'senary': '#0070f3',
+        }
+      }
+    })
   ],
 });
