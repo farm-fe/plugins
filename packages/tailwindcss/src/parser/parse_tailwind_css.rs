@@ -1,3 +1,4 @@
+use farmfe_toolkit::fs::read_file_utf8;
 use std::path::PathBuf;
 use tailwind_ast::parse_tailwind;
 use tailwind_css::{TailwindBuilder, TailwindInstruction};
@@ -14,11 +15,21 @@ pub fn filter_tailwind_atom_css(css: Vec<String>) -> Vec<String> {
   css
     .iter()
     .filter(|&c| {
-      let styles = parse_tailwind(c).unwrap()[0].clone();
       if need_filter.contains(c) {
         return false;
       }
-      TailwindInstruction::from(styles).get_instance().is_ok()
+      let styles = parse_tailwind(c).unwrap()[0].clone();
+      match TailwindInstruction::from(styles).get_instance() {
+        Ok(rule) => {
+          if rule.id().contains("[]") { // ignore atomic rules that do not conform to the specification
+            return false;
+          }
+          return true;
+        }
+        Err(_e) => {
+          return false;
+        }
+      }
     })
     .cloned()
     .collect()
@@ -39,9 +50,21 @@ pub fn parse_tailwind_css(
     })
     .collect();
   let mut scanner = Scanner::new(Some(DetectSources::new(PathBuf::from(base))), Some(sources));
-  let res = scanner.scan();
-  let styles: String = filter_tailwind_atom_css(res).join(" ");
-  tw_builder.trace(&styles, false).unwrap();
+  let rules = scanner.scan();
+  if rules.is_empty() {
+    return (String::new(), scanner);
+  }
+  let styles = filter_tailwind_atom_css(rules);
+  if styles.is_empty() {
+    return (String::new(), scanner);
+  }
+  let styles_str = styles.join(" ");
+  if styles_str.is_empty() {
+    println!("Unsupported atomic rules: {:#?}", styles);
+    return (String::new(), scanner);
+  }
+  println!("tailwindcss atomic rules: {:#?}", styles);
+  tw_builder.trace(&styles_str, false).unwrap();
   let bundle = tw_builder.bundle().unwrap();
   (bundle, scanner)
 }
@@ -56,13 +79,29 @@ pub fn parse_tailwind_css_with_changed(
     .map(|c| {
       return ChangedContent {
         file: Some(PathBuf::from(c)),
-        content: None,
+        content: Some(read_file_utf8(c).unwrap()),
       };
     })
     .collect();
-  let res = scanner.scan_content(changed_content);
-  let styles: String = filter_tailwind_atom_css(res).join(" ");
-  tw_builder.trace(&styles, false).unwrap();
+  let rules = scanner.scan_content(changed_content);
+  if rules.is_empty() {
+    return String::new();
+  }
+  let styles = filter_tailwind_atom_css(rules);
+  if styles.is_empty() {
+    return String::new();
+  }
+  let styles_str = styles.join(" ");
+  if styles_str.is_empty() {
+    println!("Unsupported atomic rules: {:#?}", styles);
+    return String::new();
+  }
+  tw_builder.trace(&styles_str, false).unwrap();
   let bundle = tw_builder.bundle().unwrap();
   bundle
+}
+
+fn clean_tailwind_css(css: &str) -> String {
+  //
+  todo!()
 }

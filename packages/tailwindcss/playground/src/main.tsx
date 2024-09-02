@@ -7,7 +7,7 @@ export function Main() {
   console.log("rendering Main component")
   return (
     <>
-      <div className="flex-1 flex-auto flex-none">
+      <div className="p">
         <a href="https://farmfe.org/" target="_blank">
           <img src={FarmLogo} className="logo" alt="Farm logo" />
         </a>
