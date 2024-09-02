@@ -2,12 +2,13 @@ import React, { useState } from "react";
 import "./main.css";
 import reactLogo from "./assets/react.svg";
 import FarmLogo from "./assets/logo.png";
+import { Home } from './components/home'
 export function Main() {
   const [count, setCount] = useState(0);
   console.log("rendering Main component")
   return (
     <>
-      <div className="p">
+      <div className="p-3">
         <a href="https://farmfe.org/" target="_blank">
           <img src={FarmLogo} className="logo" alt="Farm logo" />
         </a>
@@ -16,6 +17,7 @@ export function Main() {
         </a>
       </div>
       <h1>Farm + React</h1>
+      <Home/>
       <div className="card">
         <button onClick={() => setCount((count) => count + 1)}>
           count is {count}

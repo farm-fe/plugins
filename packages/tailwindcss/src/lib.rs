@@ -70,7 +70,6 @@ impl Plugin for FarmfePluginTailwindcss {
       let mut tw_scanner = self.tw_scanner.lock().unwrap();
       let mut tw_bundle = self.tw_bundle.lock().unwrap();
       let changed_files = vec![param.resolved_path.to_string()];
-      println!("changed_files: {:?}", changed_files);
       let tw_css = parse_tailwind_css_with_changed(&mut tw_builder, &mut tw_scanner, changed_files);
       println!("tw_css: {:?}", tw_css);
       return Ok(None);

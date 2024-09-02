@@ -63,7 +63,6 @@ pub fn parse_tailwind_css(
     println!("Unsupported atomic rules: {:#?}", styles);
     return (String::new(), scanner);
   }
-  println!("tailwindcss atomic rules: {:#?}", styles);
   tw_builder.trace(&styles_str, false).unwrap();
   let bundle = tw_builder.bundle().unwrap();
   (bundle, scanner)
