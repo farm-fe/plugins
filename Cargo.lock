@@ -870,6 +870,7 @@ dependencies = [
  "farmfe_macro_plugin",
  "farmfe_toolkit",
  "farmfe_toolkit_plugin_types",
+ "farmfe_utils",
  "serde",
  "serde_json",
  "tailwind-ast",
