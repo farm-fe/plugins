@@ -2,7 +2,7 @@ use crate::config::TailwindCssConfig;
 use crate::parser::parse_tailwind_config::parse_tailwind_config;
 use tailwind_css::TailwindBuilder;
 
-fn get_tailwind_builder(config: &TailwindCssConfig) -> TailwindBuilder {
+pub fn get_tailwind_builder(config: &TailwindCssConfig) -> TailwindBuilder {
   let tw_config = parse_tailwind_config(config);
   let mut builder = TailwindBuilder::default();
   if tw_config.fonts.is_some() {
