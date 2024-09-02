@@ -7,17 +7,9 @@ use tailwindcss_oxide::{
 };
 
 pub fn filter_tailwind_atom_css(css: Vec<String>) -> Vec<String> {
-  let need_filter = vec![
-    "content".to_string(),
-    "word-break".to_string(),
-    "text-overflow".to_string(),
-  ];
   css
     .iter()
     .filter(|&c| {
-      if need_filter.contains(c) {
-        return false;
-      }
       let styles = parse_tailwind(c).unwrap()[0].clone();
       match TailwindInstruction::from(styles).get_instance() {
         Ok(rule) => {
