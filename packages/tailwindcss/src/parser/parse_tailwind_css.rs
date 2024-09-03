@@ -31,7 +31,6 @@ pub fn collect_tailwind_css(tw_builder: &mut TailwindBuilder, tw_scanner: &mut S
   let styles = filter_tailwind_atom_css(rules);
   let styles_str = styles.join(" ");
   if styles_str.is_empty() {
-    println!("Unsupported atomic rules: {:#?}", styles);
     return;
   }
   tw_builder.trace(&styles_str, false).unwrap();
@@ -55,7 +54,6 @@ pub fn collect_tailwind_css_with_changed(
   let styles = filter_tailwind_atom_css(rules);
   let styles_str = styles.join(" ");
   if styles_str.is_empty() {
-    println!("Unsupported atomic rules: {:#?}", styles);
     return false;
   }
   tw_builder.trace(&styles_str, false).unwrap();

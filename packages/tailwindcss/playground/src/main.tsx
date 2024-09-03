@@ -8,7 +8,7 @@ export function Main() {
   console.log("rendering Main component")
   return (
     <>
-      <div className="p-3">
+      <div className="p-3 bg-slate-600">
         <a href="https://farmfe.org/" target="_blank">
           <img src={FarmLogo} className="logo" alt="Farm logo" />
         </a>
