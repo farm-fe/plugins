@@ -736,6 +736,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "farmfe_plugin_auto_import"
+version = "0.0.0"
+dependencies = [
+ "farmfe_core",
+ "farmfe_macro_plugin",
+ "farmfe_toolkit_plugin_types",
+]
+
+[[package]]
 name = "farmfe_plugin_dsv"
 version = "0.0.1"
 dependencies = [
