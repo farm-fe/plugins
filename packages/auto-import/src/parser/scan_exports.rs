@@ -48,17 +48,16 @@ pub fn scan_exports(file_path: &str, content: &str) -> Vec<Export> {
   for export in exports {
     let ESMExport {
       name,
-      declaration_type,
       default_name,
       named_exports,
-      specifier,
       export_type,
       type_named_exports,
+      ..
     } = export;
     match export_type {
       ExportType::Default => {
         exports_names.push(Export {
-          form: "export default".to_string(),
+          form: file_path.to_string(),
           name: default_name.unwrap(),
           priority: 0,
           disabled: None,
@@ -68,9 +67,65 @@ pub fn scan_exports(file_path: &str, content: &str) -> Vec<Export> {
           type_from: None,
           as_name: None,
         });
-      },
-      // do it later
-      _ =>{}
+      }
+      ExportType::Type => {
+        if let Some(type_named_export) = type_named_exports {
+          for (_k, v) in type_named_export {
+            exports_names.push(Export {
+              form: file_path.to_string(),
+              name: v,
+              priority: 0,
+              disabled: None,
+              dts_disabled: None,
+              declaration_type: None,
+              tp: Some(true),
+              type_from: Some(filename.clone()),
+              as_name: None,
+            });
+          }
+        }
+      }
+      ExportType::Declaration => {
+        exports_names.push(Export {
+          form: file_path.to_string(),
+          name: name.unwrap(),
+          priority: 0,
+          disabled: None,
+          dts_disabled: None,
+          declaration_type: None,
+          tp: None,
+          type_from: None,
+          as_name: None,
+        });
+      }
+      ExportType::Namespace => exports_names.push(Export {
+        form: file_path.to_string(),
+        name: name.unwrap(),
+        priority: 0,
+        disabled: None,
+        dts_disabled: None,
+        declaration_type: None,
+        tp: None,
+        type_from: None,
+        as_name: None,
+      }),
+      ExportType::Named => {
+        if let Some(named_export) = named_exports {
+          for (_k, v) in named_export {
+            exports_names.push(Export {
+              form: file_path.to_string(),
+              name: v,
+              priority: 0,
+              disabled: None,
+              dts_disabled: None,
+              declaration_type: None,
+              tp: None,
+              type_from: None,
+              as_name: None,
+            });
+          }
+        }
+      }
     }
   }
   exports_names
