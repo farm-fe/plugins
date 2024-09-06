@@ -6,7 +6,8 @@
   "type": "module",
   "license": "MIT",
   "devDependencies": {
-    "@farmfe/plugin-tools": "latest"
+    "@farmfe/plugin-tools": "latest",
+    "@farmfe/js-plugin-visualizer": "latest"
   },
   "napi": {
     "name": "farmfe_plugin_auto_import",
