@@ -14,6 +14,7 @@ pub enum ImportType {
   Named,
   Type,
   Namespace,
+  // TODO: 暂时不支持动态导入
   Dynamic,
 }
 
@@ -341,13 +342,27 @@ impl Visit for ImportExportVisitor {
   }
 }
 
-pub fn parse_esm_imports_exports(file_path: &str) -> (Vec<ESMImport>, Vec<ESMExport>) {
-  let file_content = fs::read_to_string(file_path)
-    .unwrap_or_else(|_| panic!("Unable to read file: {:?}", file_path));
-  let components_path = file_path.to_string();
+pub fn parse_esm_imports_exports(
+  file_path: Option<&str>,
+  content: Option<&str>,
+) -> (Vec<ESMImport>, Vec<ESMExport>) {
+  if file_path.is_none() && content.is_none() {
+    return (vec![], vec![]);
+  }
+  let file_path = if file_path.is_none() {
+    ""
+  } else {
+    file_path.unwrap()
+  };
+  let content = if content.is_none() {
+    &fs::read_to_string(file_path.clone())
+      .unwrap_or_else(|_| panic!("Unable to read file: {:?}", file_path))
+  } else {
+    content.unwrap()
+  };
   let ParseScriptModuleResult { ast, comments: _ } = match parse_module(
-    &components_path,
-    &file_content,
+    &file_path,
+    &content,
     Syntax::Typescript(TsSyntax {
       tsx: true,
       decorators: true,
@@ -358,7 +373,7 @@ pub fn parse_esm_imports_exports(file_path: &str) -> (Vec<ESMImport>, Vec<ESMExp
     Ok(res) => res,
     Err(err) => {
       println!("{}", err.to_string());
-      panic!("Parse {} failed. See error details above.", components_path);
+      panic!("Parse {} failed. See error details above.", file_path);
     }
   };
 
@@ -374,7 +389,7 @@ mod tests {
 
   #[test]
   fn test_parse_esm_imports_exports() {
-    let (imports, exports) = parse_esm_imports_exports("./tests/test.ts");
+    let (imports, exports) = parse_esm_imports_exports(Some("./tests/test.ts"), None);
     println!("imports: {:#?}", imports);
     println!("exports: {:#?}", exports);
   }
