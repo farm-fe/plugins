@@ -20,6 +20,7 @@ pub enum ImportType {
 
 #[derive(Debug)]
 pub enum ExportType {
+  All,
   Type,
   Declaration,
   Named,
@@ -334,6 +335,18 @@ impl Visit for ImportExportVisitor {
           default_name: Some(String::from("Anonymous")),
           named_exports: None,
           specifier: None,
+          type_named_exports: None,
+        });
+      }
+      ModuleDecl::ExportAll(export_all) => {
+        let specifier = export_all.src.value.to_string();
+        self.exports.push(ESMExport {
+          export_type: ExportType::All,
+          declaration_type: None,
+          name: None,
+          default_name: None,
+          named_exports: None,
+          specifier: Some(specifier),
           type_named_exports: None,
         });
       }

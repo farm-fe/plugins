@@ -2,9 +2,9 @@ import { a, a as A, type b, type c } from "modules/a"
 import * as StarB from "modules/b"
 import "@/xxx"
 import K from "@/k"
-export *  as M from "./test"
+export * from "./test"
 
-export { r  } from "./test"
+export { r  } from "./x/test"
 export {
   a as P,
   A as Q,

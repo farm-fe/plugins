@@ -1,10 +1,19 @@
-use std::path::Path;
+use std::{fs::{metadata, read_dir, read_to_string}, path::Path};
 
-use crate::parser::parse::{
-  parse_esm_imports_exports, DeclarationType, ESMExport, ESMImport, ExportType,
-};
+use farmfe_toolkit::pluginutils::normalize_path::normalize_path;
 
-pub struct Export {
+use crate::parser::parse::{parse_esm_imports_exports, DeclarationType, ESMExport, ExportType};
+const FILE_EXTENSION_LOOKUP: [&'static str; 8] = [
+    ".mts",
+    ".cts",
+    ".ts",
+    ".mjs",
+    ".cjs",
+    ".js",
+    ".jsx",
+    ".tsx"
+];
+pub struct Import {
   form: String,
   name: String,
   priority: usize,
@@ -41,7 +50,7 @@ fn get_filename_by_path(file_path: &str) -> String {
   to_pascal_case(&filename)
 }
 
-pub fn scan_exports(file_path: &str, content: &str) -> Vec<Export> {
+pub fn scan_exports(file_path: &str, content: &str) -> Vec<Import> {
   let (_, exports) = parse_esm_imports_exports(None, Some(content));
   let filename = get_filename_by_path(file_path);
   let mut exports_names = Vec::new();
@@ -52,11 +61,12 @@ pub fn scan_exports(file_path: &str, content: &str) -> Vec<Export> {
       named_exports,
       export_type,
       type_named_exports,
+      specifier,
       ..
     } = export;
     match export_type {
       ExportType::Default => {
-        exports_names.push(Export {
+        exports_names.push(Import {
           form: file_path.to_string(),
           name: default_name.unwrap(),
           priority: 0,
@@ -71,7 +81,7 @@ pub fn scan_exports(file_path: &str, content: &str) -> Vec<Export> {
       ExportType::Type => {
         if let Some(type_named_export) = type_named_exports {
           for (_k, v) in type_named_export {
-            exports_names.push(Export {
+            exports_names.push(Import {
               form: file_path.to_string(),
               name: v,
               priority: 0,
@@ -86,7 +96,7 @@ pub fn scan_exports(file_path: &str, content: &str) -> Vec<Export> {
         }
       }
       ExportType::Declaration => {
-        exports_names.push(Export {
+        exports_names.push(Import {
           form: file_path.to_string(),
           name: name.unwrap(),
           priority: 0,
@@ -98,7 +108,7 @@ pub fn scan_exports(file_path: &str, content: &str) -> Vec<Export> {
           as_name: None,
         });
       }
-      ExportType::Namespace => exports_names.push(Export {
+      ExportType::Namespace => exports_names.push(Import {
         form: file_path.to_string(),
         name: name.unwrap(),
         priority: 0,
@@ -112,7 +122,7 @@ pub fn scan_exports(file_path: &str, content: &str) -> Vec<Export> {
       ExportType::Named => {
         if let Some(named_export) = named_exports {
           for (_k, v) in named_export {
-            exports_names.push(Export {
+            exports_names.push(Import {
               form: file_path.to_string(),
               name: v,
               priority: 0,
@@ -123,6 +133,25 @@ pub fn scan_exports(file_path: &str, content: &str) -> Vec<Export> {
               type_from: None,
               as_name: None,
             });
+          }
+        }
+      }
+      ExportType::All=>{
+        let specifier_path = Path::new(file_path).join(specifier.unwrap());
+        let specifier_path = normalize_path(specifier_path.to_str().unwrap());
+
+        let file_exts = FILE_EXTENSION_LOOKUP.to_vec();
+        // check specifier_path is a directory
+        if metadata(&specifier_path).unwrap().is_dir() {
+          // check if specifier_path has index.tsx ...
+          for ext in &file_exts {
+            let index_path = format!("{}/index{}",specifier_path, ext);
+            if metadata(&index_path).is_ok() {
+              let index_content = read_to_string(&index_path).unwrap();
+              let index_exports = scan_exports(&index_path, &index_content);
+              exports_names.extend(index_exports);
+              break;
+            }
           }
         }
       }

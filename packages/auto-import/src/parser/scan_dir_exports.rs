@@ -1,8 +1,10 @@
-use crate::parser::scan_exports::scan_exports;
+use super::scan_exports::{
+  Import,
+  scan_exports
+};
 use walkdir::WalkDir;
-use super::scan_exports::Export;
 
-pub fn scan_dir_exports(dir: &str) -> Vec<Export> {
+pub fn scan_dir_exports(dir: &str) -> Vec<Import> {
   let walker = WalkDir::new(dir).into_iter();
   let file_exts = vec![".js", ".ts", ".jsx", ".tsx"];
   let filtered_entries = walker.filter_map(Result::ok).filter(|e| {
