@@ -4,3 +4,4 @@ pub mod scan_exports;
 pub mod stringify_imports;
 pub mod inject_imports;
 pub mod generate_dts;
+pub mod pattern;
