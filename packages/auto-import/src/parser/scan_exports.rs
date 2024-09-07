@@ -3,15 +3,13 @@ use std::{
   path::Path,
 };
 
-use super::parse::{
-  parse_esm_exports, parse_esm_imports_exports, DeclarationType, ESMExport, ExportType,
-};
+use super::parse::{parse_esm_exports, DeclarationType, ESMExport, ExportType};
 use farmfe_toolkit::pluginutils::normalize_path::normalize_path;
 
 const FILE_EXTENSION_LOOKUP: [&'static str; 8] =
   [".mts", ".cts", ".ts", ".mjs", ".cjs", ".js", ".jsx", ".tsx"];
 
-#[derive(Debug, Default)]
+#[derive(Debug, Default, Clone, PartialEq, Eq)]
 pub struct Import {
   pub form: String,
   pub name: String,
@@ -63,8 +61,8 @@ fn get_filename_by_path(file_path: &str) -> String {
   to_pascal_case(&filename)
 }
 
-pub fn scan_exports(file_path: &str, content: &str) -> Vec<Import> {
-  let exports = parse_esm_exports(None, Some(content));
+pub fn scan_exports(file_path: &str, content: Option<&str>) -> Vec<Import> {
+  let exports = parse_esm_exports(Some(file_path), content);
   let filename = get_filename_by_path(file_path);
   let mut exports_names = Vec::new();
   for export in exports {
@@ -164,7 +162,7 @@ pub fn scan_exports(file_path: &str, content: &str) -> Vec<Import> {
             let index_path = format!("{}/index{}", specifier_path, ext);
             if metadata(&index_path).is_ok() {
               let index_content = read_to_string(&index_path).unwrap();
-              let index_exports = scan_exports(&index_path, &index_content);
+              let index_exports = scan_exports(&index_path, Some(&index_content));
               exports_names.extend(index_exports);
               break;
             }

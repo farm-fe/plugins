@@ -10,10 +10,10 @@ pub struct Preset {
   imports: Vec<String>,
 }
 
-pub fn resolve_presets(presets: &[&str]) -> Vec<Import> {
+pub fn resolve_presets(presets: &Vec<String>) -> Vec<Import> {
   let mut imports = Vec::new();
-  for &p in presets {
-    let preset = match p {
+  for p in presets {
+    let preset = match &p[..] {
         "react" => react::get_react_preset(),
         "react-router" => react_router::get_react_router_preset(),
         "react-router-dom" => react_router_dom::get_react_router_dom_preset(),
@@ -41,7 +41,7 @@ mod tests {
 
   #[test]
   fn test_resolve_presets() {
-    let imports = resolve_presets(&vec!["react"]);
+    let imports = resolve_presets(&vec!["react".to_string()]);
     println!("imports: {:#?}", imports)
   }
 }

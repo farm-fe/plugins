@@ -18,7 +18,7 @@ pub enum ImportType {
   Dynamic,
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub enum ExportType {
   All,
   Type,
@@ -441,8 +441,10 @@ pub fn parse_esm_imports(file_path: Option<&str>, content: Option<&str>) -> Vec<
     &content,
     Syntax::Typescript(TsSyntax {
       tsx: true,
-      decorators: true,
-      ..Default::default()
+      decorators: false,
+      dts: false,
+      no_early_errors: true,
+      disallow_ambiguous_jsx_like: true,
     }),
     EsVersion::latest(),
   ) {

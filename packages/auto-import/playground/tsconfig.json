@@ -20,6 +20,6 @@
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true
   },
-  "include": ["src"],
+  "include": ["src","./auto_import.d.ts"],
   "references": [{ "path": "./tsconfig.node.json" }]
 }

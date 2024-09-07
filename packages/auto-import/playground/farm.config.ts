@@ -13,7 +13,10 @@ export default defineConfig({
   },
   plugins: [
     react({ runtime: "automatic" }),
-    autoImport(),
+    autoImport({
+      presets: ["react"],
+      dirs:["src/apis"]
+    }),
     visualizer()
   ],
 });
