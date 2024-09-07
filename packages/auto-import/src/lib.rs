@@ -98,7 +98,6 @@ impl Plugin for FarmfePluginAutoImport {
     if !filter.execute(&param.module_id) {
       return Ok(None);
     } else {
-    println!("FarmfePluginAutoImport: {:?}", param.module_id);
       let imports = self.collect_imports.lock().unwrap();
       let content =
         parser::inject_imports::inject_imports(&param.content, imports.clone().to_vec(), None);

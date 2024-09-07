@@ -42,8 +42,8 @@ pub fn finish_imports(params: FinishImportsParams) {
     context_imports,
   } = params;
 
-  let mut local_imports = scan_dirs_exports(&root_path, &dirs.clone());
-  let presets_imports = resolve_presets(&presets);
+  let mut presets_imports = resolve_presets(&presets);
+  let local_imports = scan_dirs_exports(&root_path, &dirs.clone());
   let mut context_imports_guard = match context_imports.lock() {
     Ok(guard) => guard,
     Err(poisoned) => poisoned.into_inner(),
@@ -60,7 +60,7 @@ pub fn finish_imports(params: FinishImportsParams) {
     generate_dts(generate_dts_option);
   }
   if has_new_or_removed_imports {
-    local_imports.extend(presets_imports);
-    *context_imports_guard = local_imports;
+    presets_imports.extend(local_imports);
+    *context_imports_guard = presets_imports;
   }
 }

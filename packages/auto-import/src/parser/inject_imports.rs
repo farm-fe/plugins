@@ -1,6 +1,6 @@
-use farmfe_core::regex::Regex;
-
 use crate::parser::parse::{parse_esm_imports, ESMImport};
+use farmfe_core::regex::Regex;
+use regress::Regex as JsRegex;
 
 use super::scan_exports::Import;
 use super::stringify_imports::stringify_imports;
@@ -11,14 +11,17 @@ const JS_CLASS_DEF_REGEX: &str = r"\bclass\s+(?<class_name>[\w$]+)";
 
 const JS_FUNC_DEF_REGEX: &str = r"(?:^|\s+)function\s+(?<func_name>[\w$]+)\s*\(";
 
+const MATCH_RE: &str = r"(^|\.\.\.|(?:\bcase|\?)\s+|[^\w$/)]|\bextends\s+)([\w$]+)\s*(?=[.()[\]}:;?+\-*&|`<>,\n]|\b(?:instanceof|in)\b|$|(?<=extends\s+\w+)\s+\{)";
+
 fn get_exclude_imports(content: &str, imports: Vec<Import>) -> Vec<Import> {
-  let mut vars = vec![];
+  let mut exclude_vars = vec![];
+  let mut include_vars = vec![];
   for capture in Regex::new(JS_VAR_DEF_REGEX)
     .unwrap()
     .captures_iter(&content)
   {
     if let Some(var_name) = capture.name("var_name") {
-      vars.push(var_name.as_str());
+      exclude_vars.push(var_name.as_str());
     }
   }
 
@@ -27,7 +30,7 @@ fn get_exclude_imports(content: &str, imports: Vec<Import>) -> Vec<Import> {
     .captures_iter(&content)
   {
     if let Some(class_name) = capture.name("class_name") {
-      vars.push(class_name.as_str());
+      exclude_vars.push(class_name.as_str());
     }
   }
   for capture in Regex::new(JS_FUNC_DEF_REGEX)
@@ -35,15 +38,17 @@ fn get_exclude_imports(content: &str, imports: Vec<Import>) -> Vec<Import> {
     .captures_iter(&content)
   {
     if let Some(func_name) = capture.name("func_name") {
-      vars.push(func_name.as_str());
+      exclude_vars.push(func_name.as_str());
     }
   }
-
+  for m in JsRegex::new(MATCH_RE).unwrap().find_iter(&content) {
+    include_vars.push(content[m.range()].trim());
+  }
   imports
     .into_iter()
     .filter(|item| {
       let name = &item.name.as_str();
-      vars.contains(name)
+      !exclude_vars.contains(name) && include_vars.contains(name)
     })
     .collect()
 }
