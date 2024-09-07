@@ -1,4 +1,5 @@
-mod parse;
-mod scan_dir_exports;
-mod scan_exports;
-mod to_import_string;
+pub mod parse;
+pub mod scan_dir_exports;
+pub mod scan_exports;
+pub mod stringify_imports;
+pub mod inject_imports;

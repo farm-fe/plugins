@@ -1,5 +1,6 @@
 #![deny(clippy::all)]
 mod parser;
+mod presets;
 
 use farmfe_core::{config::{config_regex::ConfigRegex, Config}, plugin::Plugin};
 

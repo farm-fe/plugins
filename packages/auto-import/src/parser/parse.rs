@@ -18,7 +18,7 @@ pub enum ImportType {
   Dynamic,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum ExportType {
   All,
   Type,
@@ -26,6 +26,12 @@ pub enum ExportType {
   Named,
   Default,
   Namespace,
+}
+
+impl Default for ExportType {
+  fn default() -> Self {
+    ExportType::Declaration
+  }
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -64,21 +70,31 @@ pub struct ESMImport {
   pub type_named_imports: Option<HashMap<String, String>>,
 }
 
-pub struct ImportExportVisitor {
+pub struct ImportsVisitor {
   imports: Vec<ESMImport>,
-  exports: Vec<ESMExport>,
 }
 
-impl ImportExportVisitor {
+impl ImportsVisitor {
   fn new() -> Self {
     Self {
       imports: Vec::new(),
+    }
+  }
+}
+
+pub struct ExportsVisitor {
+  exports: Vec<ESMExport>,
+}
+
+impl ExportsVisitor {
+  fn new() -> Self {
+    Self {
       exports: Vec::new(),
     }
   }
 }
 
-impl Visit for ImportExportVisitor {
+impl Visit for ImportsVisitor {
   fn visit_module_decl(&mut self, n: &ModuleDecl) {
     match n {
       ModuleDecl::Import(import) => {
@@ -143,6 +159,14 @@ impl Visit for ImportExportVisitor {
           });
         }
       }
+      _ => {}
+    }
+  }
+}
+
+impl Visit for ExportsVisitor {
+  fn visit_module_decl(&mut self, n: &ModuleDecl) {
+    match n {
       ModuleDecl::ExportNamed(named_export) => {
         let mut named_exports = HashMap::new();
         let mut type_named_exports = HashMap::new();
@@ -368,7 +392,7 @@ pub fn parse_esm_imports_exports(
     file_path.unwrap()
   };
   let content = if content.is_none() {
-    &fs::read_to_string(file_path.clone())
+    &fs::read_to_string(file_path)
       .unwrap_or_else(|_| panic!("Unable to read file: {:?}", file_path))
   } else {
     content.unwrap()
@@ -390,12 +414,86 @@ pub fn parse_esm_imports_exports(
     }
   };
 
-  let mut visitor = ImportExportVisitor::new();
-  ast.visit_with(&mut visitor);
-
-  (visitor.imports, visitor.exports)
+  let mut imports_visitor = ImportsVisitor::new();
+  ast.visit_with(&mut imports_visitor);
+  let mut exports_visitor = ExportsVisitor::new();
+  ast.visit_with(&mut exports_visitor);
+  (imports_visitor.imports, exports_visitor.exports)
 }
 
+pub fn parse_esm_imports(file_path: Option<&str>, content: Option<&str>) -> Vec<ESMImport> {
+  if file_path.is_none() && content.is_none() {
+    return vec![];
+  }
+  let file_path = if file_path.is_none() {
+    ""
+  } else {
+    file_path.unwrap()
+  };
+  let content = if content.is_none() {
+    &fs::read_to_string(file_path)
+      .unwrap_or_else(|_| panic!("Unable to read file: {:?}", file_path))
+  } else {
+    content.unwrap()
+  };
+  let ParseScriptModuleResult { ast, comments: _ } = match parse_module(
+    &file_path,
+    &content,
+    Syntax::Typescript(TsSyntax {
+      tsx: true,
+      decorators: true,
+      ..Default::default()
+    }),
+    EsVersion::latest(),
+  ) {
+    Ok(res) => res,
+    Err(err) => {
+      println!("{}", err.to_string());
+      panic!("Parse {} failed. See error details above.", file_path);
+    }
+  };
+
+  let mut imports_visitor = ImportsVisitor::new();
+  ast.visit_with(&mut imports_visitor);
+  imports_visitor.imports
+}
+
+pub fn parse_esm_exports(file_path: Option<&str>, content: Option<&str>) -> Vec<ESMExport> {
+  if file_path.is_none() && content.is_none() {
+    return vec![];
+  }
+  let file_path = if file_path.is_none() {
+    ""
+  } else {
+    file_path.unwrap()
+  };
+  let content = if content.is_none() {
+    &fs::read_to_string(file_path)
+      .unwrap_or_else(|_| panic!("Unable to read file: {:?}", file_path))
+  } else {
+    content.unwrap()
+  };
+  let ParseScriptModuleResult { ast, comments: _ } = match parse_module(
+    &file_path,
+    &content,
+    Syntax::Typescript(TsSyntax {
+      tsx: true,
+      decorators: true,
+      ..Default::default()
+    }),
+    EsVersion::latest(),
+  ) {
+    Ok(res) => res,
+    Err(err) => {
+      println!("{}", err.to_string());
+      panic!("Parse {} failed. See error details above.", file_path);
+    }
+  };
+
+  let mut exports_visitor = ExportsVisitor::new();
+  ast.visit_with(&mut exports_visitor);
+  exports_visitor.exports
+}
 #[cfg(test)]
 mod tests {
   use super::*;
