@@ -1,7 +1,7 @@
 # @farmfe/plugin-auto-import
 
-## 0.1.0
+## 0.0.1
 
-### Minor Changes
+### Patch Changes
 
-- feat: auto-import
+- feat: @farmfe/plugin-auto-import
