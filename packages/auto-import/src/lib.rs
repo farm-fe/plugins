@@ -1,12 +1,10 @@
 #![deny(clippy::all)]
+mod addons;
 mod finish_imports;
 mod parser;
 mod presets;
 
-use std::{
-  path::PathBuf,
-  sync::{Arc, Mutex},
-};
+use std::{fmt, sync::{Arc, Mutex}};
 
 use farmfe_core::{
   config::{config_regex::ConfigRegex, Config},
@@ -15,10 +13,13 @@ use farmfe_core::{
   serde_json,
 };
 
+use addons::vue_template::vue_template_addon;
 use farmfe_macro_plugin::farm_plugin;
-use farmfe_toolkit::common::{build_source_map, create_swc_source_map, PathFilter, Source};
+use farmfe_toolkit::common::PathFilter;
 use finish_imports::FinishImportsParams;
 use parser::scan_exports::Import;
+use serde::de::{self, Visitor};
+use serde::{Deserialize, Deserializer, Serialize, Serializer};
 
 #[derive(serde::Deserialize, serde::Serialize, Clone, Debug)]
 pub enum ImportMode {
@@ -26,13 +27,63 @@ pub enum ImportMode {
   Absolute,
 }
 
+#[derive(Clone, Debug)]
+pub enum Dts {
+  Bool(bool),
+  Filename(String),
+}
+
+impl Serialize for Dts {
+  fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+  where
+    S: Serializer,
+  {
+    match *self {
+      Dts::Bool(ref b) => serializer.serialize_bool(*b),
+      Dts::Filename(ref s) => serializer.serialize_str(s),
+    }
+  }
+}
+
+impl<'de> Deserialize<'de> for Dts {
+  fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+  where
+    D: Deserializer<'de>,
+  {
+    struct StringOrBoolVisitor;
+    impl<'de> Visitor<'de> for StringOrBoolVisitor {
+      type Value = Dts;
+      fn expecting(&self, formatter: &mut std::fmt::Formatter) -> fmt::Result {
+        formatter.write_str("a boolean or a string")
+      }
+      fn visit_bool<E>(self, value: bool) -> Result<Self::Value, E>
+      where
+        E: de::Error,
+      {
+        Ok(Dts::Bool(value))
+      }
+      fn visit_str<E>(self, value: &str) -> Result<Self::Value, E>
+      where
+        E: de::Error,
+      {
+        Ok(Dts::Filename(value.to_owned()))
+      }
+    }
+    deserializer.deserialize_any(StringOrBoolVisitor)
+  }
+}
+
+impl Default for Dts {
+  fn default() -> Self {
+    Dts::Bool(true)
+  }
+}
+
 #[derive(serde::Deserialize, serde::Serialize, Clone, Debug)]
 pub struct Options {
   pub imports: Option<Vec<String>>,
   pub dirs: Option<Vec<ConfigRegex>>,
-  pub filename: Option<String>,
-  pub dts: Option<bool>,
-  pub local: Option<bool>,
+  pub dts: Option<Dts>,
   pub presets: Option<Vec<String>>,
   pub import_mode: Option<ImportMode>,
   pub include: Option<Vec<ConfigRegex>>,
@@ -51,18 +102,13 @@ impl FarmfePluginAutoImport {
     let collect_imports: Arc<Mutex<Vec<Import>>> = Arc::new(Mutex::new(vec![]));
 
     let presets = options.presets.clone().unwrap_or(vec![]);
-    let filename = options
-      .filename
-      .clone()
-      .unwrap_or("auto_import.d.ts".to_string());
     let dirs = options.dirs.clone().unwrap_or(vec![]);
     let root_path = config.root.clone();
     finish_imports::finish_imports(FinishImportsParams {
       root_path,
       presets,
       dirs,
-      filename,
-      dts: options.dts.unwrap_or(true),
+      dts: options.dts.clone().unwrap_or_default(),
       context_imports: &collect_imports,
     });
     Self {
@@ -93,14 +139,20 @@ impl Plugin for FarmfePluginAutoImport {
     }
     let options = self.options.clone();
     let include = options.include.unwrap_or(vec![]);
-    let exclude = options.exclude.unwrap_or(vec![ConfigRegex::new("node_modules")]);
+    let exclude = options
+      .exclude
+      .unwrap_or(vec![ConfigRegex::new("node_modules")]);
     let filter = PathFilter::new(&include, &exclude);
     if !filter.execute(&param.module_id) {
       return Ok(None);
     } else {
       let imports = self.collect_imports.lock().unwrap();
+      let mut content = param.content.clone();
+      if param.resolved_path.ends_with(".vue") {
+        vue_template_addon(&mut content, &imports);
+      }
       let content =
-        parser::inject_imports::inject_imports(&param.content, imports.clone().to_vec(), None);
+        parser::inject_imports::inject_imports(&content, imports.clone().to_vec(), None);
       // let (cm, src) = create_swc_source_map(Source {
       //   path: PathBuf::from(param.resolved_path),
       //   content: Arc::new(content.clone()),
@@ -124,11 +176,6 @@ impl Plugin for FarmfePluginAutoImport {
     &self,
     context: &Arc<farmfe_core::context::CompilationContext>,
   ) -> farmfe_core::error::Result<Option<()>> {
-    let filename = self
-      .options
-      .filename
-      .clone()
-      .unwrap_or("auto_import.d.ts".to_string());
     let dirs = self.options.dirs.clone().unwrap_or(vec![]);
     let root_path = context.config.root.clone();
     let presets = self.options.presets.clone().unwrap_or(vec![]);
@@ -136,8 +183,7 @@ impl Plugin for FarmfePluginAutoImport {
       root_path,
       presets,
       dirs,
-      filename,
-      dts: self.options.dts.unwrap_or(true),
+      dts: self.options.dts.clone().unwrap_or_default(),
       context_imports: &self.collect_imports,
     });
     Ok(None)

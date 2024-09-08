@@ -6,13 +6,13 @@ use crate::parser::generate_dts::{generate_dts, GenerateDtsOption};
 use crate::parser::scan_dirs_exports::scan_dirs_exports;
 use crate::parser::scan_exports::Import;
 use crate::presets::resolve_presets;
+use crate::Dts;
 
 pub struct FinishImportsParams<'a> {
   pub root_path: String,
   pub presets: Vec<String>,
   pub dirs: Vec<ConfigRegex>,
-  pub filename: String,
-  pub dts: bool,
+  pub dts: Dts,
   pub context_imports: &'a Arc<Mutex<Vec<Import>>>,
 }
 
@@ -37,7 +37,6 @@ pub fn finish_imports(params: FinishImportsParams) {
     root_path,
     presets,
     dirs,
-    filename,
     dts,
     context_imports,
   } = params;
@@ -50,7 +49,18 @@ pub fn finish_imports(params: FinishImportsParams) {
   };
   let has_new_or_removed_imports =
     maybe_has_new_or_removed_imports(&context_imports_guard, &local_imports, &presets_imports);
-  if has_new_or_removed_imports && dts {
+  let filename = match dts {
+    Dts::Filename(filename) => filename,
+    Dts::Bool(b) => {
+      if b {
+        "auto_import.d.ts".to_string()
+      } else {
+        "".to_string()
+      }
+    }
+  };
+
+  if has_new_or_removed_imports && !filename.is_empty() {
     let generate_dts_option = GenerateDtsOption {
       filename,
       root_path,

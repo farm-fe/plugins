@@ -131,7 +131,6 @@ pub fn inject_imports(content: &str, imports: Vec<Import>, priority: Option<usiz
       })
     })
     .collect::<Vec<Import>>();
-
   let mut content_str = stringify_imports(imports);
   content_str.push_str(content);
   content_str

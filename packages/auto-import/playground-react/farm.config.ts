@@ -14,7 +14,7 @@ export default defineConfig({
   plugins: [
     react({ runtime: "automatic" }),
     autoImport({
-      presets: ["react"],
+      presets: ["react","react-router"],
       dirs:["src/apis"]
     }),
     visualizer()

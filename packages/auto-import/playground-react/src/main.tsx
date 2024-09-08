@@ -1,12 +1,12 @@
-import React from "react";
 import "./main.css";
+import { useState } from "react"
 import reactLogo from "./assets/react.svg";
 import FarmLogo from "./assets/logo.png";
 export function Main() {
   const [count, setCount] = useState(0);
-  const data = getData()
+  const data = getName()
   console.log(data);
-  
+
   console.log("rendering Main component")
   return (
     <>
