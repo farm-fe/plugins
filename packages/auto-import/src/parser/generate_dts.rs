@@ -87,15 +87,20 @@ mod tests {
   use super::*;
   use crate::parser::scan_dirs_exports::scan_dir_exports;
   use crate::presets::resolve_presets;
+  use crate::presets::PresetItem;
+
   use std::env;
   #[test]
   fn test_generate_dts() {
     let current_dir = env::current_dir().unwrap();
-    let binding = current_dir.join("playground");
+    let binding = current_dir.join("playground-vue");
     let root_path = binding.to_str().unwrap();
     let imports = scan_dir_exports(root_path);
     println!("imports: {:#?}", imports);
-    let presets_imports = resolve_presets(&vec!["react".to_string()]);
+
+    let presets_imports = resolve_presets(&vec![PresetItem::String(
+      "react-router".to_string(),
+    )]);
     let generate_dts_option = GenerateDtsOption {
       imports: &imports.iter().collect::<Vec<_>>(),
       presets_imports: &presets_imports.iter().collect::<Vec<_>>(),

@@ -1,8 +1,8 @@
-use super::Preset;
+use super::ImportPreset;
 
-pub fn get_react_preset() -> Preset {
-  return Preset {
-    form: "react".to_string(),
+pub fn get_react_preset() -> ImportPreset {
+  return ImportPreset {
+    from: "react".to_string(),
     imports: vec![
       "useState".to_string(),
       "useCallback".to_string(),

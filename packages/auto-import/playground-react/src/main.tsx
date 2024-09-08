@@ -1,5 +1,4 @@
 import "./main.css";
-import { useState } from "react"
 import reactLogo from "./assets/react.svg";
 import FarmLogo from "./assets/logo.png";
 export function Main() {

@@ -27,8 +27,22 @@ impl Import {
   pub fn stringify_import(&self) -> String {
     match self.export_type {
       ExportType::Default => format!("import {} from '{}';\n", self.name, self.form),
-      ExportType::Namespace | ExportType::Declaration | ExportType::Named => {
+      ExportType::Declaration | ExportType::Named => {
         format!("import {{ {} }} from '{}';\n", self.name, self.form)
+      }
+      ExportType::Namespace => {
+        if let Some(as_name) = &self.as_name {
+          if as_name == &self.name {
+            format!("import {{ {} }} from '{}';\n", self.name, self.form)
+          } else {
+            format!(
+              "import {{ {} as {} }} from '{}';\n",
+              self.name, as_name, self.form
+            )
+          }
+        } else {
+          format!("import {{ {} }} from '{}';\n", self.name, self.form)
+        }
       }
       ExportType::Type => format!("import {{ type {} }} from '{}';\n", self.name, self.form),
       _ => String::new(),
@@ -123,7 +137,7 @@ pub fn scan_exports(file_path: &str, content: Option<&str>) -> Vec<Import> {
       }
       ExportType::Namespace => exports_names.push(Import {
         form: file_path.to_string(),
-        name: name.unwrap(),
+        name: name.clone().unwrap(),
         export_type,
         priority: 0,
         disabled: None,
@@ -131,7 +145,7 @@ pub fn scan_exports(file_path: &str, content: Option<&str>) -> Vec<Import> {
         declaration_type: None,
         tp: None,
         type_from: None,
-        as_name: None,
+        as_name: name,
       }),
       ExportType::Named => {
         if let Some(named_export) = named_exports {

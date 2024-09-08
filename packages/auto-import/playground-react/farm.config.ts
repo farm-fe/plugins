@@ -14,8 +14,22 @@ export default defineConfig({
   plugins: [
     react({ runtime: "automatic" }),
     autoImport({
-      presets: ["react","react-router"],
-      dirs:["src/apis"]
+      presets: [
+        "react",
+        "react-router",
+        {
+          '@vueuse/core': [
+            'useMouse',
+            ['useFetch', 'useMyFetch']
+          ],
+        },
+        {
+          from: 'vue-router',
+          imports: ['RouteLocationRaw'],
+        },
+      ],
+      dirs: ["src/apis"],
+      ignore:[]
     }),
     visualizer()
   ],

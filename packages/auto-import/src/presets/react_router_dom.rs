@@ -1,7 +1,7 @@
-use super::Preset;
-pub fn get_react_router_dom_preset() -> Preset {
-  Preset {
-    form: "react-router-dom".to_string(),
+use super::ImportPreset;
+
+pub fn get_react_router_dom_preset() -> ImportPreset {
+  ImportPreset {
     imports: vec![
       "useLinkClickHandler".to_string(),
       "useSearchParams".to_string(),
@@ -12,5 +12,6 @@ pub fn get_react_router_dom_preset() -> Preset {
       "Route".to_string(),
       "Routes".to_string(),
     ],
+    from: "react-router-dom".to_string(),
   }
 }

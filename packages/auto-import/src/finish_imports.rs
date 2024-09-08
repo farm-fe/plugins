@@ -5,14 +5,15 @@ use farmfe_core::config::config_regex::ConfigRegex;
 use crate::parser::generate_dts::{generate_dts, GenerateDtsOption};
 use crate::parser::scan_dirs_exports::scan_dirs_exports;
 use crate::parser::scan_exports::Import;
-use crate::presets::resolve_presets;
+use crate::presets::{resolve_presets, PresetItem};
 use crate::Dts;
 
 pub struct FinishImportsParams<'a> {
   pub root_path: String,
-  pub presets: Vec<String>,
+  pub presets: Vec<PresetItem>,
   pub dirs: Vec<ConfigRegex>,
   pub dts: Dts,
+  pub ignore: Vec<ConfigRegex>,
   pub context_imports: &'a Arc<Mutex<Vec<Import>>>,
 }
 
@@ -38,11 +39,18 @@ pub fn finish_imports(params: FinishImportsParams) {
     presets,
     dirs,
     dts,
+    ignore,
     context_imports,
   } = params;
 
-  let mut presets_imports = resolve_presets(&presets);
-  let local_imports = scan_dirs_exports(&root_path, &dirs.clone());
+  let mut presets_imports = resolve_presets(&presets)
+    .into_iter()
+    .filter(|import| !ignore.iter().any(|ignore| ignore.is_match(&import.name)))
+    .collect::<Vec<_>>();
+  let local_imports = scan_dirs_exports(&root_path, &dirs.clone())
+    .into_iter()
+    .filter(|import| !ignore.iter().any(|ignore| ignore.is_match(&import.name)))
+    .collect::<Vec<_>>();
   let mut context_imports_guard = match context_imports.lock() {
     Ok(guard) => guard,
     Err(poisoned) => poisoned.into_inner(),

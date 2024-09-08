@@ -4,7 +4,10 @@ mod finish_imports;
 mod parser;
 mod presets;
 
-use std::{fmt, sync::{Arc, Mutex}};
+use std::{
+  fmt,
+  sync::{Arc, Mutex},
+};
 
 use farmfe_core::{
   config::{config_regex::ConfigRegex, Config},
@@ -18,6 +21,7 @@ use farmfe_macro_plugin::farm_plugin;
 use farmfe_toolkit::common::PathFilter;
 use finish_imports::FinishImportsParams;
 use parser::scan_exports::Import;
+use presets::PresetItem;
 use serde::de::{self, Visitor};
 use serde::{Deserialize, Deserializer, Serialize, Serializer};
 
@@ -81,10 +85,10 @@ impl Default for Dts {
 
 #[derive(serde::Deserialize, serde::Serialize, Clone, Debug)]
 pub struct Options {
-  pub imports: Option<Vec<String>>,
   pub dirs: Option<Vec<ConfigRegex>>,
   pub dts: Option<Dts>,
-  pub presets: Option<Vec<String>>,
+  pub ignore: Option<Vec<ConfigRegex>>,
+  pub presets: Option<Vec<PresetItem>>,
   pub import_mode: Option<ImportMode>,
   pub include: Option<Vec<ConfigRegex>>,
   pub exclude: Option<Vec<ConfigRegex>>,
@@ -100,14 +104,15 @@ impl FarmfePluginAutoImport {
   fn new(config: &Config, options: String) -> Self {
     let options: Options = serde_json::from_str(&options).unwrap();
     let collect_imports: Arc<Mutex<Vec<Import>>> = Arc::new(Mutex::new(vec![]));
-
-    let presets = options.presets.clone().unwrap_or(vec![]);
     let dirs = options.dirs.clone().unwrap_or(vec![]);
     let root_path = config.root.clone();
+    let presets = options.presets.clone().unwrap_or(vec![]);
+    let ignore = options.ignore.clone().unwrap_or(vec![]);
     finish_imports::finish_imports(FinishImportsParams {
       root_path,
       presets,
       dirs,
+      ignore,
       dts: options.dts.clone().unwrap_or_default(),
       context_imports: &collect_imports,
     });
@@ -179,10 +184,12 @@ impl Plugin for FarmfePluginAutoImport {
     let dirs = self.options.dirs.clone().unwrap_or(vec![]);
     let root_path = context.config.root.clone();
     let presets = self.options.presets.clone().unwrap_or(vec![]);
+    let ignore = self.options.ignore.clone().unwrap_or(vec![]);
     finish_imports::finish_imports(FinishImportsParams {
       root_path,
       presets,
       dirs,
+      ignore,
       dts: self.options.dts.clone().unwrap_or_default(),
       context_imports: &self.collect_imports,
     });

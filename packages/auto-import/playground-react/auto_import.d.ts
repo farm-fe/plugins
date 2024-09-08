@@ -21,4 +21,7 @@ declare global {
 	const useParams: typeof import('react-router')['useParams']
 	const useResolvedPath: typeof import('react-router')['useResolvedPath']
 	const useRoutes: typeof import('react-router')['useRoutes']
+	const useMouse: typeof import('@vueuse/core')['useMouse']
+	const useFetch: typeof import('@vueuse/core')['useFetch']
+	const RouteLocationRaw: typeof import('vue-router')['RouteLocationRaw']
 }

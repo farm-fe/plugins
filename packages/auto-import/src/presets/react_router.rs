@@ -1,8 +1,8 @@
-use super::Preset;
+use super::ImportPreset;
 
-pub fn get_react_router_preset() -> Preset {
-  Preset {
-    form: "react-router".to_string(),
+pub fn get_react_router_preset() -> ImportPreset {
+  ImportPreset {
+    from: "react-router".to_string(),
     imports: vec![
       "useOutletContext".to_string(),
       "useHref".to_string(),
