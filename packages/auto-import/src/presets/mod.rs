@@ -1,7 +1,10 @@
 // presets.rs
+mod pinia;
 mod react;
 mod react_router;
 mod react_router_dom;
+mod vue;
+mod vue_router;
 
 use std::collections::HashMap;
 
@@ -51,6 +54,9 @@ pub fn parse_presets(presets: &Vec<PresetItem>) -> Vec<Preset> {
           "react" => react::get_react_preset(),
           "react-router" => react_router::get_react_router_preset(),
           "react-router-dom" => react_router_dom::get_react_router_dom_preset(),
+          "vue" => vue::get_vue_preset(),
+          "vue-router" => vue_router::get_vue_router_preset(),
+          "pinia" => pinia::get_pinia_preset(),
           _ => {
             println!("[farm-plugin-auto-import] Unknown preset: {}", preset_name);
             continue;
@@ -129,16 +135,3 @@ pub fn resolve_presets(presets: &Vec<PresetItem>) -> Vec<Import> {
   }
   imports
 }
-
-// #[cfg(test)]
-// mod tests {
-//   use super::*;
-
-//   #[test]
-//   fn test_resolve_presets() {
-//     let imports = resolve_presets(&vec![PresetItem::Preset(Preset::String(
-//       "react".to_string(),
-//     ))]);
-//     println!("imports: {:#?}", imports)
-//   }
-// }
