@@ -1,5 +1,12 @@
 <script setup lang="ts">
 import HelloWorld from './components/HelloWorld.vue'
+const s = useMyFetch("http:://baidu.com")
+const { x, y } = useMouse()
+watch(y, () => {
+  console.log(y)
+}, {
+  deep: true
+})
 </script>
 
 <template>

@@ -26,7 +26,7 @@ pub struct Import {
 impl Import {
   pub fn stringify_import(&self) -> String {
     match self.export_type {
-      ExportType::Default => format!("import {} from '{}';\n", self.name, self.form),
+      ExportType::DefaultDecl => format!("import {} from '{}';\n", self.name, self.form),
       ExportType::Declaration | ExportType::Named => {
         format!("import {{ {} }} from '{}';\n", self.name, self.form)
       }
@@ -94,20 +94,20 @@ pub fn scan_exports(file_path: &str, content: Option<&str>) -> Vec<Import> {
           for (_k, v) in type_named_export {
             exports_names.push(Import {
               form: file_path.to_string(),
-              name: v,
+              tp: Some(true),
               export_type: export_type.clone(),
+              name: v,
               priority: 0,
               disabled: None,
               dts_disabled: None,
               declaration_type: None,
-              tp: Some(true),
               type_from: None,
               as_name: None,
             });
           }
         }
       }
-      ExportType::Default => {
+      ExportType::DefaultDecl => {
         exports_names.push(Import {
           form: file_path.to_string(),
           name: filename.clone(),
@@ -182,6 +182,9 @@ pub fn scan_exports(file_path: &str, content: Option<&str>) -> Vec<Import> {
             }
           }
         }
+      }
+      _ => {
+        // do nothing
       }
     }
   }

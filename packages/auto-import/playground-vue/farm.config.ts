@@ -7,7 +7,15 @@ export default defineConfig({
   plugins: [
     visualizer(),
     farmAutoImport({
-    dirs: ["src/apis"],
-    dts: "./src/auto_import.d.ts",
-  })],
+      dts: "./src/auto_import.d.ts",
+      presets:[
+        "vue",
+        {
+          '@vueuse/core': [
+            'useMouse',
+            ['useFetch', 'useMyFetch']
+          ],
+        }
+      ]
+    })],
 });

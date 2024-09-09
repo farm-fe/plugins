@@ -21,27 +21,29 @@ pub fn remove_tsx_jsx_suffix(s: &str) -> String {
   re.replace(s, "").into_owned()
 }
 
-pub fn stringify_resolver(item: &Import) -> String {
+pub fn stringify_presets(item: &Import) -> String {
   format!(
     "\tconst {}: typeof import('{}')['{}']\n",
-    item.name, item.form, item.name
+    item.as_name.clone().unwrap_or(item.name.clone()), item.form, item.name
   )
 }
 
 pub fn stringify_imports_dts(dts_file_path: &str, item: &Import) -> String {
   let related = format!("./{}", relative(dts_file_path, &item.form));
   let import_path = remove_tsx_jsx_suffix(&related);
-  let is_export_component = match item.export_type {
-    ExportType::Default => false,
+  let is_export_decl = match item.export_type {
+    ExportType::DefaultDecl => false,
     _ => true,
   };
   let mut target = "default";
-  if is_export_component {
+  if is_export_decl {
     target = &item.name;
   }
   format!(
     "\tconst {}: typeof import('{}')['{}']\n",
-    item.name, import_path, target
+    item.as_name.clone().unwrap_or(item.name.clone()),
+    import_path,
+    target
   )
 }
 
@@ -61,7 +63,7 @@ pub fn generate_dts(option: GenerateDtsOption) {
     &option
       .presets_imports
       .iter()
-      .map(|&item| stringify_resolver(item))
+      .map(|&item| stringify_presets(item))
       .collect::<Vec<_>>()
       .join(""),
   );
@@ -98,9 +100,7 @@ mod tests {
     let imports = scan_dir_exports(root_path);
     println!("imports: {:#?}", imports);
 
-    let presets_imports = resolve_presets(&vec![PresetItem::String(
-      "react-router".to_string(),
-    )]);
+    let presets_imports = resolve_presets(&vec![PresetItem::String("react-router".to_string())]);
     let generate_dts_option = GenerateDtsOption {
       imports: &imports.iter().collect::<Vec<_>>(),
       presets_imports: &presets_imports.iter().collect::<Vec<_>>(),

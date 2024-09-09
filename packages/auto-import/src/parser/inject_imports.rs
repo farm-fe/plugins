@@ -47,7 +47,8 @@ fn get_exclude_imports(content: &str, imports: Vec<Import>) -> Vec<Import> {
   imports
     .into_iter()
     .filter(|item| {
-      let name = &item.name.as_str();
+      let name = item.as_name.clone().unwrap_or(item.name.clone());
+      let name = &name.as_str();
       !exclude_vars.contains(name) && include_vars.contains(name)
     })
     .collect()

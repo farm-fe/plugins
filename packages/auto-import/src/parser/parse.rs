@@ -24,7 +24,8 @@ pub enum ExportType {
   Type,
   Declaration,
   Named,
-  Default,
+  DefaultDecl,
+  DefaultExpr,
   Namespace,
 }
 
@@ -188,7 +189,7 @@ impl Visit for ExportsVisitor {
             ExportSpecifier::Default(default) => {
               let default_name = default.exported.sym.to_string();
               self.exports.push(ESMExport {
-                export_type: ExportType::Default,
+                export_type: ExportType::DefaultDecl,
                 specifier: specifier_str.clone(),
                 name: Some(default_name.clone()),
                 declaration_type: None,
@@ -325,7 +326,7 @@ impl Visit for ExportsVisitor {
           ),
         };
         self.exports.push(ESMExport {
-          export_type: ExportType::Default,
+          export_type: ExportType::DefaultDecl,
           declaration_type: Some(declaration_type),
           name: None,
           default_name: Some(default_name),
@@ -353,7 +354,7 @@ impl Visit for ExportsVisitor {
           _ => DeclarationType::Var,
         };
         self.exports.push(ESMExport {
-          export_type: ExportType::Default,
+          export_type: ExportType::DefaultExpr,
           declaration_type: Some(declaration_type),
           name: None,
           default_name: Some(String::from("Anonymous")),
