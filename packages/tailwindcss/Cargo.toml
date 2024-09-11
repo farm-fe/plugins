@@ -1,0 +1,21 @@
+[package]
+edition = "2021"
+name = "farmfe_plugin_tailwindcss"
+version = "0.0.1"
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+farmfe_toolkit_plugin_types = { workspace = true }
+farmfe_macro_plugin = { workspace = true }
+farmfe_core = { workspace = true }
+farmfe_toolkit= { workspace = true }
+farmfe_utils = "0.1.4"
+tailwind-css = "0.13.0"
+tailwind-ast = "0.4.1"
+serde = { version = "1.0.197", features = ["derive"] }
+serde_json = "1.0"
+css-color = "0.2.8"
+
+tailwindcss-oxide = { path = "./crates/oxide" }

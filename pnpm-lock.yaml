@@ -42,6 +42,12 @@ importers:
 
   packages/strip: {}
 
+  packages/tailwindcss:
+    devDependencies:
+      '@farmfe/plugin-tools':
+        specifier: latest
+        version: 0.1.1
+
   packages/url: {}
 
   packages/virtual: {}
