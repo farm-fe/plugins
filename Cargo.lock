@@ -803,6 +803,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "farmfe_plugin_mdx"
+version = "0.0.0"
+dependencies = [
+ "farmfe_core",
+ "farmfe_macro_plugin",
+ "farmfe_toolkit_plugin_types",
+]
+
+[[package]]
 name = "farmfe_plugin_react_components"
 version = "0.0.1"
 dependencies = [
