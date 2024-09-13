@@ -1,5 +1,11 @@
 # @farmfe/plugin-url
 
+## 0.0.5
+
+### Patch Changes
+
+- update package.json
+
 ## 0.0.4
 
 ### Patch Changes

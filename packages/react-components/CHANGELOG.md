@@ -1,5 +1,11 @@
 # @farmfe/plugin-react-components
 
+## 1.0.8
+
+### Patch Changes
+
+- update package.json
+
 ## 1.0.7
 
 ### Patch Changes

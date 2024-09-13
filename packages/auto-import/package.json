@@ -1,6 +1,6 @@
 {
   "name": "@farmfe/plugin-auto-import",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "main": "scripts/index.js",
   "types": "scripts/index.d.ts",
   "type": "module",
@@ -9,6 +9,20 @@
     "@farmfe/plugin-tools": "latest",
     "@farmfe/js-plugin-visualizer": "latest"
   },
+  "homepage": "https://github.com/farm-fe/plugins",
+  "author": "CCherry07 <2405693142@qq.com>",
+  "bugs": {
+    "url": "https://github.com/farm-fe/plugins/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/farm-fe/plugins.git"
+  },
+  "keywords": [
+    "rust",
+    "auto-import",
+    "farmfe"
+  ],
   "napi": {
     "name": "farmfe_plugin_auto_import",
     "triples": {

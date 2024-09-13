@@ -12,5 +12,8 @@
   "devDependencies": {
     "@changesets/cli": "^2.27.7",
     "@farmfe/plugin-tools": "latest"
+  },
+  "engines": {
+    "pnpm": "9.1.0"
   }
 }

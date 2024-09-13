@@ -1,5 +1,11 @@
 # @farmfe/plugin-yaml
 
+## 0.0.6
+
+### Patch Changes
+
+- update package.json
+
 ## 0.0.5
 
 ### Patch Changes
