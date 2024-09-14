@@ -6,6 +6,7 @@
 
 |                                               |                                                                                |
 | --------------------------------------------- | ------------------------------------------------------------------------------ |
+| [auto-import](packages/auto-import)           | Auto import APIs on-demand for Farm                       |
 | [dsv](packages/dsv)                           | Converts `.csv` and `.tsv` files into JavaScript modules                       |
 | [image](packages/image)                       | Imports JPG, PNG, GIF, SVG, and WebP files                                     |
 | [yaml](packages/yaml)                         | Convert YAML files to ES6 modules                                              |

@@ -1,5 +1,11 @@
 # @farmfe/plugin-icons
 
+## 0.0.3
+
+### Patch Changes
+
+- update package.json
+
 ## 0.0.2
 
 ### Patch Changes
