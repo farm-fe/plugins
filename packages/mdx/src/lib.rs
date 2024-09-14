@@ -61,7 +61,6 @@ impl Plugin for FarmPluginMdx {
         ignore_previous_source_map: true,
       }));
     }
-    println!("{}", param.module_id);
     return Ok(None);
   }
 }
