@@ -1,13 +1,20 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import "./main.css";
 import reactLogo from "./assets/react.svg";
 import FarmLogo from "./assets/logo.png";
+
+import MdxComponents from "./01.mdx";
+
 export function Main() {
   const [count, setCount] = useState(0);
 
+  useEffect(() => {
+    console.log("MdxComponents", MdxComponents);
+  }, []);
   return (
     <>
       <div>
+        <MdxComponents />
         <a href="https://farmfe.org/" target="_blank">
           <img src={FarmLogo} className="logo" alt="Farm logo" />
         </a>

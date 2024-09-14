@@ -3,4 +3,7 @@ import farmPluginMdx from "@farmfe/plugin-mdx";
 
 export default defineConfig({
   plugins: ["@farmfe/plugin-react", farmPluginMdx()],
+  compilation: {
+    persistentCache: false,
+  },
 });
