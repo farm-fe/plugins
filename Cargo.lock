@@ -813,6 +813,8 @@ dependencies = [
  "farmfe_macro_plugin",
  "farmfe_toolkit_plugin_types",
  "mdxjs",
+ "regex",
+ "serde",
 ]
 
 [[package]]
@@ -1501,6 +1503,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "6996bd9591dc92f29740adca2e1290fa17919dab0b0337918ee05f257cff284e"
 dependencies = [
  "markdown",
+ "serde",
  "swc_core 0.96.9",
 ]
 
