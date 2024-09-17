@@ -10,6 +10,7 @@
 | [dsv](packages/dsv)                           | Converts `.csv` and `.tsv` files into JavaScript modules                       |
 | [image](packages/image)                       | Imports JPG, PNG, GIF, SVG, and WebP files                                     |
 | [yaml](packages/yaml)                         | Convert YAML files to ES6 modules                                              |
+| [mdx](packages/mdx)                           | Convert md(x) files to React component                                         |
 | [react-components](packages/react-components) | On-demand components auto importing for React                                  |
 | [strip](packages/strip)                       | Remove `debugger` statements and functions like `assert.equal` from your code. |
 | [url](packages/url)                           | Imports files as data-URIs or ES Modules.                                      |
