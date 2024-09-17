@@ -1,0 +1,15 @@
+[package]
+edition = "2021"
+name = "farmfe_plugin_mdx"
+version = "0.0.0"
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+mdxjs = {version="0.2.5", features=["serializable"]}
+farmfe_core = {workspace = true}
+farmfe_macro_plugin = {workspace = true}
+farmfe_toolkit_plugin_types = {workspace = true}
+regex = "1.10.6"
+serde = "1.0.210"
