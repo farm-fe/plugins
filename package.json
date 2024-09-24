@@ -4,13 +4,17 @@
   "description": "The collections of farm plugins",
   "packageManager": "pnpm@9.1.0",
   "scripts": {
-    "release": "npx changeset && npx changeset version"
+    "release": "npx changeset && npx changeset version",
+    "prepare": "husky"
   },
   "keywords": [],
   "author": "",
   "license": "MIT",
   "devDependencies": {
     "@changesets/cli": "^2.27.7",
-    "@farmfe/plugin-tools": "latest"
+    "@farmfe/plugin-tools": "latest",
+    "commitlint": "^19.5.0",
+    "husky": "^9.1.6",
+    "picocolors": "^1.1.0"
   }
 }
