@@ -1,0 +1,42 @@
+name: PR build plugins
+on: workflow_call
+
+jobs:
+  build:
+    if: github.event_name == 'pull_request' && (contains(github.event.pull_request.title, 'js-plugins') || contains(github.event.pull_request.title, 'all'))
+    runs-on: ubuntu-latest
+    name: release
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 2
+      - name: Setup Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: 20
+          registry-url: https://registry.npmjs.org/
+
+      - name: Enable Corepack
+        id: pnpm-setup
+        run: |
+          corepack enable
+
+      - name: Initliaze .npmrc
+        run: >
+          echo -e "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}\n$(cat .npmrc)" > .npmrc
+          && cat -n .npmrc
+
+      - name: pnpm install
+        run: pnpm install --frozen-lockfile
+
+      - name: Get changed packages
+        id: get_changed_packages
+        run: |
+          JS_CHANGED_PACKAGES=$(git diff --name-only HEAD HEAD~1 | grep -E '^(js-plugins)/' | awk -F'/' '{print $2}' | sort -u)
+          echo "js_changed_packages=$JS_CHANGED_PACKAGES" >> "$GITHUB_ENV"
+
+      - name: Build Packages
+        run: |
+          for package in $js_changed_packages; do
+            pnpm --filter "@farmfe/js-plugin-$package" build
+          done

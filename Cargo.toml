@@ -1,6 +1,6 @@
 [workspace]
 members = [
-  "packages/*",
+  "rust-plugins/*",
 ]
 resolver = "2"
 [workspace.dependencies]

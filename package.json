@@ -5,7 +5,7 @@
   "packageManager": "pnpm@9.1.0",
   "scripts": {
     "release": "npx changeset && npx changeset version",
-    "prepare": "husky",
+    "prepare": "husky install",
     "commit": "git cz"
   },
   "keywords": [],

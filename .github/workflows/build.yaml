@@ -5,6 +5,7 @@ jobs:
   build:
     name: Build and Upload Artifacts - ${{ matrix.settings.abi }}
     runs-on: ${{ matrix.settings.os }}
+    if: contains(github.event.head_commit.message, 'rust-plugins') || contains(github.event.head_commit.message, 'all')
     strategy:
       fail-fast: false
       matrix:
@@ -17,7 +18,10 @@ jobs:
               set -e &&
               unset CC_x86_64_unknown_linux_gnu &&
               unset CC &&
-              pnpm --filter "[HEAD^]" --sequential build --target x86_64-unknown-linux-gnu --abi linux-x64-gnu
+              for package in $rust_changed_packages; do
+                echo "@farmfe/plugin-$package"
+                pnpm --filter "@farmfe/plugin-$package" build --target x86_64-unknown-linux-gnu --abi linux-x64-gnu
+              done
           - os: ubuntu-latest
             docker: ghcr.io/napi-rs/napi-rs/nodejs-rust:lts-alpine
             abi: linux-x64-musl
@@ -26,7 +30,10 @@ jobs:
               set -e &&
               unset CC_x86_64_unknown_linux_musl &&
               unset CC &&
-              pnpm --filter "[HEAD^]" --sequential build --target x86_64-unknown-linux-musl --abi linux-x64-musl
+              for package in $rust_changed_packages; do
+                echo "@farmfe/plugin-$package"
+                pnpm --filter "@farmfe/plugin-$package" build --target x86_64-unknown-linux-musl --abi linux-x64-musl
+              done
           - os: windows-latest
             abi: win32-x64-msvc
           - os: macos-latest
@@ -41,7 +48,10 @@ jobs:
             build: |
               export CARGO_PROFILE_RELEASE_LTO=false
               cargo install cargo-xwin --locked
-              pnpm --filter "[HEAD^]" --sequential build --target i686-pc-windows-msvc --abi win32-ia32-msvc --cargo-flags="--no-default-features"
+              for package in $rust_changed_packages; do
+                echo "@farmfe/plugin-$package"
+                pnpm --filter "@farmfe/plugin-$package" build --target i686-pc-windows-msvc --abi win32-ia32-msvc --cargo-flags="--no-default-features"
+              done
           - os: windows-latest
             abi: win32-arm64-msvc
             target: aarch64-pc-windows-msvc
@@ -49,7 +59,10 @@ jobs:
               export CARGO_PROFILE_RELEASE_CODEGEN_UNITS=256
               export CARGO_PROFILE_RELEASE_LTO=false
               cargo install cargo-xwin --locked
-              pnpm --filter "[HEAD^]" --sequential build --target aarch64-pc-windows-msvc --abi win32-arm64-msvc --cargo-flags="--no-default-features"
+              for package in $rust_changed_packages; do
+                echo "@farmfe/plugin-$package"
+                pnpm --filter "@farmfe/plugin-$package" build --target aarch64-pc-windows-msvc --abi win32-arm64-msvc --cargo-flags="--no-default-features"
+              done
           # linux
           - os: ubuntu-latest
             abi: linux-arm64-musl
@@ -67,6 +80,21 @@ jobs:
         uses: Swatinem/rust-cache@v2
         with:
           shared-key: rust-build-${{ matrix.settings.abi }}
+
+      - name: Get changed packages
+        id: get_changed_packages
+        run: |
+
+          if [ "${{ matrix.os }}" == "windows-latest" ]; then
+            $RUST_CHANGED_PACKAGES = git diff --name-only HEAD HEAD~1 | findstr /R /C:"^rust-plugins/" /C:"^packages/" | for /F "tokens=2 delims=/" %i in ('sort /unique') do @echo %i
+            $RUST_CHANGED_PACKAGES = echo %RUST_CHANGED_PACKAGES:~0,-1%
+            echo "rust_changed_packages=$RUST_CHANGED_PACKAGES" >> $env:GITHUB_ENV
+          else
+            RUST_ORIGIN_CHANGED_PACKAGES=$(git diff --name-only HEAD HEAD~1 | grep -E '^(rust-plugins|packages)/' | awk -F'/' '{print $2}' | sort -u)
+            RUST_CHANGED_PACKAGES=$(echo "$RUST_CHANGED_PACKAGES" | paste -sd " " -)
+            echo "rust_changed_packages=$RUST_CHANGED_PACKAGES" >> "$GITHUB_ENV"
+          fi
+
       - uses: actions/setup-node@v3
         with:
           node-version: 18
@@ -92,7 +120,10 @@ jobs:
       - name: Default Build
         if: ${{ !matrix.settings.docker && !matrix.settings.build }}
         run: >-
-          pnpm --filter "[HEAD^]" --sequential build --abi ${{ matrix.settings.abi }} ${{ matrix.settings.target && format('--target {0}', matrix.settings.target) || '' }} ${{ matrix.settings.zig && '--zig' || '' }}
+          for package in $rust_changed_packages; do
+            echo "@farmfe/plugin-$package"
+            pnpm --filter "@farmfe/plugin-$package" build --abi ${{ matrix.settings.abi }} ${{ matrix.settings.target && format('--target {0}', matrix.settings.target) || '' }} ${{ matrix.settings.zig && '--zig' || '' }}
+          done
         shell: bash
       - name: Build
         if: ${{ !matrix.settings.docker && matrix.settings.build }}
@@ -102,53 +133,53 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: ${{ github.sha }}-${{ matrix.settings.abi }}-dsv
-          path: ./packages/dsv/npm/${{ matrix.settings.abi }}/index.farm
+          path: ./rust-plugins/dsv/npm/${{ matrix.settings.abi }}/index.farm
           if-no-files-found: ignore
       - name: Upload Plugin react-components
         uses: actions/upload-artifact@v3
         with:
           name: ${{ github.sha }}-${{ matrix.settings.abi }}-react-components
-          path: ./packages/react-components/npm/${{ matrix.settings.abi }}/index.farm
+          path: ./rust-plugins/react-components/npm/${{ matrix.settings.abi }}/index.farm
           if-no-files-found: ignore
       - name: Upload Plugin virtual
         uses: actions/upload-artifact@v3
         with:
           name: ${{ github.sha }}-${{ matrix.settings.abi }}-virtual
-          path: ./packages/virtual/npm/${{ matrix.settings.abi }}/index.farm
+          path: ./rust-plugins/virtual/npm/${{ matrix.settings.abi }}/index.farm
           if-no-files-found: ignore
       - name: Upload Plugin yaml
         uses: actions/upload-artifact@v3
         with:
           name: ${{ github.sha }}-${{ matrix.settings.abi }}-yaml
-          path: ./packages/yaml/npm/${{ matrix.settings.abi }}/index.farm
+          path: ./rust-plugins/yaml/npm/${{ matrix.settings.abi }}/index.farm
           if-no-files-found: ignore
       - name: Upload Plugin strip
         uses: actions/upload-artifact@v3
         with:
           name: ${{ github.sha }}-${{ matrix.settings.abi }}-strip
-          path: ./packages/strip/npm/${{ matrix.settings.abi }}/index.farm
+          path: ./rust-plugins/strip/npm/${{ matrix.settings.abi }}/index.farm
           if-no-files-found: ignore
       - name: Upload Plugin image
         uses: actions/upload-artifact@v3
         with:
           name: ${{ github.sha }}-${{ matrix.settings.abi }}-image
-          path: ./packages/image/npm/${{ matrix.settings.abi }}/index.farm
+          path: ./rust-plugins/image/npm/${{ matrix.settings.abi }}/index.farm
           if-no-files-found: ignore
       - name: Upload Plugin url
         uses: actions/upload-artifact@v3
         with:
           name: ${{ github.sha }}-${{ matrix.settings.abi }}-url
-          path: ./packages/url/npm/${{ matrix.settings.abi }}/index.farm
+          path: ./rust-plugins/url/npm/${{ matrix.settings.abi }}/index.farm
           if-no-files-found: ignore
       - name: Upload Plugin icons
         uses: actions/upload-artifact@v3
         with:
           name: ${{ github.sha }}-${{ matrix.settings.abi }}-icons
-          path: ./packages/icons/npm/${{ matrix.settings.abi }}/index.farm
+          path: ./rust-plugins/icons/npm/${{ matrix.settings.abi }}/index.farm
           if-no-files-found: ignore
       - name: Upload Plugin auto-import
         uses: actions/upload-artifact@v3
         with:
           name: ${{ github.sha }}-${{ matrix.settings.abi }}-auto-import
-          path: ./packages/auto-import/npm/${{ matrix.settings.abi }}/index.farm
+          path: ./rust-plugins/auto-import/npm/${{ matrix.settings.abi }}/index.farm
           if-no-files-found: ignore
