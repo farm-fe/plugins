@@ -6,7 +6,7 @@ const scoreRule = (parsed) => {
 
   return [
     isValid,
-    `current scope is ${pc.yellow(parsed.scope)}, ${pc.green(
+    `current scope is ${pc.red(parsed.scope)}, ${pc.green(
       "because we need the right scope to do CI dispatch"
     )} .Mark ${pc.yellowBright(
       "js-plugins"

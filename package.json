@@ -5,7 +5,8 @@
   "packageManager": "pnpm@9.1.0",
   "scripts": {
     "release": "npx changeset && npx changeset version",
-    "prepare": "husky"
+    "prepare": "husky",
+    "commit": "git cz"
   },
   "keywords": [],
   "author": "",
@@ -14,7 +15,13 @@
     "@changesets/cli": "^2.27.7",
     "@farmfe/plugin-tools": "latest",
     "commitlint": "^19.5.0",
+    "git-cz": "^4.9.0",
     "husky": "^9.1.6",
     "picocolors": "^1.1.0"
+  },
+  "config": {
+    "commitizen": {
+      "path": "git-cz"
+    }
   }
 }
