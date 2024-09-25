@@ -22,7 +22,7 @@ jobs:
         with:
           fetch-depth: 2
       - run: |
-          git fetch --no-tags --prune --depth=1 origin +refs/heads/*:refs/remotes/origin/*
+          git fetch --no-tags --prune --depth=1 origin +refs/heads/*:refs/remotes/origin/main
 
       - name: Setup Node.js 18.x
         uses: actions/setup-node@v3

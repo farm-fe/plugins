@@ -21,7 +21,7 @@ jobs:
           token: ${{ secrets.GH_TOKEN }}
 
       - run: |
-          git fetch --no-tags --prune --depth=1 origin +refs/heads/*:refs/remotes/origin/*
+          git fetch --no-tags --prune --depth=1 origin +refs/heads/*:refs/remotes/origin/main
 
       - name: Update Master
         run: |
