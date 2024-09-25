@@ -20,6 +20,9 @@ jobs:
           fetch-depth: 2
           token: ${{ secrets.GH_TOKEN }}
 
+      - run: |
+          git fetch --no-tags --prune --depth=1 origin +refs/heads/*:refs/remotes/origin/*
+
       - name: Update Master
         run: |
           git pull --force --no-tags origin main:main
@@ -53,21 +56,11 @@ jobs:
       - name: pnpm install
         run: pnpm install --frozen-lockfile
 
-      - name: Get changed packages
-        id: get_changed_packages
-        run: |
-          JS_CHANGED_PACKAGES=$(git diff --name-only HEAD HEAD~1 | grep -E '^(js-plugins)/' | awk -F'/' '{print $2}' | sort -u)
-          echo "js_changed_packages=$JS_CHANGED_PACKAGES" >> "$GITHUB_ENV"
-
       - name: Build Packages
         run: |
-          for package in $js_changed_packages; do
-            pnpm --filter "@farmfe/js-plugin-$package" build
-          done
+          pnpm --filter "{js-plugins}[origin/main]" build
 
       - name: Release and Publish Packages
         run: |
-          for package in $js_changed_packages; do
-             npm set //registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }} && npm config set access public && pnpm --filter "@farmfe/js-plugin-$package" publish
-           done
+            npm set //registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }} && npm config set access public && pnpm --filter "{js-plugins}[origin/main]" publish --no-git-checks
 

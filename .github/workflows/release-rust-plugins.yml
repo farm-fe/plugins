@@ -21,6 +21,8 @@ jobs:
         uses: actions/checkout@v3
         with:
           fetch-depth: 2
+      - run: |
+          git fetch --no-tags --prune --depth=1 origin +refs/heads/*:refs/remotes/origin/*
 
       - name: Setup Node.js 18.x
         uses: actions/setup-node@v3
@@ -53,6 +55,6 @@ jobs:
         run: npm install -g pnpm@9.1.0 && pnpm i --frozen-lockfile
 
       - name: Publish to npm
-        run: for package in ${{ env.rust_changed_packages }}; do
-          npm set //registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }} && npm config set access public && pnpm --filter "@farmfe/plugin-$package" publish --no-git-checks
-          done
+        run: |
+          npm set //registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }} && npm config set access public && pnpm --filter "{rust-plugins/**}[origin/main]" --filtr "{packages/**}[origin/main]" publish --no-git-checks
+          

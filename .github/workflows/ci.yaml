@@ -6,6 +6,6 @@ on:
 
 jobs:
   call-rust-build:
-    uses: ./.github/workflows/plugin-build.yaml
+    uses: ./.github/workflows/build.yaml
   call-js-build:
     uses: ./.github/workflows/js-plugin-build.yaml
