@@ -5,7 +5,6 @@ jobs:
   build:
     name: Build and Upload Artifacts - ${{ matrix.settings.abi }}
     runs-on: ${{ matrix.settings.os }}
-    if: github.event_name == 'pull_request' && (contains(github.event.pull_request.title, 'rust-plugins') || contains(github.event.pull_request.title, 'all'))
     strategy:
       fail-fast: false
       matrix:
@@ -66,7 +65,7 @@ jobs:
         with:
           fetch-depth: 2
       - run: |
-          git fetch --no-tags --prune --depth=1 origin +refs/heads/*:refs/remotes/origin/main
+          git fetch --no-tags --prune --depth=1 origin +refs/heads/main:refs/remotes/origin/main
 
       - name: Cache rust artifacts
         uses: Swatinem/rust-cache@v2

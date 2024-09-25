@@ -6,28 +6,17 @@ on:
       - main
 
 jobs:
-  publish:
-    if: github.event_name == 'pull_request' && (contains(github.event.pull_request.title, 'js-plugins') || contains(github.event.pull_request.title, 'all'))
-
+  release:
     runs-on: ubuntu-latest
-
     name: release
-
     steps:
-      - name: Checkout Commit
+      - name: Checkout repo
         uses: actions/checkout@v4
         with:
           fetch-depth: 2
-          token: ${{ secrets.GH_TOKEN }}
 
       - run: |
-          git fetch --no-tags --prune --depth=1 origin +refs/heads/*:refs/remotes/origin/main
-
-      - name: Update Master
-        run: |
-          git pull --force --no-tags origin main:main
-          git checkout main
-          git fetch --tags
+          git fetch --no-tags --prune --depth=1 origin +refs/heads/main:refs/remotes/origin/main
 
       - name: Setup Node
         uses: actions/setup-node@v3
@@ -39,14 +28,6 @@ jobs:
         id: pnpm-setup
         run: |
           corepack enable
-
-      - name: pnpm Cache
-        uses: actions/cache@v3
-        with:
-          path: ${{ steps.pnpm-setup.outputs.pnpm_cache_dir }}
-          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
-          restore-keys: |
-            ${{ runner.os }}-pnpm-store-
 
       - name: Initliaze .npmrc
         run: >
@@ -62,5 +43,4 @@ jobs:
 
       - name: Release and Publish Packages
         run: |
-            npm set //registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }} && npm config set access public && pnpm --filter "{js-plugins}[origin/main]" publish --no-git-checks
-
+          npm set //registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }} && npm config set access public && pnpm --filter "{js-plugins}[origin/main]" publish --no-git-checks
