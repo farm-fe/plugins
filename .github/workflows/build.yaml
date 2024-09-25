@@ -18,7 +18,7 @@ jobs:
               set -e &&
               unset CC_x86_64_unknown_linux_gnu &&
               unset CC &&
-              pnpm --filter "{packages/**}[origin/main]" --filter "{rust-plugins/**}[origin/main]" --sequential build --target x86_64-unknown-linux-gnu --abi linux-x64-gnu
+              pnpm --filter "{rust-plugins}[origin/main]" --sequential build --target x86_64-unknown-linux-gnu --abi linux-x64-gnu
           - os: ubuntu-latest
             docker: ghcr.io/napi-rs/napi-rs/nodejs-rust:lts-alpine
             abi: linux-x64-musl
@@ -27,7 +27,7 @@ jobs:
               set -e &&
               unset CC_x86_64_unknown_linux_musl &&
               unset CC &&
-              pnpm --filter "{packages/**}[origin/main]" --filter "{rust-plugins/**}[origin/main]" --sequential build --target x86_64-unknown-linux-musl --abi linux-x64-musl
+              pnpm  --filter "{rust-plugins}[origin/main]" --sequential build --target x86_64-unknown-linux-musl --abi linux-x64-musl
           - os: windows-latest
             abi: win32-x64-msvc
           - os: macos-latest
@@ -42,7 +42,7 @@ jobs:
             build: |
               export CARGO_PROFILE_RELEASE_LTO=false
               cargo install cargo-xwin --locked
-              pnpm --filter "{packages/**}[origin/main]" --filter "{rust-plugins/**}[origin/main]" --sequential build --target i686-pc-windows-msvc --abi win32-ia32-msvc --cargo-flags="--no-default-features"
+              pnpm --filter "{rust-plugins}[origin/main]" --sequential build --target i686-pc-windows-msvc --abi win32-ia32-msvc --cargo-flags="--no-default-features"
           - os: windows-latest
             abi: win32-arm64-msvc
             target: aarch64-pc-windows-msvc
@@ -50,7 +50,7 @@ jobs:
               export CARGO_PROFILE_RELEASE_CODEGEN_UNITS=256
               export CARGO_PROFILE_RELEASE_LTO=false
               cargo install cargo-xwin --locked
-              pnpm --filter "{packages/**}[origin/main]" --filter "{rust-plugins/**}[origin/main]" --sequential build --target aarch64-pc-windows-msvc --abi win32-arm64-msvc --cargo-flags="--no-default-features"
+              pnpm --filter "{rust-plugins}[origin/main]" --sequential build --target aarch64-pc-windows-msvc --abi win32-arm64-msvc --cargo-flags="--no-default-features"
 
           # linux
           - os: ubuntu-latest
@@ -98,7 +98,7 @@ jobs:
       - name: Default Build
         if: ${{ !matrix.settings.docker && !matrix.settings.build }}
         run: |
-          pnpm --filter "{packages/**}[origin/main]" --filter "{rust-plugins/**}[origin/main]" --sequential build --abi ${{ matrix.settings.abi }} ${{ matrix.settings.target && format('--target {0}', matrix.settings.target) || '' }} ${{ matrix.settings.zig && '--zig' || '' }}
+          pnpm --filter "{rust-plugins}[origin/main]" --sequential build --abi ${{ matrix.settings.abi }} ${{ matrix.settings.target && format('--target {0}', matrix.settings.target) || '' }} ${{ matrix.settings.zig && '--zig' || '' }}
         shell: bash
       - name: Build
         if: ${{ !matrix.settings.docker && matrix.settings.build }}

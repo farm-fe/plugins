@@ -33,4 +33,4 @@ jobs:
 
       - name: Build Packages
         run: |
-          pnpm --filter "{js-plugins/**}[origin/main]" build
+          pnpm --filter "{js-plugins}[origin/main]" build
