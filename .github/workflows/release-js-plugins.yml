@@ -8,15 +8,16 @@ on:
 jobs:
   release:
     runs-on: ubuntu-latest
+    if: contains(github.event.head_commit.message, 'rust-plugins') || contains(github.event.head_commit.message, 'all')
     name: release
     steps:
       - name: Checkout repo
-        uses: actions/checkout@v4
+        uses: actions/checkout@v3
         with:
           fetch-depth: 2
 
-      - run: |
-          git fetch --no-tags --prune --depth=1 origin +refs/heads/main:refs/remotes/origin/main
+      # - run: |
+      #     git fetch --no-tags --prune --depth=1 origin +refs/heads/main:refs/remotes/HEAD~1
 
       - name: Setup Node
         uses: actions/setup-node@v3
@@ -39,8 +40,8 @@ jobs:
 
       - name: Build Packages
         run: |
-          pnpm --filter "{js-plugins}[origin/main]" build
+          pnpm --filter "{js-plugins}[HEAD~1]" build
 
       - name: Release and Publish Packages
         run: |
-          npm set //registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }} && npm config set access public && pnpm --filter "{js-plugins}[origin/main]" publish --no-git-checks
+          npm set //registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }} && npm config set access public && pnpm --filter "{js-plugins}[HEAD~1]" publish --no-git-checks

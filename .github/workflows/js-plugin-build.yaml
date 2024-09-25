@@ -9,8 +9,8 @@ jobs:
       - uses: actions/checkout@v3
         with:
           fetch-depth: 2
-      - run: |
-          git fetch --no-tags --prune --depth=1 origin +refs/heads/main:refs/remotes/origin/main
+      # - run: |
+          # git fetch --no-tags --prune --depth=1 origin +refs/heads/main:refs/remotes/HEAD~1
       - name: Setup Node
         uses: actions/setup-node@v3
         with:
@@ -32,4 +32,4 @@ jobs:
 
       - name: Build Packages
         run: |
-          pnpm --filter "{js-plugins}[origin/main]" build
+          pnpm --filter "{js-plugins}[HEAD~1]" build

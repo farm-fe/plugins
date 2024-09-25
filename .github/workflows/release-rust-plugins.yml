@@ -8,10 +8,12 @@ concurrency: ${{ github.workflow }}-${{ github.ref }}
 
 jobs:
   call-rust-build:
+    if: contains(github.event.head_commit.message, 'rust-plugins') || contains(github.event.head_commit.message, 'all')
     uses: ./.github/workflows/build.yaml
 
   release:
     name: Release
+    if: contains(github.event.head_commit.message, 'rust-plugins') || contains(github.event.head_commit.message, 'all')
     needs: [call-rust-build]
     runs-on: ubuntu-latest
     steps:
@@ -20,7 +22,7 @@ jobs:
         with:
           fetch-depth: 2
       - run: |
-          git fetch --no-tags --prune --depth=1 origin +refs/heads/main:refs/remotes/origin/main
+          git fetch --no-tags --prune --depth=1 origin +refs/heads/main:refs/remotes/HEAD~1
 
       - name: Setup Node.js 18.x
         uses: actions/setup-node@v3
@@ -54,5 +56,4 @@ jobs:
 
       - name: Publish to npm
         run: |
-          npm set //registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }} && npm config set access public && pnpm --filter "{rust-plugins}[origin/main]" publish --no-git-checks
-          
+          npm set //registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }} && npm config set access public && pnpm --filter "{rust-plugins}[HEAD~1]" publish --no-git-checks
