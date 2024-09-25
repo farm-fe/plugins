@@ -1,5 +1,11 @@
 # @farmfe/js-plugin-copy
 
+## 0.0.2
+
+### Patch Changes
+
+- fix copy plugin build
+
 ## 0.0.1
 
 ### Patch Changes
