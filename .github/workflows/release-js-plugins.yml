@@ -1,0 +1,46 @@
+name: Release Packages
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    name: release
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      - run: |
+          git fetch --no-tags --prune --depth=1 origin +refs/heads/main:refs/remotes/origin/main
+
+      - name: Setup Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: 20
+          registry-url: https://registry.npmjs.org/
+
+      - name: Enable Corepack
+        id: pnpm-setup
+        run: |
+          corepack enable
+
+      - name: Initliaze .npmrc
+        run: >
+          echo -e "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}\n$(cat .npmrc)" > .npmrc
+          && cat -n .npmrc
+
+      - name: pnpm install
+        run: pnpm install --frozen-lockfile
+
+      - name: Build Packages
+        run: |
+          pnpm --filter "{js-plugins}[origin/main]" build
+
+      - name: Release and Publish Packages
+        run: |
+          npm set //registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }} && npm config set access public && pnpm --filter "{js-plugins}[origin/main]" publish --no-git-checks

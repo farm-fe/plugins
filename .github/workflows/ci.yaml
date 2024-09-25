@@ -6,4 +6,8 @@ on:
 
 jobs:
   call-rust-build:
-    uses: ./.github/workflows/plugin-build.yaml
+    if: github.event_name == 'pull_request' && (contains(github.event.pull_request.title, 'rust-plugins') || contains(github.event.pull_request.title, 'all'))
+    uses: ./.github/workflows/build.yaml
+  call-js-build:
+    if: github.event_name == 'pull_request' && (contains(github.event.pull_request.title, 'js-plugins') || contains(github.event.pull_request.title, 'all'))
+    uses: ./.github/workflows/js-plugin-build.yaml
