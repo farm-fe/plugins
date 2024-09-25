@@ -1,6 +1,6 @@
 {
   "name": "@farmfe/js-plugin-copy",
-  "version": "0.0.3",
+  "version": "0.0.1",
   "description": "",
   "main": "./build/cjs/index.cjs",
   "types": "./build/esm/index.d.ts",
