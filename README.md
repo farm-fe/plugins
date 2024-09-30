@@ -45,7 +45,8 @@ Thanks to:
 
 - The [rollup/plugins](https://github.com/rollup/plugins) project, which Provides a lot of inspiration.
 
-[LICENSE (MIT)](./LICENSE)
+## License
+[MIT](./LICENSE)
 
 ## Star History
 
