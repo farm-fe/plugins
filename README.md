@@ -27,6 +27,18 @@
 | [copy](js-plugins/copy) | Copy files and folders Inspired by [rollup-plugin-copy](https://github.com/vladshcherbin/rollup-plugin-copy) |
 |                         |                                                                                                              |
 
+
+
+
+
+## Contributors ✨
+Thanks go to these wonderful people:
+
+<a href="https://github.com/farm-fe/plugins/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=farm-fe/plugins" />
+</a>
+
+
 ## Credits
 
 Thanks to:
@@ -38,5 +50,4 @@ Thanks to:
 ## Star History
 
 [![Star History Chart](https://api.star-history.com/svg?repos=farm-fe/plugins&type=Timeline)](https://star-history.com/#farm-fe/plugins&Timeline)
-
 
