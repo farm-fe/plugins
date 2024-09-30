@@ -34,3 +34,9 @@ Thanks to:
 - The [rollup/plugins](https://github.com/rollup/plugins) project, which Provides a lot of inspiration.
 
 [LICENSE (MIT)](./LICENSE)
+
+## Star History
+
+[![Star History Chart](https://api.star-history.com/svg?repos=farm-fe/plugins&type=Timeline)](https://star-history.com/#farm-fe/plugins&Timeline)
+
+
