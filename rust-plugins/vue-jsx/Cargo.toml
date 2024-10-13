@@ -1,0 +1,19 @@
+[package]
+edition = "2021"
+name = "farmfe_plugin_vue_jsx"
+version = "0.0.0"
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+farmfe_core = { workspace = true }
+farmfe_toolkit_plugin_types = { workspace = true }
+farmfe_macro_plugin = { workspace = true }
+swc-vue-jsx-visitor = "0.3.2"
+swc_core = { version = "0.99", features = [
+  "ecma_parser",
+  "ecma_plugin_transform",
+  "ecma_utils",
+] }
+
