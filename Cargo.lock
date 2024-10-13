@@ -868,6 +868,17 @@ dependencies = [
 ]
 
 [[package]]
+name = "farmfe_plugin_vue"
+version = "0.0.0"
+dependencies = [
+ "farmfe_core",
+ "farmfe_macro_plugin",
+ "farmfe_toolkit_plugin_types",
+ "fervid",
+ "fxhash",
+]
+
+[[package]]
 name = "farmfe_plugin_yaml"
 version = "0.0.1"
 dependencies = [
