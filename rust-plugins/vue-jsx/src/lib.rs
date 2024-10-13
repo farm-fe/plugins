@@ -3,6 +3,7 @@
 use farmfe_core::{config::Config, plugin::Plugin};
 
 use farmfe_macro_plugin::farm_plugin;
+use swc_vue_jsx_visitor::VueJsxTransformVisitor;
 
 #[farm_plugin]
 pub struct FarmfePluginVueJsx {}
