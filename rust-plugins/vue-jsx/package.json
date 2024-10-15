@@ -1,5 +1,5 @@
 {
-  "name": "farmfe-plugin-vue-jsx",
+  "name": "@farmfe/plugin-vue-jsx",
   "version": "0.0.0",
   "main": "scripts/index.js",
   "types": "scripts/index.d.ts",

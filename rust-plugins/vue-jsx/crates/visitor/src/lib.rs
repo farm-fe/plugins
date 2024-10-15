@@ -5,15 +5,14 @@ pub use options::{Options, Regex};
 use patch_flags::PatchFlags;
 use slot_flag::SlotFlag;
 use std::{borrow::Cow, collections::BTreeMap, mem};
-use swc_core::{
-  common::{comments::Comments, Mark, Span, Spanned, SyntaxContext, DUMMY_SP},
-  ecma::{
-    ast::*,
-    atoms::JsWord,
-    utils::{private_ident, quote_ident, quote_str},
-    visit::{VisitMut, VisitMutWith},
-  },
-  plugin::errors::HANDLER,
+use farmfe_core::{
+  swc_common::{comments::Comments, errors::HANDLER, Mark, Span, Spanned, SyntaxContext, DUMMY_SP},
+  swc_ecma_ast::*,
+};
+use farmfe_toolkit::{
+  swc_atoms::JsWord,
+  swc_ecma_utils::{private_ident, quote_ident, quote_str},
+  swc_ecma_visit::{VisitMut, VisitMutWith},
 };
 
 mod directive;
@@ -85,7 +84,6 @@ where
       injecting_consts: Default::default(),
     }
   }
-
   fn import_from_vue(&mut self, item: &'static str) -> Ident {
     self
       .vue_imports
@@ -1335,7 +1333,10 @@ where
   fn visit_mut_ts_interface_decl(&mut self, ts_interface_decl: &mut TsInterfaceDecl) {
     ts_interface_decl.visit_mut_children_with(self);
     if self.options.resolve_type {
-      let key = (ts_interface_decl.id.sym.clone(), ts_interface_decl.id.span.ctxt);
+      let key = (
+        ts_interface_decl.id.sym.clone(),
+        ts_interface_decl.id.span.ctxt,
+      );
       if let Some(interface) = self.interfaces.get_mut(&key) {
         interface
           .body
