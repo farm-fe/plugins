@@ -1,5 +1,11 @@
 # @farmfe/plugin-react-components
 
+## 1.0.9
+
+### Patch Changes
+
+- chore: dts to filename
+
 ## 1.0.8
 
 ### Patch Changes

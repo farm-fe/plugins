@@ -8,15 +8,21 @@ pub mod resolvers;
 
 use std::{
   collections::HashSet,
+  fmt,
   path::PathBuf,
   sync::{Arc, Mutex},
+};
+
+use serde::{
+  de::{self, Visitor},
+  Deserialize, Deserializer, Serialize, Serializer,
 };
 
 use farmfe_core::{
   config::{config_regex::ConfigRegex, Config},
   module::ModuleType,
   plugin::{Plugin, PluginTransformHookResult},
-  serde_json,
+  serde_json::{self},
   swc_ecma_parser::{Syntax, TsSyntax},
 };
 
@@ -38,12 +44,63 @@ pub enum ImportMode {
   Absolute,
 }
 
+#[derive(Clone, Debug)]
+pub enum Dts {
+  Bool(bool),
+  Filename(String),
+}
+
+impl Serialize for Dts {
+  fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+  where
+    S: Serializer, 
+  {
+    match *self {
+      Dts::Bool(ref b) => serializer.serialize_bool(*b),
+      Dts::Filename(ref s) => serializer.serialize_str(s),
+    }
+  }
+}
+
+impl<'de> Deserialize<'de> for Dts {
+  fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+  where
+    D: Deserializer<'de>,
+  {
+    struct StringOrBoolVisitor;
+    impl<'de> Visitor<'de> for StringOrBoolVisitor {
+      type Value = Dts;
+      fn expecting(&self, formatter: &mut std::fmt::Formatter) -> fmt::Result {
+        formatter.write_str("a boolean or a string")
+      }
+      fn visit_bool<E>(self, value: bool) -> Result<Self::Value, E>
+      where
+        E: de::Error,
+      {
+        Ok(Dts::Bool(value))
+      }
+      fn visit_str<E>(self, value: &str) -> Result<Self::Value, E>
+      where
+        E: de::Error,
+      {
+        Ok(Dts::Filename(value.to_owned()))
+      }
+    }
+    deserializer.deserialize_any(StringOrBoolVisitor)
+  }
+}
+
+impl Default for Dts {
+  fn default() -> Self {
+    Dts::Bool(true)
+  }
+}
+
 #[derive(serde::Deserialize, serde::Serialize, Clone, Debug)]
 #[serde(rename_all = "camelCase")]
 pub struct Options {
   pub dirs: Option<Vec<ConfigRegex>>,
-  pub filename: Option<String>,
-  pub dts: Option<bool>,
+  pub dts: Option<Dts>,
   pub local: Option<bool>,
   pub import_mode: Option<ImportMode>,
   pub include: Option<Vec<ConfigRegex>>,
@@ -62,10 +119,6 @@ impl FarmPluginReactComponents {
   pub fn new(config: &Config, options: String) -> Self {
     let options: Options = serde_json::from_str(&options).unwrap();
     let resolvers = options.resolvers.clone().unwrap_or(vec![]);
-    let filename = options
-      .filename
-      .clone()
-      .unwrap_or("components.d.ts".to_string());
     let dirs = options.dirs.clone().unwrap_or(vec![]);
     let root_path = config.root.clone();
     let components = Arc::new(Mutex::new(HashSet::new()));
@@ -73,9 +126,8 @@ impl FarmPluginReactComponents {
       root_path: normalize_path(&root_path),
       resolvers,
       dirs,
-      filename,
       local: options.local.unwrap_or(true),
-      dts: options.dts.unwrap_or(true),
+      dts: options.dts.clone().unwrap_or_default(),
       context_components: &components,
     });
     Self {
@@ -173,20 +225,14 @@ impl Plugin for FarmPluginReactComponents {
     context: &Arc<farmfe_core::context::CompilationContext>,
   ) -> farmfe_core::error::Result<Option<()>> {
     let resolvers = self.options.resolvers.clone().unwrap_or(vec![]);
-    let filename = self
-      .options
-      .filename
-      .clone()
-      .unwrap_or("components.d.ts".to_string());
     let dirs = self.options.dirs.clone().unwrap_or(vec![]);
     let root_path = context.config.root.clone();
     finish_components(FinishComponentsParams {
       root_path: normalize_path(&root_path),
       resolvers,
       dirs,
-      filename,
       local: self.options.local.unwrap_or(true),
-      dts: self.options.dts.unwrap_or(true),
+      dts: self.options.dts.clone().unwrap_or_default(),
       context_components: &self.components,
     });
 
