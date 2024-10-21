@@ -27,12 +27,14 @@ use farmfe_core::{
 };
 
 use farmfe_macro_plugin::farm_plugin;
+
 use farmfe_toolkit::{
   common::{build_source_map, create_swc_source_map, PathFilter, Source},
   pluginutils::normalize_path::normalize_path,
   script::{codegen_module, parse_module, CodeGenCommentsConfig, ParseScriptModuleResult},
   swc_ecma_visit::VisitMutWith,
 };
+
 use find_local_components::ComponentInfo;
 use finish_components::{finish_components, FinishComponentsParams};
 use insert_import::{ImportModifier, InsertImportModifier};
