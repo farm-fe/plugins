@@ -1,11 +1,14 @@
 #![deny(clippy::all)]
 
+use std::{fs, path::Path};
+
 use farmfe_core::{
   config::Config,
+  context::EmitFileParams,
   module::ModuleType,
   plugin::{Plugin, PluginLoadHookResult, PluginResolveHookResult},
+  resource::ResourceType,
 };
-
 use farmfe_macro_plugin::farm_plugin;
 
 const WASM_HELPER_ID_FARM: &str = "\0farm/wasm-helper.js";
@@ -15,7 +18,7 @@ const WASM_HELPER_ID_VITE: &str = "\0vite/wasm-helper.js";
 pub struct FarmfePluginWasm {}
 
 impl FarmfePluginWasm {
-  fn new(config: &Config, options: String) -> Self {
+  fn new(_config: &Config, _options: String) -> Self {
     Self {}
   }
 }
@@ -78,6 +81,27 @@ impl Plugin for FarmfePluginWasm {
     }
     let query = &param.query;
     if query.iter().any(|(k, _)| k == "init") {
+      let file_name = Path::new(&param.resolved_path)
+        .file_name()
+        .map(|x| x.to_string_lossy().to_string());
+      let content = fs::read(file_name.as_ref().unwrap()).unwrap();
+      let params = EmitFileParams {
+        name: file_name.clone().unwrap(),
+        content,
+        resource_type: ResourceType::Custom("wasm".to_string()),
+        resolved_path: param.resolved_path.to_string(),
+      };
+      context.emit_file(params);
+      let url = format!("/{}", param.resolved_path);
+      let code = format!(
+        r#"import initWasm from "{WASM_HELPER_ID_FARM}"; 
+        export default opts => initWasm(opts, "{url}")"#
+      );
+      return Ok(Some(PluginLoadHookResult {
+        content: code,
+        module_type: ModuleType::Js,
+        source_map: None,
+      }));
     }
     Ok(None)
   }
