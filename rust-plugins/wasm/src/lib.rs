@@ -106,30 +106,26 @@ impl Plugin for FarmfePluginWasm {
         resolved_path: param.resolved_path.to_string(),
       };
       context.emit_file(params);
+      let mut _code = String::new();
       if init {
-        let code = format!(
+        _code = format!(
           r#"import initWasm from "{WASM_HELPER_ID_FARM}"; 
           export default opts => initWasm(opts, "{wasm_url}")"#
         );
-        return Ok(Some(PluginLoadHookResult {
-          content: code,
-          module_type: ModuleType::Js,
-          source_map: None,
-        }));
       } else {
-        let code = format!(
+        _code = format!(
           r#"import initWasm from "{WASM_HELPER_ID_FARM}"; 
         const instance = await initWasm(undefined, "{wasm_url}");
         Object.assign(exports, instance.exports);
         export default instance;
         "#
         );
-        return Ok(Some(PluginLoadHookResult {
-          content: code,
-          module_type: ModuleType::Js,
-          source_map: None,
-        }));
       }
+      return Ok(Some(PluginLoadHookResult {
+        content: _code,
+        module_type: ModuleType::Js,
+        source_map: None,
+      }));
     }
     Ok(None)
   }

@@ -9,52 +9,44 @@ export function Main() {
   console.log("rendering Main component")
 
   const transformToInterface = async (json: string) => {
-    // console.log(init);
-    
-    // const instance = await init();
-    // const res = instance.exports.run(
-    //   'Root',
-    //   json,
-    //   JSON.stringify({
-    //     output_mode: 'typescript'
-    //   })
-    // )
-    const res = run(
+    return run(
       'Root',
       json,
       JSON.stringify({
         output_mode: 'typescript'
       })
-    ) 
-
-    console.log(res);
-
-    return res
+    )
   }
 
   const json = `{
-    "name": "wasm-test",
-    "private": true,
-    "version": "1.0.0",
-    "scripts": {
-      "build": "rsbuild build",
-      "check": "biome check --write",
-      "dev": "rsbuild dev --open",
-      "format": "biome format --write",
-      "preview": "rsbuild preview"
-    },
-    "dependencies": {
-      "json_typegen_wasm": "^0.7.0",
-      "vue": "^3.5.0"
-    },
-    "devDependencies": {
-      "@biomejs/biome": "^1.8.3",
-      "@rsbuild/core": "1.0.1-rc.4",
-      "@rsbuild/plugin-vue": "1.0.1-rc.4",
-      "typescript": "^5.5.2"
-    }
-  }`
-
+  "name": "playground",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "farm start",
+    "start": "farm start",
+    "build": "farm build",
+    "preview": "farm preview",
+    "clean": "farm clean"
+  },
+  "dependencies": {
+    "@farmfe/plugin-wasm": "workspace:*",
+    "clsx": "^1.2.1",
+    "json_typegen_wasm": "^0.7.0",
+    "react": "18",
+    "react-dom": "18"
+  },
+  "devDependencies": {
+    "@farmfe/cli": "^1.0.2",
+    "@farmfe/core": "^1.3.0",
+    "@farmfe/plugin-react": "^1.2.0",
+    "@types/react": "18",
+    "@types/react-dom": "18",
+    "core-js": "^3.36.1",
+    "react-refresh": "^0.14.0"
+  }
+}
+`
 
   const transform = async () => {
     const interfaces = await transformToInterface(json)
