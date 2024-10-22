@@ -2,22 +2,33 @@ import React, { useState } from "react";
 import "./main.css";
 import reactLogo from "./assets/react.svg";
 import FarmLogo from "./assets/logo.png";
-import init from "./assets/json_typegen_wasm_bg.wasm?init";
+// import init from "./assets/json_typegen_wasm_bg.wasm?init";
+import { run } from "json_typegen_wasm"
 export function Main() {
   const [count, setCount] = useState(0);
   console.log("rendering Main component")
 
   const transformToInterface = async (json: string) => {
-    const instance = await init();    
-    const res = await instance.exports.run(
+    // console.log(init);
+    
+    // const instance = await init();
+    // const res = instance.exports.run(
+    //   'Root',
+    //   json,
+    //   JSON.stringify({
+    //     output_mode: 'typescript'
+    //   })
+    // )
+    const res = run(
       'Root',
       json,
       JSON.stringify({
         output_mode: 'typescript'
       })
-    )
+    ) 
+
     console.log(res);
-    
+
     return res
   }
 

@@ -7,6 +7,10 @@ export default defineConfig({
     input: {
       index: "./index.html",
     },
+    output: {
+      filename: 'assets/[ext]/[name].[hash].[ext]',
+      assetsFilename: 'static/[resourceName].[hash].[ext]'
+    },
     persistentCache: false,
     progress: false,
   },

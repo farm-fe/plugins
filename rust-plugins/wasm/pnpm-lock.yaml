@@ -20,6 +20,9 @@ importers:
       clsx:
         specifier: ^1.2.1
         version: 1.2.1
+      json_typegen_wasm:
+        specifier: ^0.7.0
+        version: 0.7.0
       react:
         specifier: '18'
         version: 18.3.1
@@ -919,6 +922,9 @@ packages:
   js-yaml@3.14.1:
     resolution: {integrity: sha512-okMH7OXXJ7YrN9Ok3/SXrnu4iX9yOk+25nqX4imS2npuvTYDmo/QEZoqwZkYaIDk3jVvBOTOIEgEhaLOynBS9g==}
     hasBin: true
+
+  json_typegen_wasm@0.7.0:
+    resolution: {integrity: sha512-xTDD7jlMpXB8S/6lD00aqOmHPuVszG4vtrJTaED8Mb6ziryGtXmtkREWpuvJbWWj45aVFGO3O/WjwxRBLw8dUQ==}
 
   jsonfile@4.0.0:
     resolution: {integrity: sha512-m6F1R3z8jjlf2imQHS2Qez5sjKWQzbuuhuJ/FKYFRZvPE3PuHcSMVZzfsLhGVOkfd20obL5SWEBew5ShlquNxg==}
@@ -2342,6 +2348,8 @@ snapshots:
     dependencies:
       argparse: 1.0.10
       esprima: 4.0.1
+
+  json_typegen_wasm@0.7.0: {}
 
   jsonfile@4.0.0:
     optionalDependencies:

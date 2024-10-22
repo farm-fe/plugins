@@ -10,3 +10,4 @@ crate-type = ["cdylib", "rlib"]
 farmfe_core = { version = "*" }
 farmfe_toolkit_plugin_types = { version = "*" }
 farmfe_macro_plugin = { version = "*" }
+farmfe_toolkit = { version = "*" }
