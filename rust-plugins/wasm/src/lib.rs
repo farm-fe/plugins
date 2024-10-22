@@ -33,35 +33,33 @@ impl Plugin for FarmfePluginWasm {
     _context: &std::sync::Arc<farmfe_core::context::CompilationContext>,
     _hook_context: &farmfe_core::plugin::PluginHookContext,
   ) -> farmfe_core::error::Result<Option<farmfe_core::plugin::PluginResolveHookResult>> {
-    if let Some(ref importer) = param.importer {
-      let id = importer.relative_path();
-      if id == WASM_HELPER_ID_FARM || id == WASM_HELPER_ID_VITE {
-        return Ok(Some(PluginResolveHookResult {
-          resolved_path: id.to_string(),
-          ..Default::default()
-        }));
-      }
-
-      if id.ends_with(".wasm?init") {
-        return Ok(Some(PluginResolveHookResult {
-          resolved_path: id.replace("?init", ""),
-          query: vec![("init".to_string(), "".to_string())]
-            .into_iter()
-            .collect(),
-          ..Default::default()
-        }));
-      }
-
-      // if id.ends_with(".wasm?url") {
-      //   return Ok(Some(PluginResolveHookResult {
-      //     resolved_path: id.to_string(),
-      //     query: vec![("url".to_string(), "".to_string())]
-      //       .into_iter()
-      //       .collect(),
-      //     ..Default::default()
-      //   }));
-      // }
+    let id = &param.source;
+    if id == WASM_HELPER_ID_FARM || id == WASM_HELPER_ID_VITE {
+      return Ok(Some(PluginResolveHookResult {
+        resolved_path: id.to_string(),
+        ..Default::default()
+      }));
     }
+
+    if id.ends_with(".wasm?init") {
+      return Ok(Some(PluginResolveHookResult {
+        resolved_path: id.replace("?init", ""),
+        query: vec![("init".to_string(), "".to_string())]
+          .into_iter()
+          .collect(),
+        ..Default::default()
+      }));
+    }
+
+    // if id.ends_with(".wasm?url") {
+    //   return Ok(Some(PluginResolveHookResult {
+    //     resolved_path: id.to_string(),
+    //     query: vec![("url".to_string(), "".to_string())]
+    //       .into_iter()
+    //       .collect(),
+    //     ..Default::default()
+    //   }));
+    // }
 
     Ok(None)
   }
@@ -72,6 +70,7 @@ impl Plugin for FarmfePluginWasm {
     context: &std::sync::Arc<farmfe_core::context::CompilationContext>,
     _hook_context: &farmfe_core::plugin::PluginHookContext,
   ) -> farmfe_core::error::Result<Option<farmfe_core::plugin::PluginLoadHookResult>> {
+    println!("resolved_path: {}", &param.resolved_path);
     if param.resolved_path == WASM_HELPER_ID_FARM || param.resolved_path == WASM_HELPER_ID_VITE {
       return Ok(Some(PluginLoadHookResult {
         content: include_str!("wasm_runtime.js").to_string(),
@@ -84,15 +83,15 @@ impl Plugin for FarmfePluginWasm {
       let file_name = Path::new(&param.resolved_path)
         .file_name()
         .map(|x| x.to_string_lossy().to_string());
-      let content = fs::read(file_name.as_ref().unwrap()).unwrap();
+      let content = fs::read(&param.resolved_path).unwrap();
       let params = EmitFileParams {
         name: file_name.clone().unwrap(),
         content,
-        resource_type: ResourceType::Custom("wasm".to_string()),
+        resource_type: ResourceType::Asset("wasm".to_string()),
         resolved_path: param.resolved_path.to_string(),
       };
       context.emit_file(params);
-      let url = format!("/{}", param.resolved_path);
+      let url = format!("/{}", param.module_id.replace("?init", ""));
       let code = format!(
         r#"import initWasm from "{WASM_HELPER_ID_FARM}"; 
         export default opts => initWasm(opts, "{url}")"#
