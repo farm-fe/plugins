@@ -39,10 +39,10 @@ jobs:
               do
                 folder_path="/tmp/artifacts/${{github.sha}}-${abi}-${package}"
                 if [ -d "${folder_path}" ] && [ -n "$(ls -A $folder_path)" ]; then
-                  mv /tmp/artifacts/${{ github.sha }}-${abi}-${package}/* ./packages/${package}/npm/${abi}
+                  mv /tmp/artifacts/${{ github.sha }}-${abi}-${package}/* ./rust-plugins/${package}/npm/${abi}
                   ls -R $folder_path
-                  ls -R ./packages/${package}/npm/${abi}
-                  test -f ./packages/${package}/npm/${abi}/index.farm
+                  ls -R ./rust-plugins/${package}/npm/${abi}
+                  test -f ./rust-plugins/${package}/npm/${abi}/index.farm
                 else
                   echo "${folder_path} is empty"
                 fi
