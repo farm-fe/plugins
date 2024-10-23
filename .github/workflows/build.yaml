@@ -157,3 +157,9 @@ jobs:
           name: ${{ github.sha }}-${{ matrix.settings.abi }}-auto-import
           path: ./rust-plugins/auto-import/npm/${{ matrix.settings.abi }}/index.farm
           if-no-files-found: ignore
+      - name: Upload Plugin wasm
+        uses: actions/upload-artifact@v3
+        with:
+          name: ${{ github.sha }}-${{ matrix.settings.abi }}-wasm
+          path: ./rust-plugins/wasm/npm/${{ matrix.settings.abi }}/index.farm
+          if-no-files-found: ignore
