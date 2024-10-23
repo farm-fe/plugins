@@ -16,6 +16,7 @@ use farmfe_core::serde_json;
 use farmfe_plugin_react_components::find_local_components::ExportType;
 use farmfe_plugin_react_components::resolvers::ImportStyle;
 use farmfe_plugin_react_components::resolvers::ResolverOption;
+use farmfe_plugin_react_components::Dts;
 use farmfe_plugin_react_components::ImportMode;
 use farmfe_plugin_react_components::{FarmPluginReactComponents, Options};
 #[test]
@@ -51,12 +52,11 @@ fn transform() {
   // let resolvers_components = get_resolvers_result(&root_path.to_string_lossy().to_string(), resolvers.to_vec());
   let option = Options {
     dirs: Some(vec![ConfigRegex::new("src/components")]),
-    dts: Some(true),
+    dts: Some(Dts::Bool(true)),
     import_mode: Some(ImportMode::Relative),
     local: Some(true),
     include: None,
     exclude: None,
-    filename: None,
     resolvers: Some(resolvers.to_vec()),
   };
   let option = serde_json::to_string(&option).unwrap();
