@@ -35,14 +35,14 @@ jobs:
         run: |
           for abi in linux-x64-gnu linux-x64-musl darwin-x64 win32-x64-msvc linux-arm64-musl linux-arm64-gnu darwin-arm64 win32-ia32-msvc win32-arm64-msvc
           do
-            for package in dsv react-components virtual yaml strip image url icons auto-import mdx
+            for package in dsv react-components virtual yaml strip image url icons auto-import mdx wasm
               do
                 folder_path="/tmp/artifacts/${{github.sha}}-${abi}-${package}"
                 if [ -d "${folder_path}" ] && [ -n "$(ls -A $folder_path)" ]; then
-                  mv /tmp/artifacts/${{ github.sha }}-${abi}-${package}/* ./packages/${package}/npm/${abi}
+                  mv /tmp/artifacts/${{ github.sha }}-${abi}-${package}/* ./rust-plugins/${package}/npm/${abi}
                   ls -R $folder_path
-                  ls -R ./packages/${package}/npm/${abi}
-                  test -f ./packages/${package}/npm/${abi}/index.farm
+                  ls -R ./rust-plugins/${package}/npm/${abi}
+                  test -f ./rust-plugins/${package}/npm/${abi}/index.farm
                 else
                   echo "${folder_path} is empty"
                 fi
