@@ -11,6 +11,7 @@ use farmfe_core::{
   },
   module::ModuleType,
   plugin::{Plugin, PluginLoadHookResult},
+  relative_path::RelativePath,
   serde, serde_json,
 };
 use farmfe_macro_plugin::farm_plugin;
@@ -22,6 +23,12 @@ const WORKER_OR_SHARED_WORKER_RE: &str = r#"/(?:\?|&)(worker|sharedworker)(?:&|$
 const WORKER_FILE_RE: &str = r#"/(?:\?|&)worker_file&type=(\w+)(?:&|$)/"#;
 const INLINE_RE: &str = r#"/[?&]inline\b/"#;
 
+fn get_worker_cache_dir(root: &str) -> String {
+  RelativePath::new("node_modules/.farm/cache/workers")
+    .to_logical_path(root)
+    .to_string_lossy()
+    .to_string()
+}
 #[derive(Debug, Clone, Serialize, Deserialize, Default)]
 #[serde(rename_all = "camelCase", default)]
 struct Options {
@@ -110,6 +117,8 @@ impl Plugin for FarmfePluginWorker {
           file_name.as_bytes(),
           ext,
         );
+        let worker_cache_dir_path = get_worker_cache_dir(&context.config.root);
+        let temp_cache_worker_file_path = format!("{worker_cache_dir_path}/{file_name}.js");
         let mut input = HashMap::new();
         input.insert(file_name.clone(), param.resolved_path.to_string());
         let compiler = Compiler::new(
@@ -124,6 +133,7 @@ impl Plugin for FarmfePluginWorker {
             }),
             output: Box::new(OutputConfig {
               target_env: TargetEnv::Custom("library-browser".to_string()),
+              path: worker_cache_dir_path.clone(),
               ..*self.options.compiler_config.output.clone()
             }),
             ..self.options.compiler_config.clone()
@@ -131,10 +141,15 @@ impl Plugin for FarmfePluginWorker {
           vec![],
         )
         .unwrap();
-        let bandle = compiler.compile().unwrap();
+        compiler.compile().unwrap();
+
+        // TODO code content is ready
 
       }
-      Mode::Development => {}
+      Mode::Development => {
+
+
+      }
     }
     return Ok(None);
   }
