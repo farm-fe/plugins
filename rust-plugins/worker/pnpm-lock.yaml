@@ -14,12 +14,15 @@ importers:
 
   playground:
     dependencies:
+      '@farmfe/plugin-worker':
+        specifier: workspace:*
+        version: link:..
       clsx:
         specifier: ^1.2.1
         version: 1.2.1
-      farmfe-plugin-worker:
-        specifier: workspace:*
-        version: link:..
+      lodash-es:
+        specifier: ^4.17.21
+        version: 4.17.21
       react:
         specifier: '18'
         version: 18.3.1
@@ -962,6 +965,9 @@ packages:
   locate-path@5.0.0:
     resolution: {integrity: sha512-t7hw9pI+WvuwNJXwk5zVHpyhIqzg2qTlklJOf0mVxGSbe3Fp2VieZcduNYjaLDoy6p9uGpQEGWG87WpMKlNq8g==}
     engines: {node: '>=8'}
+
+  lodash-es@4.17.21:
+    resolution: {integrity: sha512-mKnC+QJ9pWVzv+C4/U3rRsHapFfHvQFoFB92e52xeyGMcX6/OlIl78je1u8vePzYZSkkogMPJ2yjxxsb89cxyw==}
 
   lodash.debounce@4.0.8:
     resolution: {integrity: sha512-FT1yDzDYEoYWhnSGnpE/4Kj1fLZkDFyqRb7fNt6FdYOSxlUWAtp42Eh6Wb0rGIv/m9Bgo7x4GhQbm5Ys4SG5ow==}
@@ -2421,6 +2427,8 @@ snapshots:
   locate-path@5.0.0:
     dependencies:
       p-locate: 4.1.0
+
+  lodash-es@4.17.21: {}
 
   lodash.debounce@4.0.8: {}
 

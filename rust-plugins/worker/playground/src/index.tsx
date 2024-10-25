@@ -1,8 +1,11 @@
 import React from 'react';
 import { createRoot } from 'react-dom/client';
 import { Main } from './main';
+import TestWorker from "./worker/test.worker?worker"
 import './index.css'
 
+const worker = TestWorker();
+console.log(worker);
 
 const container = document.querySelector('#root');
 const root = createRoot(container);
