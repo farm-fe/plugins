@@ -32,22 +32,11 @@ fn get_worker_cache_dir(root: &str) -> String {
     .to_string_lossy()
     .to_string()
 }
-#[derive(Debug, Clone, Serialize, Deserialize, Default)]
-#[serde(rename_all = "camelCase", default)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 struct Options {
-  is_worker: bool,
-  is_bund: bool,
-  compiler_config: Config,
-}
-
-impl Options {
-  fn default() -> Self {
-    Self {
-      is_worker: false,
-      is_bund: false,
-      compiler_config: Config::default(),
-    }
-  }
+  is_build: Option<bool>,
+  compiler_config: Option<Config>,
 }
 
 #[farm_plugin]
@@ -57,11 +46,14 @@ pub struct FarmfePluginWorker {
 }
 
 impl FarmfePluginWorker {
-  fn new(config: &Config, options: String) -> Self {
+  fn new(_config: &Config, options: String) -> Self {
     let options: Options = serde_json::from_str(&options).unwrap();
     let worker_cache = cache::WorkerCache::new();
     Self {
-      options,
+      options: Options {
+        is_build: Some(options.is_build.unwrap_or(false)),
+        compiler_config: Some(options.compiler_config.unwrap_or(Config::default())),
+      },
       worker_cache,
     }
   }
@@ -79,17 +71,14 @@ impl Plugin for FarmfePluginWorker {
     _hook_context: &farmfe_core::plugin::PluginHookContext,
   ) -> farmfe_core::error::Result<Option<farmfe_core::plugin::PluginResolveHookResult>> {
     let id = &param.source;
-    // let (clean_path, query) = &param.source.split_once("?").unwrap();
-    // let query = parse_query(query);
-    println!("[FarmfePluginWorker] resolve: {:?}", param.source);
+    let (clean_path, query) = &param.source.split_once("?").unwrap();
+    let query = parse_query(&format!("?{}", query));
     if JsRegex::new(WORKER_OR_SHARED_WORKER_RE)
       .unwrap()
       .find(id)
-      .is_some() 
+      .is_some()
+      || query.iter().any(|(k, _v)| k == WORKER_FILE_ID)
     {
-      let (clean_path, query) = &param.source.split_once("?").unwrap();
-      let query = parse_query(query);
-      println!("[FarmfePluginWorker] resolve: {:?}", query);
       return Ok(Some(PluginResolveHookResult {
         resolved_path: clean_path.to_string(),
         query,
@@ -130,7 +119,9 @@ impl Plugin for FarmfePluginWorker {
     if param.module_type != ModuleType::Custom("worker".to_string()) {
       return Ok(None);
     }
-    let is_build = self.options.is_bund;
+    let is_build = self.options.is_build.unwrap();
+    println!("is_build: {is_build}");
+    let compiler_config = self.options.compiler_config.clone().unwrap();
     let worker_file_match = JsRegex::new(WORKER_FILE_RE).unwrap().find(&param.module_id);
     if worker_file_match.is_some() {
       let worker_type = &param.module_id[worker_file_match.unwrap().group(1).unwrap()];
@@ -172,7 +163,7 @@ impl Plugin for FarmfePluginWorker {
     let worker_type = if is_build {
       "module"
     } else {
-      match &self.options.compiler_config.output.format {
+      match &compiler_config.output.format {
         ModuleFormat::EsModule => "module",
         _ => "classic",
       }
@@ -192,7 +183,7 @@ impl Plugin for FarmfePluginWorker {
           .map(|x| x.to_string_lossy().to_string())
           .unwrap();
         let (file_name, ext) = file_name_ext.split_once(".").unwrap();
-        let assets_filename_config = self.options.compiler_config.output.assets_filename.clone();
+        let assets_filename_config = compiler_config.output.assets_filename.clone();
         let full_file_name = transform_output_filename(
           assets_filename_config,
           &file_name,
@@ -209,14 +200,14 @@ impl Plugin for FarmfePluginWorker {
                 name: file_name.to_string(),
                 test: vec![ConfigRegex::new(".+")],
               }],
-              ..*self.options.compiler_config.partial_bundling.clone()
+              ..*compiler_config.partial_bundling.clone()
             }),
             output: Box::new(OutputConfig {
               target_env: TargetEnv::Custom("library-browser".to_string()),
-              ..*self.options.compiler_config.output.clone()
+              ..*compiler_config.output.clone()
             }),
             minify: Box::new(bool_or_obj::BoolOrObj::Bool(false)),
-            ..self.options.compiler_config.clone()
+            ..compiler_config
           },
           vec![],
         )
@@ -286,6 +277,7 @@ impl Plugin for FarmfePluginWorker {
             content_base64, worker_constructor, worker_type_option
           )
         };
+        println!("is build code: {}", code);
         return Ok(Some(PluginTransformHookResult {
           content: code,
           module_type: Some(ModuleType::Js),
@@ -309,7 +301,8 @@ impl Plugin for FarmfePluginWorker {
     println!("url_code: {}", url_code);
     return Ok(Some(PluginTransformHookResult {
       content: format!(
-        r#"export default function WorkerWrapper(options) {{
+        r#"
+        export default function WorkerWrapper(options) {{
           return new {0}(
             "{1}",
             {2}

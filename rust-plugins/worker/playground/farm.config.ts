@@ -12,6 +12,8 @@ export default defineConfig({
   },
   plugins: [
     react({ runtime: "automatic" }),
-    farmPlugin()
+    farmPlugin({
+      isBuild: true
+    })
   ],
 });
