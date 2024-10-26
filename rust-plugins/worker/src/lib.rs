@@ -25,9 +25,7 @@ use regress::Regex as JsRegex;
 use serde::{Deserialize, Serialize};
 
 const WORKER_OR_SHARED_WORKER_RE: &str = r#"(?:\?|&)(worker|sharedworker)(?:&|$)"#;
-const WORKER_FILE_RE: &str = r#"(?:\?|&)worker_file&type=(\w+)(?:&|$)"#;
 const INLINE_RE: &str = r#"[?&]inline\b"#;
-const WORKER_FILE_ID: &str = "worker_file";
 
 fn build_worker(resolved_path: &str, compiler_config: &Config) -> Vec<u8> {
   let file_name_ext = Path::new(resolved_path)
@@ -78,12 +76,11 @@ fn emit_worker_file(
   content_bytes: Vec<u8>,
   context: &std::sync::Arc<farmfe_core::context::CompilationContext>,
 ) {
-  println!("emit worker file: {},filename:{}", resolved_path, file_name);
   let params = EmitFileParams {
     resolved_path: resolved_path.to_string(),
     content: content_bytes,
     name: file_name.to_string(),
-    resource_type: ResourceType::Asset("worker".to_string()),
+    resource_type: ResourceType::Js,
   };
   context.emit_file(params);
 }
@@ -136,24 +133,19 @@ fn process_worker(param: ProcessWorkerParam) -> String {
   let (worker_url, file_name) = get_worker_url(resolved_path, context);
 
   let content_bytes = build_worker(resolved_path, &compiler_config);
-  // if worker_cache.get(resolved_path).is_none() {
-  //   let content_bytes = insert_worker_cache(
-  //     &worker_cache,
-  //     param.resolved_path.to_string(),
-  //     content_bytes,
-  //   );
-  //   emit_worker_file(resolved_path, &file_name, content_bytes, context);
-  // } else {
-  //   let worker_cache_content_bytes = &worker_cache.get(resolved_path).unwrap();
-  //   if worker_cache_content_bytes != &content_bytes {
-  //     let content_bytes = insert_worker_cache(
-  //       &worker_cache,
-  //       param.resolved_path.to_string(),
-  //       content_bytes,
-  //     );
-  //     emit_worker_file(resolved_path, &file_name, content_bytes, context);
-  //   }
-  // }
+
+  if worker_cache.get(resolved_path).is_none() {
+    let content_bytes =
+      insert_worker_cache(&worker_cache, resolved_path.to_string(), content_bytes);
+    emit_worker_file(resolved_path, &file_name, content_bytes, context);
+  } else {
+    let catch_content_bytes = worker_cache.get(resolved_path).unwrap();
+    if content_bytes != catch_content_bytes {
+      let content_bytes =
+        insert_worker_cache(&worker_cache, resolved_path.to_string(), content_bytes);
+      emit_worker_file(resolved_path, &file_name, content_bytes, context);
+    }
+  }
 
   let worker_match = JsRegex::new(WORKER_OR_SHARED_WORKER_RE)
     .unwrap()
@@ -241,24 +233,7 @@ fn process_worker(param: ProcessWorkerParam) -> String {
       return code;
     }
   } else {
-    // farm env ?
-    // let inject_env = match worker_type {
-    //   "classic" => format!("importScripts('{}')", worker_url.to_string()),
-    //   "module" => format!("import '{}'\n", worker_url.to_string()),
-    //   "ignore" => String::new(),
-    //   _ => String::new(),
-    // };
-    // let raw = String::from_utf8_lossy(&content_bytes);
-    // let content = format!("{};\n{}", inject_env, raw);
-    let params = EmitFileParams {
-      resolved_path: param.resolved_path.to_string(),
-      content: content_bytes,
-      name: file_name.to_string(),
-      resource_type: ResourceType::Js,
-    };
-    context.emit_file(params);
-
-    url_code = file_name.to_string()
+    url_code = file_name
   }
   if is_url {
     return format!("export default {}", url_code);
@@ -267,11 +242,11 @@ fn process_worker(param: ProcessWorkerParam) -> String {
     r#"
       export default function WorkerWrapper(options) {{
         return new {0}(
-          "/{1}",
+          "{1}",
           {2}
         );
       }}"#,
-    worker_constructor, url_code, worker_type_option
+    worker_constructor, worker_url, worker_type_option
   );
 }
 
@@ -325,7 +300,6 @@ impl Plugin for FarmfePluginWorker {
       .unwrap()
       .find(id)
       .is_some()
-      || query.iter().any(|(k, _v)| k == WORKER_FILE_ID)
     {
       return Ok(Some(PluginResolveHookResult {
         resolved_path: clean_path.to_string(),
@@ -347,8 +321,6 @@ impl Plugin for FarmfePluginWorker {
       .unwrap()
       .find(&param.module_id)
       .is_some()
-      || param.query.iter().any(|(k, _v)| k == WORKER_FILE_ID)
-    // query has WORKER_FILE_ID
     {
       return Ok(Some(PluginLoadHookResult {
         content: String::new(),
