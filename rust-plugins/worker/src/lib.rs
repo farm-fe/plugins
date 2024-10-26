@@ -162,7 +162,6 @@ fn process_worker(param: ProcessWorkerParam) -> String {
     "module" => "{type: 'module', name: options?.name}",
     _ => "{name: options?.name}",
   };
-  let mut url_code = String::new();
   if is_build {
     let worker_inline_match = JsRegex::new(INLINE_RE).unwrap().find(&param.module_id);
     if worker_inline_match.is_some() {
@@ -224,11 +223,9 @@ fn process_worker(param: ProcessWorkerParam) -> String {
       };
       return code;
     }
-  } else {
-    url_code = file_name
   }
   if is_url {
-    return format!(r#"export default "{}""#, url_code);
+    return format!(r#"export default "{}""#, worker_url);
   }
   return format!(
     r#"

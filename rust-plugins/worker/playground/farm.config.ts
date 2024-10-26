@@ -13,7 +13,7 @@ export default defineConfig({
   plugins: [
     react({ runtime: "automatic" }),
     farmPlugin({
-      isBuild: false,
+      isBuild: true,
       compilerConfig:{
         output:{
           assetsFilename: '[resourceName].[hash].js',
