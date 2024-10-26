@@ -87,22 +87,22 @@ fn emit_worker_file(
 
 fn get_worker_url(
   resolved_path: &str,
-  context: &std::sync::Arc<farmfe_core::context::CompilationContext>, // base farm config context
+  compiler_config: &Config
 ) -> (String, String) {
   let file_name_ext = Path::new(resolved_path)
     .file_name()
     .map(|x| x.to_string_lossy().to_string())
     .unwrap();
   let (file_name, ext) = file_name_ext.split_once(".").unwrap();
-  let assets_filename_config = "worker/[resourceName].[hash].js".to_string();
+  let assets_filename_config = compiler_config.output.assets_filename.clone();
   let file_name = transform_output_filename(
     assets_filename_config,
     &file_name,
     file_name.as_bytes(),
     ext,
   );
-  let worker_url = if !context.config.output.public_path.is_empty() {
-    let normalized_public_path = context.config.output.public_path.trim_end_matches("/");
+  let worker_url = if !compiler_config.output.public_path.is_empty() {
+    let normalized_public_path = compiler_config.output.public_path.trim_end_matches("/");
     format!("{}/{}", normalized_public_path, file_name)
   } else {
     format!("/{}", file_name)
@@ -130,7 +130,7 @@ fn process_worker(param: ProcessWorkerParam) -> String {
     context,
   } = param;
 
-  let (worker_url, file_name) = get_worker_url(resolved_path, context);
+  let (worker_url, file_name) = get_worker_url(resolved_path, compiler_config);
 
   let content_bytes = build_worker(resolved_path, &compiler_config);
 
@@ -236,7 +236,7 @@ fn process_worker(param: ProcessWorkerParam) -> String {
     url_code = file_name
   }
   if is_url {
-    return format!("export default {}", url_code);
+    return format!(r#"export default "{}""#, url_code);
   }
   return format!(
     r#"

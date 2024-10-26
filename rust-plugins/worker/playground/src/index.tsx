@@ -4,10 +4,12 @@ import { Main } from './main';
 import TestWorker from "./worker/test.worker?worker"
 import './index.css'
 
+console.log(TestWorker);
+
 const worker = new TestWorker();
 worker.postMessage([5, 5]);
 worker.onmessage = (e) => {
-  console.log("worker response: ", e.data);
+  console.log(e.data);
 }
 
 const container = document.querySelector('#root');
