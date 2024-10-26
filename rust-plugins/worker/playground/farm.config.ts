@@ -16,7 +16,7 @@ export default defineConfig({
       isBuild: false,
       compilerConfig:{
         output:{
-          assetsFilename: '[resourceName].[hash].[ext]',
+          assetsFilename: '[resourceName].[hash].js',
         }
       }
     })

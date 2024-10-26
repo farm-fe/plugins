@@ -28,18 +28,7 @@ const WORKER_OR_SHARED_WORKER_RE: &str = r#"(?:\?|&)(worker|sharedworker)(?:&|$)
 const INLINE_RE: &str = r#"[?&]inline\b"#;
 
 fn build_worker(resolved_path: &str, compiler_config: &Config) -> Vec<u8> {
-  let file_name_ext = Path::new(resolved_path)
-    .file_name()
-    .map(|x| x.to_string_lossy().to_string())
-    .unwrap();
-  let (file_name, ext) = file_name_ext.split_once(".").unwrap();
-  let assets_filename_config = compiler_config.output.assets_filename.clone();
-  let full_file_name = transform_output_filename(
-    assets_filename_config,
-    &file_name,
-    file_name.as_bytes(),
-    ext,
-  );
+  let (_worker_url, full_file_name) = get_worker_url(resolved_path, compiler_config);
   let mut input = HashMap::new();
   input.insert(full_file_name.clone(), resolved_path.to_string());
   let compiler = Compiler::new(
@@ -47,7 +36,7 @@ fn build_worker(resolved_path: &str, compiler_config: &Config) -> Vec<u8> {
       input,
       partial_bundling: Box::new(PartialBundlingConfig {
         enforce_resources: vec![PartialBundlingEnforceResourceConfig {
-          name: file_name.to_string(),
+          name: full_file_name.to_string(),
           test: vec![ConfigRegex::new(".+")],
         }],
         ..*compiler_config.partial_bundling.clone()
@@ -85,10 +74,7 @@ fn emit_worker_file(
   context.emit_file(params);
 }
 
-fn get_worker_url(
-  resolved_path: &str,
-  compiler_config: &Config
-) -> (String, String) {
+fn get_worker_url(resolved_path: &str, compiler_config: &Config) -> (String, String) {
   let file_name_ext = Path::new(resolved_path)
     .file_name()
     .map(|x| x.to_string_lossy().to_string())
@@ -101,6 +87,12 @@ fn get_worker_url(
     file_name.as_bytes(),
     ext,
   );
+  // worker.ts -> worker.js
+  let file_name = if file_name.ends_with(".ts") {
+    file_name.replace(".ts", ".js")
+  } else {
+    file_name
+  };
   let worker_url = if !compiler_config.output.public_path.is_empty() {
     let normalized_public_path = compiler_config.output.public_path.trim_end_matches("/");
     format!("{}/{}", normalized_public_path, file_name)
