@@ -4,8 +4,11 @@ import { Main } from './main';
 import TestWorker from "./worker/test.worker?worker"
 import './index.css'
 
-const worker = TestWorker();
-console.log(worker);
+const worker = new TestWorker();
+worker.postMessage([5, 5]);
+worker.onmessage = (e) => {
+  console.log("worker response: ", e.data);
+}
 
 const container = document.querySelector('#root');
 const root = createRoot(container);

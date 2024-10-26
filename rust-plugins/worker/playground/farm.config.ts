@@ -13,7 +13,7 @@ export default defineConfig({
   plugins: [
     react({ runtime: "automatic" }),
     farmPlugin({
-      isBuild: true
+      isBuild: false
     })
   ],
 });
