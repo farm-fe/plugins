@@ -286,13 +286,13 @@ impl Plugin for FarmfePluginWorker {
     _hook_context: &farmfe_core::plugin::PluginHookContext,
   ) -> farmfe_core::error::Result<Option<farmfe_core::plugin::PluginResolveHookResult>> {
     let id = &param.source;
-    let (clean_path, query) = &param.source.split_once("?").unwrap_or((id, ""));
-    let query = parse_query(&format!("?{}", query));
     if JsRegex::new(WORKER_OR_SHARED_WORKER_RE)
       .unwrap()
       .find(id)
       .is_some()
     {
+      let (clean_path, query) = &param.source.split_once("?").unwrap_or((id, ""));
+      let query = parse_query(&format!("?{}", query));
       return Ok(Some(PluginResolveHookResult {
         resolved_path: clean_path.to_string(),
         query,
