@@ -1,12 +1,12 @@
 export interface IPluginOptions {
   include?: String,
   exclude?: String,
-  development?: bool,
-  provider_import_source?: String,
-  jsx?: bool,
+  development?: boolean,
+  providerImportSource?: String,
+  jsx?: boolean,
   pragma?: String,
-  pragma_frag?: String,
-  pragma_import_source?: String,
-  jsx_import_source?: String,
+  pragmaFrag?: String,
+  pragmaImportSource?: String,
+  jsxImportSource?: String,
   filepath?: String,
 }

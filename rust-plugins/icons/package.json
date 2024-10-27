@@ -1,6 +1,6 @@
 {
   "name": "@farmfe/plugin-icons",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "main": "scripts/index.js",
   "types": "scripts/index.d.ts",
   "type": "module",
@@ -37,9 +37,9 @@
   },
   "exports": {
     ".": {
-      "import": "./scripts/index.js",
-      "require": "./scripts/index.js",
-      "types": "./scripts/index.d.ts"
+      "import": "./scripts/func.js",
+      "types": "./scripts/index.d.ts",
+      "default": "./scripts/index.js"
     },
     "./package.json": "./package.json",
     "./types/astro": {
@@ -89,6 +89,7 @@
   },
   "files": [
     "scripts",
-    "types"
+    "types",
+    "options.d.ts"
   ]
 }

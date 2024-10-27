@@ -1,6 +1,6 @@
 {
   "name": "@farmfe/plugin-wasm",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "main": "scripts/index.js",
   "types": "scripts/index.d.ts",
   "type": "module",
@@ -27,7 +27,8 @@
       "types": "./scripts/index.d.ts",
       "default": "./scripts/index.js"
     },
-    "./package.json": "./package.json"
+    "./package.json": "./package.json",
+    "./types": "./types/index.d.ts"
   },
   "scripts": {
     "dev": "cargo watch -w src -s 'scripts/watch.sh'",
@@ -38,6 +39,7 @@
   },
   "files": [
     "scripts",
+    "types",
     "options.d.ts"
   ]
 }

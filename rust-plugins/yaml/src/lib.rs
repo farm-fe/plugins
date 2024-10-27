@@ -5,7 +5,6 @@ use farmfe_macro_plugin::farm_plugin;
 use lazy_static::lazy_static;
 use regex::Regex;
 use serde::Deserialize;
-use serde_yaml::Value;
 use std::fs::read_to_string;
 
 lazy_static! {
@@ -18,15 +17,22 @@ fn is_yaml_file(file_name: &String) -> bool {
 
 #[derive(Debug, Deserialize)]
 #[serde(rename_all = "camelCase")]
+enum DocumentMode {
+  Single,
+  Multi
+}
+
+#[derive(Debug, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct FarmPluginYamlOptions {
-  document_mode: Option<String>,
+  document_mode: Option<DocumentMode>,
   include: Option<String>,
   exclude: Option<String>,
 }
 
 #[farm_plugin]
 pub struct FarmPluginYaml {
-  document_mode: String,
+  document_mode: DocumentMode,
   include: String,
   exclude: String,
 }
@@ -34,20 +40,10 @@ pub struct FarmPluginYaml {
 impl FarmPluginYaml {
   fn new(_config: &Config, options: String) -> Self {
     let yaml_options: FarmPluginYamlOptions = serde_json::from_str(&options).unwrap();
-    let mut document_mode: String = String::from("single");
-    let mut include: String = String::from("");
-    let mut exclude: String = String::from("");
-    if let Some(mode) = yaml_options.document_mode {
-      document_mode = mode
-    }
-    if let Some(inc) = yaml_options.include {
-      include = inc;
-    }
-    if let Some(exc) = yaml_options.exclude {
-      exclude = exc;
-    }
+    let include: String = yaml_options.include.unwrap_or(String::from(""));
+    let exclude: String = yaml_options.exclude.unwrap_or(String::from(""));
     Self {
-      document_mode,
+      document_mode: yaml_options.document_mode.unwrap_or(DocumentMode::Single),
       include,
       exclude,
     }
@@ -83,7 +79,7 @@ impl Plugin for FarmPluginYaml {
       return Ok(None);
     }
 
-    if self.include != String::from("") {
+    if !self.include.is_empty() {
       let inc_reg = Regex::new(&format!("{}", self.include)).unwrap();
       if let Some(_text) = inc_reg.find(param.resolved_path) {
       } else {
@@ -91,48 +87,44 @@ impl Plugin for FarmPluginYaml {
       }
     }
 
-    if self.exclude != String::from("") {
+    if !self.exclude.is_empty() {
       let exc_reg = Regex::new(&format!("{}", self.exclude)).unwrap();
       if let Some(_text) = exc_reg.find(param.resolved_path) {
         return Ok(None);
       }
     }
 
-    let content = param.content.clone();
+    let code = match self.document_mode {
+      DocumentMode::Single => {
+        let result: serde_json::Value =
+          serde_yaml::from_str::<serde_json::Value>(&param.content).unwrap();
+        let mut export_val = String::new();
 
-    if self.document_mode == String::from("single") {
-      let result: serde_json::Value = serde_yaml::from_str::<serde_json::Value>(&content).unwrap();
-      let mut export_val = String::new();
+        if let serde_json::Value::Object(object) = result.clone() {
+          for (key, val) in object {
+            export_val.push_str(&format!("export var {} =  {};\n", key, val));
+          }
+        }
+        format!("export default {}\n\n {}", result, export_val)
+      }
+      DocumentMode::Multi => {
+        let result: serde_json::Value =
+          serde_yaml::from_str::<serde_json::Value>(&param.content).unwrap();
+        let mut export_val = String::new();
+        if let serde_json::Value::Object(object) = result.clone() {
+          for (key, val) in object {
+            export_val.push_str(&format!("export var {} =  {};\n", key, val));
+          }
+        }
+        format!("export default {}\n\n {}", result, export_val)
+      }
+    };
 
-      if let serde_json::Value::Object(object) = result.clone() {
-        for (key, val) in object {
-          export_val.push_str(&format!("export var {} =  {};\n", key, val));
-        }
-      }
-      return Ok(Some(farmfe_core::plugin::PluginTransformHookResult {
-        content: format!("export default {}\n\n {}", result, export_val),
-        module_type: Some(ModuleType::Js),
-        source_map: None,
-        ignore_previous_source_map: false,
-      }));
-    } else if self.document_mode == "multi" {
-      let mut result: Vec<String> = vec![];
-      for document in serde_yaml::Deserializer::from_str(&content) {
-        let value = Value::deserialize(document).unwrap();
-        if let Some(mapping) = value.as_mapping() {
-          let json_string = serde_json::to_string(&mapping).unwrap();
-          result.push(json_string);
-        }
-      }
-      let content = result.join(",");
-      return Ok(Some(farmfe_core::plugin::PluginTransformHookResult {
-        content: format!("export default [ {} ]", content),
-        module_type: Some(ModuleType::Js),
-        source_map: None,
-        ignore_previous_source_map: false,
-      }));
-    } else {
-      panic!("documentMode must be single or multi")
-    }
+    return Ok(Some(farmfe_core::plugin::PluginTransformHookResult {
+      content: code,
+      module_type: Some(ModuleType::Js),
+      source_map: None,
+      ignore_previous_source_map: false,
+    }));
   }
 }

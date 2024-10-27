@@ -1,5 +1,7 @@
 import { defineConfig } from "@farmfe/core";
 import { resolve } from "path"
+import url from "@farmfe/plugin-url"
+import react from "@farmfe/plugin-react"
 export default defineConfig({
   compilation: {
     input: {
@@ -9,9 +11,12 @@ export default defineConfig({
     progress: false,
   },
   plugins: [
-    ["@farmfe/plugin-react", { runtime: "automatic" }],
-    [
-      "@farmfe/plugin-url", { limit: 10 * 1024, public_path: "output/", emit_files: true, dest_dir: resolve(__dirname, "./dist/assets") }
-    ]
+    react({ runtime: "automatic" }),
+    url({
+      limit: 10 * 1024,
+      publicPath: "output/",
+      emitFiles: true,
+      destDir: resolve(__dirname, "./dist/assets")
+    })
   ],
 });

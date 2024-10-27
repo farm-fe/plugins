@@ -48,7 +48,7 @@ pub struct Options {
   pub limit: Option<u64>,
   pub public_path: Option<String>,
   pub emit_files: Option<bool>,
-  pub file_name: Option<String>,
+  pub filename: Option<String>,
   pub dest_dir: Option<String>,
   pub source_dir: Option<String>,
   pub include: Option<Vec<ConfigRegex>>,
@@ -109,7 +109,7 @@ impl Plugin for FarmfePluginUrl {
       let file_path = Path::new(param.resolved_path);
       let ext: &str = file_path.extension().and_then(|s| s.to_str()).unwrap();
       let filename = file_path.file_prefix().and_then(|s| s.to_str()).unwrap();
-      let mut filename_config = options.file_name.unwrap_or("[hash].[ext]".to_string());
+      let mut filename_config = options.filename.unwrap_or("[hash].[ext]".to_string());
       let relative_dir = {
         let dir_name = Path::new(param.resolved_path)
           .parent()

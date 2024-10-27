@@ -41,6 +41,7 @@ use insert_import::{ImportModifier, InsertImportModifier};
 use resolvers::ResolverOption;
 
 #[derive(serde::Deserialize, serde::Serialize, Clone, Debug)]
+#[serde(rename_all = "camelCase")]
 pub enum ImportMode {
   Relative,
   Absolute,

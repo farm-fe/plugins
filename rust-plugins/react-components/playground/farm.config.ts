@@ -1,6 +1,7 @@
 import { defineConfig } from "@farmfe/core";
 import less from "@farmfe/js-plugin-less"
-
+import react from "@farmfe/plugin-react"
+import reactComponents from "@farmfe/plugin-react-components"
 export default defineConfig({
   compilation: {
     input: {
@@ -11,10 +12,10 @@ export default defineConfig({
   },
   plugins: [
     less(),
-    ["@farmfe/plugin-react", { runtime: "automatic" }],
-    ["@farmfe/plugin-react-components", {
-      filename: "src/types/components.d.ts",
-      dirs:["src/components"],
+    react({ runtime: "automatic" }),
+    reactComponents({
+      dts: "src/types/components.d.ts",
+      dirs: ["src/components"],
       resolvers: [
         {
           module: "antd",
@@ -23,9 +24,9 @@ export default defineConfig({
         {
           module: "@arco-design/web-react",
           prefix: "Arco",
-          import_style: true // style/index.js
+          importStyle: true // style/index.js
         }
       ]
-    }]
+    })
   ],
 });

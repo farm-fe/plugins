@@ -1,5 +1,11 @@
 # @farmfe/plugin-yaml
 
+## 0.0.7
+
+### Patch Changes
+
+- feat(rust-plugin): optimization plugin
+
 ## 0.0.6
 
 ### Patch Changes

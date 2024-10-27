@@ -21,10 +21,10 @@ pub fn get_compiler(param: GetCompilerParams) -> impl Fn(CompilerParams) -> Stri
   let GetCompilerParams { compiler, jsx } = param;
   match compiler.as_str() {
     "jsx" => {
-      if jsx == "react" {
-        react::react_complier
-      } else {
+      if jsx == "preact" {
         preact::preact_complier
+      } else {
+        react::react_complier
       }
     }
     "svelte" => svelte::svelte_compiler,
