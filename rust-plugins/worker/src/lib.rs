@@ -328,8 +328,6 @@ impl Plugin for FarmfePluginWorker {
     if param.module_type != ModuleType::Custom("worker".to_string()) {
       return Ok(None);
     }
-    let is_build = self.options.is_build.unwrap();
-    let compiler_config = self.options.compiler_config.clone().unwrap();
 
     let worker_match = JsRegex::new(WORKER_OR_SHARED_WORKER_RE)
       .unwrap()
@@ -341,12 +339,13 @@ impl Plugin for FarmfePluginWorker {
     let code = process_worker(ProcessWorkerParam {
       resolved_path: param.resolved_path,
       module_id: &param.module_id,
-      is_build,
+      is_build: self.options.is_build.unwrap(),
       is_url: param.query.iter().any(|(k, _v)| k == "url"),
-      compiler_config: &compiler_config,
+      compiler_config: self.options.compiler_config.as_ref().unwrap(),
       worker_cache: &self.worker_cache,
       context,
     });
+    
     return Ok(Some(PluginTransformHookResult {
       content: code,
       module_type: Some(ModuleType::Js),
