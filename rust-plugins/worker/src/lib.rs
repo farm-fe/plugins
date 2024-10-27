@@ -14,13 +14,12 @@ use farmfe_core::{
   },
   context::EmitFileParams,
   module::ModuleType,
-  plugin::{Plugin, PluginLoadHookResult, PluginResolveHookResult, PluginTransformHookResult},
+  plugin::{Plugin, PluginLoadHookResult, PluginTransformHookResult},
   resource::ResourceType,
   serde, serde_json,
 };
 use farmfe_macro_plugin::farm_plugin;
 use farmfe_toolkit::fs::transform_output_filename;
-use farmfe_utils::parse_query;
 use regress::Regex as JsRegex;
 use serde::{Deserialize, Serialize};
 
@@ -167,6 +166,7 @@ fn process_worker(param: ProcessWorkerParam) -> String {
     if worker_inline_match.is_some() {
       let content_bytes = worker_cache.get(resolved_path).unwrap();
       let content_base64 = general_purpose::STANDARD.encode(content_bytes);
+      let content_base64_code = format!(r#"const encodedJs = "{}";"#, content_base64);
       let code = if worker_constructor == "Worker" {
         let blob_url = if worker_type == "classic" {
           String::from("")
@@ -195,7 +195,7 @@ fn process_worker(param: ProcessWorkerParam) -> String {
                 );
               }}{4}
             }}"#,
-          content_base64,
+          content_base64_code,
           blob_url,
           worker_constructor,
           worker_type_option,
@@ -214,11 +214,11 @@ fn process_worker(param: ProcessWorkerParam) -> String {
           r#"{0}
             export default function WorkerWrapper(options) {{
               return new {1}(
-                "data:text/javascript;base64," + {0},
+                "data:text/javascript;base64," + encodedJs,
                 {2}
               );
             }}"#,
-          content_base64, worker_constructor, worker_type_option
+          content_base64_code, worker_constructor, worker_type_option
         )
       };
       return code;
@@ -275,31 +275,9 @@ impl Plugin for FarmfePluginWorker {
   fn name(&self) -> &str {
     "FarmfePluginWorker"
   }
-
-  fn resolve(
-    &self,
-    param: &farmfe_core::plugin::PluginResolveHookParam,
-    _context: &std::sync::Arc<farmfe_core::context::CompilationContext>,
-    _hook_context: &farmfe_core::plugin::PluginHookContext,
-  ) -> farmfe_core::error::Result<Option<farmfe_core::plugin::PluginResolveHookResult>> {
-    let id = &param.source;
-    if JsRegex::new(WORKER_OR_SHARED_WORKER_RE)
-      .unwrap()
-      .find(id)
-      .is_some()
-    {
-      let (clean_path, query) = &param.source.split_once("?").unwrap_or((id, ""));
-      let query = parse_query(&format!("?{}", query));
-      return Ok(Some(PluginResolveHookResult {
-        resolved_path: clean_path.to_string(),
-        query,
-        ..Default::default()
-      }));
-    }
-
-    return Ok(None);
+  fn priority(&self) -> i32 {
+    105
   }
-
   fn load(
     &self,
     param: &farmfe_core::plugin::PluginLoadHookParam,
@@ -328,7 +306,6 @@ impl Plugin for FarmfePluginWorker {
     if param.module_type != ModuleType::Custom("worker".to_string()) {
       return Ok(None);
     }
-
     let worker_match = JsRegex::new(WORKER_OR_SHARED_WORKER_RE)
       .unwrap()
       .find(&param.module_id);
@@ -345,7 +322,7 @@ impl Plugin for FarmfePluginWorker {
       worker_cache: &self.worker_cache,
       context,
     });
-    
+
     return Ok(Some(PluginTransformHookResult {
       content: code,
       module_type: Some(ModuleType::Js),
