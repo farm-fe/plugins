@@ -1,5 +1,6 @@
 import { defineConfig } from "@farmfe/core";
-
+import image from "@farmfe/plugin-image"
+import react from "@farmfe/plugin-react"
 export default defineConfig({
   compilation: {
     input: {
@@ -9,7 +10,7 @@ export default defineConfig({
     progress: false,
   },
   plugins: [
-    ["@farmfe/plugin-react", { runtime: "automatic" }],
-    ["farmfe-plugin-image",{}]
+    react({ runtime: "automatic" }),
+    image()
   ],
 });

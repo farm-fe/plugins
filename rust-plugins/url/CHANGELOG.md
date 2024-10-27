@@ -1,5 +1,11 @@
 # @farmfe/plugin-url
 
+## 0.0.6
+
+### Patch Changes
+
+- feat(rust-plugin): optimization plugin
+
 ## 0.0.5
 
 ### Patch Changes

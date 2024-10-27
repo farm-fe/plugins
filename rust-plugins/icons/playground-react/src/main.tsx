@@ -20,8 +20,8 @@ export function Main() {
           {/* <img src={reactLogo} className="logo react" alt="React logo" /> */}
         </a>
         <div style={{ display: 'flex', alignItems: "center" }}>
-          <div className="i-logos-react  text-100px text-#00D8FF"></div>
-          <ReactLogoIconify className=" text-100px text-#00D8FF" />
+          <div className="i-logos-react text-100px text-#00D8FF"></div>
+          <ReactLogoIconify className="text-100px text-#00D8FF" />
           <ReactLogoComponent className="text-100px h-1em w-1em" />
           <LocalReactLogo className="text-100px h-1em w-1em" />
           {/* <RemoteComponent className="text-100px h-1em w-1em" /> */}

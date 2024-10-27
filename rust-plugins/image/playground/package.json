@@ -13,7 +13,7 @@
     "clsx": "^1.2.1",
     "react": "18",
     "react-dom": "18",
-    "farmfe-plugin-image": "workspace:*"
+    "@farmfe/plugin-image": "workspace:*"
   },
   "devDependencies": {
     "@farmfe/cli": "^1.0.0",

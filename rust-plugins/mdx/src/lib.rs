@@ -22,6 +22,7 @@ pub struct FarmPluginMdx {
   exclude: Option<String>,
 }
 #[derive(Debug, Default, Deserialize)]
+#[serde(rename_all = "camelCase")]
 struct FarmPluginMdxOptions {
   include: Option<String>,
   exclude: Option<String>,

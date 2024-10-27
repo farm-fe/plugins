@@ -1,6 +1,6 @@
 {
   "name": "@farmfe/plugin-virtual",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "private": false,
   "main": "scripts/index.js",
   "types": "scripts/index.d.ts",
@@ -35,9 +35,9 @@
   },
   "exports": {
     ".": {
-      "import": "./scripts/index.js",
-      "require": "./scripts/index.js",
-      "types": "./scripts/index.d.ts"
+      "import": "./scripts/func.js",
+      "types": "./scripts/index.d.ts",
+      "default": "./scripts/index.js"
     },
     "./package.json": "./package.json"
   },

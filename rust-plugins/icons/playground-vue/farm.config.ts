@@ -1,5 +1,6 @@
 import { defineConfig } from '@farmfe/core';
 import vue from '@vitejs/plugin-vue';
+import icons from "@farmfe/plugin-icons"
 export default defineConfig({
   compilation: {
     input: {
@@ -10,8 +11,7 @@ export default defineConfig({
   },
   vitePlugins: [vue()],
   plugins: [
-    ["@farmfe/plugin-icons", {
-      // 支持本地 svg 
+    icons({
       autoInstall: true,
       compiler: 'vue',
       // defaultStyle: {
@@ -20,8 +20,8 @@ export default defineConfig({
       // },
       customCollections: {
         local: './src/assets',
-        remote:"https://cdn.simpleicons.org/[iconname]/"
+        remote: "https://cdn.simpleicons.org/[iconname]/"
       }
-    }],
+    }),
   ]
 });

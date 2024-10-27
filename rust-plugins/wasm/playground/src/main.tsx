@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import "./main.css";
 import reactLogo from "./assets/react.svg";
 import FarmLogo from "./assets/logo.png";
-// import init from "./assets/json_typegen_wasm_bg.wasm?init";
+import init from "./assets/json_typegen_wasm_bg.wasm?init";
 import { run } from "json_typegen_wasm"
 export function Main() {
   const [count, setCount] = useState(0);
