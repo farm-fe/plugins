@@ -1,6 +1,6 @@
 import { defineConfig } from "@farmfe/core";
 import react from '@farmfe/plugin-react';
-import farmPlugin from 'farmfe-plugin-worker';
+import farmPlugin from '@farmfe/plugin-worker';
 
 export default defineConfig({
   compilation: {
@@ -12,6 +12,12 @@ export default defineConfig({
   },
   plugins: [
     react({ runtime: "automatic" }),
-    farmPlugin()
+    farmPlugin({
+      compilerConfig:{
+        output:{
+          assetsFilename: '[resourceName].worker.[hash].[ext]',
+        }
+      }
+    })
   ],
 });

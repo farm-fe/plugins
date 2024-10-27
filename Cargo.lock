@@ -155,7 +155,7 @@ dependencies = [
  "proc-macro2",
  "quote",
  "swc_macros_common",
- "syn 2.0.77",
+ "syn 2.0.85",
 ]
 
 [[package]]
@@ -178,7 +178,7 @@ checksum = "3c87f3f15e7794432337fc718554eaa4dc8f04c9677a950ffe366f20a162ae42"
 dependencies = [
  "proc-macro2",
  "quote",
- "syn 2.0.77",
+ "syn 2.0.85",
 ]
 
 [[package]]
@@ -454,7 +454,7 @@ dependencies = [
  "heck 0.5.0",
  "proc-macro2",
  "quote",
- "syn 2.0.77",
+ "syn 2.0.85",
 ]
 
 [[package]]
@@ -468,6 +468,19 @@ name = "colorchoice"
 version = "1.0.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "d3fd119d74b830634cea2a0f58bbd0d54540518a14397557951e79340abc28c0"
+
+[[package]]
+name = "console"
+version = "0.15.8"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "0e1f83fc076bd6dd27517eacdf25fef6c4dfe5f1d7448bafaaf3a26f13b5e4eb"
+dependencies = [
+ "encode_unicode",
+ "lazy_static",
+ "libc",
+ "unicode-width",
+ "windows-sys 0.52.0",
+]
 
 [[package]]
 name = "const_format"
@@ -647,6 +660,12 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "60b1af1c220855b6ceac025d3f6ecdd2b7c4894bfe9cd9bda4fbb4bc7c0d4cf0"
 
 [[package]]
+name = "encode_unicode"
+version = "0.3.6"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "a357d28ed41a50f9c765dbfe56cbc04a64e53e5fc58ba79fbc34c10ef3df831f"
+
+[[package]]
 name = "enhanced-magic-string"
 version = "0.0.15"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -676,7 +695,7 @@ checksum = "a1ab991c1362ac86c61ab6f556cff143daa22e5a15e4e189df818b2fd19fe65b"
 dependencies = [
  "proc-macro2",
  "quote",
- "syn 2.0.77",
+ "syn 2.0.85",
 ]
 
 [[package]]
@@ -684,6 +703,35 @@ name = "equivalent"
 version = "1.0.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "5443807d6dff69373d433ab9ef5378ad8df50ca6298caf15de6e52e24aaf54d5"
+
+[[package]]
+name = "farmfe_compiler"
+version = "0.0.11"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "0e7368d84251117a7c774078662de0ac6d5cb57bd7231a5c120cc5fb03d4eb24"
+dependencies = [
+ "farmfe_core",
+ "farmfe_plugin_bundle",
+ "farmfe_plugin_css",
+ "farmfe_plugin_define",
+ "farmfe_plugin_html",
+ "farmfe_plugin_json",
+ "farmfe_plugin_lazy_compilation",
+ "farmfe_plugin_minify",
+ "farmfe_plugin_partial_bundling",
+ "farmfe_plugin_polyfill",
+ "farmfe_plugin_progress",
+ "farmfe_plugin_resolve",
+ "farmfe_plugin_runtime",
+ "farmfe_plugin_script",
+ "farmfe_plugin_static_assets",
+ "farmfe_plugin_tree_shake",
+ "farmfe_testing",
+ "farmfe_testing_helpers",
+ "farmfe_toolkit",
+ "farmfe_utils",
+ "num_cpus",
+]
 
 [[package]]
 name = "farmfe_core"
@@ -760,6 +808,43 @@ dependencies = [
 ]
 
 [[package]]
+name = "farmfe_plugin_bundle"
+version = "0.0.5"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "cc40552da5d3f9d731cf042f217ec99baf07f5bc9261b25e03377a425cd81324"
+dependencies = [
+ "farmfe_core",
+ "farmfe_testing_helpers",
+ "farmfe_toolkit",
+ "farmfe_utils",
+]
+
+[[package]]
+name = "farmfe_plugin_css"
+version = "0.0.13"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "f26675a7823ebd155e7bc3407bc495894dc9f7b790ef178b6f4c22cda9810fc0"
+dependencies = [
+ "farmfe_core",
+ "farmfe_macro_cache_item",
+ "farmfe_toolkit",
+ "farmfe_utils",
+ "rkyv",
+]
+
+[[package]]
+name = "farmfe_plugin_define"
+version = "0.0.11"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "41466f82032a38b8bbe2d4b289c694642f6a37f4d3768fad4262c5bc54b8e03a"
+dependencies = [
+ "farmfe_core",
+ "farmfe_testing_helpers",
+ "farmfe_toolkit",
+ "farmfe_utils",
+]
+
+[[package]]
 name = "farmfe_plugin_dsv"
 version = "0.0.1"
 dependencies = [
@@ -770,6 +855,18 @@ dependencies = [
  "farmfe_toolkit_plugin_types",
  "serde",
  "serde_json",
+]
+
+[[package]]
+name = "farmfe_plugin_html"
+version = "0.0.11"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "dfa86999c56f04e48dad1667f2f2020adde5a73619c52bf262257d61b6af1a4f"
+dependencies = [
+ "farmfe_core",
+ "farmfe_testing_helpers",
+ "farmfe_toolkit",
+ "rkyv",
 ]
 
 [[package]]
@@ -806,6 +903,29 @@ dependencies = [
 ]
 
 [[package]]
+name = "farmfe_plugin_json"
+version = "0.0.11"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "ddf29f280ed68649af1afadd1419261cea463aaba1a1c481f72f60c8a8c8551b"
+dependencies = [
+ "farmfe_core",
+ "farmfe_testing_helpers",
+ "farmfe_toolkit",
+]
+
+[[package]]
+name = "farmfe_plugin_lazy_compilation"
+version = "0.0.11"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "12229283f559271a5bb3eb7a2997688dfd8d6502e8cdf26a312ba0264f159935"
+dependencies = [
+ "farmfe_core",
+ "farmfe_testing_helpers",
+ "farmfe_toolkit",
+ "farmfe_utils",
+]
+
+[[package]]
 name = "farmfe_plugin_mdx"
 version = "0.0.0"
 dependencies = [
@@ -815,6 +935,51 @@ dependencies = [
  "mdxjs",
  "regex",
  "serde",
+]
+
+[[package]]
+name = "farmfe_plugin_minify"
+version = "0.0.11"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "549ae481a18389ca03fba64f012aa8d3970899e512f8d8887cfa7d66f245fb11"
+dependencies = [
+ "farmfe_core",
+ "farmfe_testing_helpers",
+ "farmfe_toolkit",
+]
+
+[[package]]
+name = "farmfe_plugin_partial_bundling"
+version = "0.0.11"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "dffe9bf7b22603158ad0a5a225df9de48b4e682c48b0c2b8f08cb09893d8982d"
+dependencies = [
+ "farmfe_core",
+ "farmfe_testing_helpers",
+ "farmfe_toolkit",
+]
+
+[[package]]
+name = "farmfe_plugin_polyfill"
+version = "0.0.11"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "1cfec23db5e3bd936a852b593f39e661e41695eb62fa8df3cd6c3dfbb93778a0"
+dependencies = [
+ "farmfe_core",
+ "farmfe_testing_helpers",
+ "farmfe_toolkit",
+]
+
+[[package]]
+name = "farmfe_plugin_progress"
+version = "0.0.11"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "01d419a62e913ff71998d77810b2ebb915e1335bf5e5d9caa0384c101d50540c"
+dependencies = [
+ "console",
+ "farmfe_core",
+ "farmfe_testing_helpers",
+ "indicatif",
 ]
 
 [[package]]
@@ -832,6 +997,60 @@ dependencies = [
 ]
 
 [[package]]
+name = "farmfe_plugin_resolve"
+version = "0.0.11"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "8cb6d6fd39df6e6bc6e2e65e869a9cdc45b88fa3c4dae5719b1feb8a82dac031"
+dependencies = [
+ "farmfe_core",
+ "farmfe_testing_helpers",
+ "farmfe_toolkit",
+ "farmfe_utils",
+ "once_cell",
+]
+
+[[package]]
+name = "farmfe_plugin_runtime"
+version = "0.0.11"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "b25a2cc697dc388caa88870344997518f603cc3afb58d96e1eb91786cf5ba44b"
+dependencies = [
+ "farmfe_core",
+ "farmfe_testing_helpers",
+ "farmfe_toolkit",
+ "farmfe_utils",
+ "rkyv",
+]
+
+[[package]]
+name = "farmfe_plugin_script"
+version = "0.0.10"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "bedcd53a85aecf1cdfb7f4d701e285c26bcbe6ff7771d013f044422050d972ea"
+dependencies = [
+ "farmfe_core",
+ "farmfe_swc_transformer_import_glob",
+ "farmfe_testing_helpers",
+ "farmfe_toolkit",
+ "farmfe_utils",
+]
+
+[[package]]
+name = "farmfe_plugin_static_assets"
+version = "0.0.11"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "d46d5fb16654486656333e5cc94c541777b21957592651baea10e8a8114cd0d9"
+dependencies = [
+ "base64 0.21.7",
+ "farmfe_core",
+ "farmfe_testing_helpers",
+ "farmfe_toolkit",
+ "farmfe_utils",
+ "mime_guess",
+ "rkyv",
+]
+
+[[package]]
 name = "farmfe_plugin_strip"
 version = "0.0.1"
 dependencies = [
@@ -841,6 +1060,18 @@ dependencies = [
  "farmfe_toolkit_plugin_types",
  "regex",
  "serde",
+]
+
+[[package]]
+name = "farmfe_plugin_tree_shake"
+version = "0.0.10"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "0e7d635f86249992b18c64ccb7cbfec885efc5c4bebb449906c5cb2c1560dfe4"
+dependencies = [
+ "farmfe_core",
+ "farmfe_testing_helpers",
+ "farmfe_toolkit",
+ "farmfe_utils",
 ]
 
 [[package]]
@@ -878,6 +1109,21 @@ dependencies = [
 ]
 
 [[package]]
+name = "farmfe_plugin_worker"
+version = "0.0.0"
+dependencies = [
+ "base64 0.22.1",
+ "farmfe_compiler",
+ "farmfe_core",
+ "farmfe_macro_plugin",
+ "farmfe_toolkit",
+ "farmfe_toolkit_plugin_types",
+ "farmfe_utils",
+ "regress",
+ "serde",
+]
+
+[[package]]
 name = "farmfe_plugin_yaml"
 version = "0.0.1"
 dependencies = [
@@ -889,6 +1135,33 @@ dependencies = [
  "regex",
  "serde",
  "serde_yaml",
+]
+
+[[package]]
+name = "farmfe_swc_transformer_import_glob"
+version = "0.0.11"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "0a3189fea7a4a64f4c4b03da72a63623ddfbece4a48a0181ac3497190a5a1b5c"
+dependencies = [
+ "farmfe_core",
+ "farmfe_testing_helpers",
+ "farmfe_toolkit",
+ "farmfe_utils",
+]
+
+[[package]]
+name = "farmfe_testing"
+version = "0.0.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "86de808359cb5358244cd4c8738eed351ff049841431202b9c8ee09a7d3e83fb"
+dependencies = [
+ "glob",
+ "heck 0.4.1",
+ "proc-macro-error",
+ "proc-macro2",
+ "quote",
+ "regex",
+ "syn 2.0.85",
 ]
 
 [[package]]
@@ -1078,7 +1351,7 @@ checksum = "32016f1242eb82af5474752d00fd8ebcd9004bd69b462b1c91de833972d08ed4"
 dependencies = [
  "proc-macro2",
  "swc_macros_common",
- "syn 2.0.77",
+ "syn 2.0.85",
 ]
 
 [[package]]
@@ -1126,7 +1399,7 @@ dependencies = [
  "proc-macro-error2",
  "proc-macro2",
  "quote",
- "syn 2.0.77",
+ "syn 2.0.85",
 ]
 
 [[package]]
@@ -1137,7 +1410,7 @@ checksum = "b0e085ded9f1267c32176b40921b9754c474f7dd96f7e808d4a982e48aa1e854"
 dependencies = [
  "proc-macro2",
  "quote",
- "syn 2.0.77",
+ "syn 2.0.85",
 ]
 
 [[package]]
@@ -1283,6 +1556,28 @@ dependencies = [
 ]
 
 [[package]]
+name = "indicatif"
+version = "0.17.8"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "763a5a8f45087d6bcea4222e7b72c291a054edf80e4ef6efd2a4979878c7bea3"
+dependencies = [
+ "console",
+ "instant",
+ "number_prefix",
+ "portable-atomic",
+ "unicode-width",
+]
+
+[[package]]
+name = "instant"
+version = "0.1.13"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "e0242819d153cba4b4b05a5a8f2a7e9bbf97b6055b2a002b395c96b5ff3c0222"
+dependencies = [
+ "cfg-if",
+]
+
+[[package]]
 name = "inventory"
 version = "0.1.11"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1326,7 +1621,7 @@ dependencies = [
  "Inflector",
  "proc-macro2",
  "quote",
- "syn 2.0.77",
+ "syn 2.0.85",
 ]
 
 [[package]]
@@ -1557,7 +1852,7 @@ checksum = "49e7bc1560b95a3c4a25d03de42fe76ca718ab92d1a22a55b9b4cf67b3ae635c"
 dependencies = [
  "proc-macro2",
  "quote",
- "syn 2.0.77",
+ "syn 2.0.85",
 ]
 
 [[package]]
@@ -1568,7 +1863,7 @@ checksum = "dcf09caffaac8068c346b6df2a7fc27a177fd20b39421a39ce0a211bde679a6c"
 dependencies = [
  "proc-macro2",
  "quote",
- "syn 2.0.77",
+ "syn 2.0.85",
 ]
 
 [[package]]
@@ -1683,6 +1978,12 @@ dependencies = [
  "hermit-abi",
  "libc",
 ]
+
+[[package]]
+name = "number_prefix"
+version = "0.4.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "830b246a0e5f20af87141b25c173cd1b609bd7779a4617d6ec582abaf90870f3"
 
 [[package]]
 name = "object"
@@ -1830,7 +2131,7 @@ dependencies = [
  "phf_shared 0.11.2",
  "proc-macro2",
  "quote",
- "syn 2.0.77",
+ "syn 2.0.85",
 ]
 
 [[package]]
@@ -1876,6 +2177,12 @@ checksum = "a4a63d338dec139f56dacc692ca63ad35a6be6a797442479b55acd611d79e906"
 dependencies = [
  "nom",
 ]
+
+[[package]]
+name = "portable-atomic"
+version = "1.9.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "cc9c68a3f6da06753e9335d63e27f6b9754dd1920d941135b7ea8224f141adb2"
 
 [[package]]
 name = "powerfmt"
@@ -1959,7 +2266,7 @@ dependencies = [
  "proc-macro-error-attr2",
  "proc-macro2",
  "quote",
- "syn 2.0.77",
+ "syn 2.0.85",
 ]
 
 [[package]]
@@ -2306,22 +2613,22 @@ checksum = "388a1df253eca08550bef6c72392cfe7c30914bf41df5269b68cbd6ff8f570a3"
 
 [[package]]
 name = "serde"
-version = "1.0.210"
+version = "1.0.213"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c8e3592472072e6e22e0a54d5904d9febf8508f65fb8552499a1abc7d1078c3a"
+checksum = "3ea7893ff5e2466df8d720bb615088341b295f849602c6956047f8f80f0e9bc1"
 dependencies = [
  "serde_derive",
 ]
 
 [[package]]
 name = "serde_derive"
-version = "1.0.210"
+version = "1.0.213"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "243902eda00fad750862fc144cea25caca5e20d615af0a81bee94ca738f1df1f"
+checksum = "7e85ad2009c50b58e87caa8cd6dac16bdf511bbfb7af6c33df902396aa480fa5"
 dependencies = [
  "proc-macro2",
  "quote",
- "syn 2.0.77",
+ "syn 2.0.85",
 ]
 
 [[package]]
@@ -2532,7 +2839,7 @@ checksum = "710e9696ef338691287aeb937ee6ffe60022f579d3c8d2fd9d58973a9a10a466"
 dependencies = [
  "proc-macro2",
  "quote",
- "syn 2.0.77",
+ "syn 2.0.85",
 ]
 
 [[package]]
@@ -2576,7 +2883,7 @@ dependencies = [
  "proc-macro2",
  "quote",
  "swc_macros_common",
- "syn 2.0.77",
+ "syn 2.0.85",
 ]
 
 [[package]]
@@ -2786,7 +3093,7 @@ dependencies = [
  "proc-macro2",
  "quote",
  "swc_macros_common",
- "syn 2.0.77",
+ "syn 2.0.85",
 ]
 
 [[package]]
@@ -2905,7 +3212,7 @@ dependencies = [
  "proc-macro2",
  "quote",
  "swc_macros_common",
- "syn 2.0.77",
+ "syn 2.0.85",
 ]
 
 [[package]]
@@ -3157,7 +3464,7 @@ dependencies = [
  "proc-macro2",
  "quote",
  "swc_macros_common",
- "syn 2.0.77",
+ "syn 2.0.85",
 ]
 
 [[package]]
@@ -3660,7 +3967,7 @@ dependencies = [
  "proc-macro2",
  "quote",
  "swc_macros_common",
- "syn 2.0.77",
+ "syn 2.0.85",
 ]
 
 [[package]]
@@ -3925,7 +4232,7 @@ checksum = "63db0adcff29d220c3d151c5b25c0eabe7e32dd936212b84cdaa1392e3130497"
 dependencies = [
  "proc-macro2",
  "quote",
- "syn 2.0.77",
+ "syn 2.0.85",
 ]
 
 [[package]]
@@ -4028,7 +4335,7 @@ dependencies = [
  "proc-macro2",
  "quote",
  "swc_macros_common",
- "syn 2.0.77",
+ "syn 2.0.85",
 ]
 
 [[package]]
@@ -4131,7 +4438,7 @@ checksum = "f486687bfb7b5c560868f69ed2d458b880cebc9babebcb67e49f31b55c5bf847"
 dependencies = [
  "proc-macro2",
  "quote",
- "syn 2.0.77",
+ "syn 2.0.85",
 ]
 
 [[package]]
@@ -4151,7 +4458,7 @@ checksum = "ff9719b6085dd2824fd61938a881937be14b08f95e2d27c64c825a9f65e052ba"
 dependencies = [
  "proc-macro2",
  "quote",
- "syn 2.0.77",
+ "syn 2.0.85",
 ]
 
 [[package]]
@@ -4174,7 +4481,7 @@ dependencies = [
  "proc-macro2",
  "quote",
  "swc_macros_common",
- "syn 2.0.77",
+ "syn 2.0.85",
 ]
 
 [[package]]
@@ -4225,7 +4532,7 @@ dependencies = [
  "proc-macro2",
  "quote",
  "swc_macros_common",
- "syn 2.0.77",
+ "syn 2.0.85",
 ]
 
 [[package]]
@@ -4265,9 +4572,9 @@ dependencies = [
 
 [[package]]
 name = "syn"
-version = "2.0.77"
+version = "2.0.85"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "9f35bcdf61fd8e7be6caf75f429fdca8beb3ed76584befb503b1569faee373ed"
+checksum = "5023162dfcd14ef8f32034d8bcd4cc5ddc61ef7a247c024a33e24e1f24d21b56"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -4318,7 +4625,7 @@ checksum = "a4558b58466b9ad7ca0f102865eccc95938dca1a74a856f2b57b6629050da261"
 dependencies = [
  "proc-macro2",
  "quote",
- "syn 2.0.77",
+ "syn 2.0.85",
 ]
 
 [[package]]
@@ -4403,7 +4710,7 @@ checksum = "693d596312e88961bc67d7f1f97af8a70227d9f90c31bba5806eec004978d752"
 dependencies = [
  "proc-macro2",
  "quote",
- "syn 2.0.77",
+ "syn 2.0.85",
 ]
 
 [[package]]
@@ -4425,7 +4732,7 @@ checksum = "34704c8d6ebcbc939824180af020566b01a7c01f80641264eba0999f6c2b6be7"
 dependencies = [
  "proc-macro2",
  "quote",
- "syn 2.0.77",
+ "syn 2.0.85",
 ]
 
 [[package]]
@@ -4625,7 +4932,7 @@ dependencies = [
  "once_cell",
  "proc-macro2",
  "quote",
- "syn 2.0.77",
+ "syn 2.0.85",
  "wasm-bindgen-shared",
 ]
 
@@ -4647,7 +4954,7 @@ checksum = "afc340c74d9005395cf9dd098506f7f44e38f2b4a21c6aaacf9a105ea5e1e836"
 dependencies = [
  "proc-macro2",
  "quote",
- "syn 2.0.77",
+ "syn 2.0.85",
  "wasm-bindgen-backend",
  "wasm-bindgen-shared",
 ]
@@ -4839,5 +5146,5 @@ checksum = "fa4f8080344d4671fb4e831a13ad1e68092748387dfc4f55e356242fae12ce3e"
 dependencies = [
  "proc-macro2",
  "quote",
- "syn 2.0.77",
+ "syn 2.0.85",
 ]

@@ -7,10 +7,12 @@ version = "0.0.0"
 crate-type = ["cdylib", "rlib"]
 
 [dependencies]
-farmfe_core = { version = "*" }
-farmfe_toolkit_plugin_types = { version = "*" }
-farmfe_macro_plugin = { version = "*" }
-farmfe_toolkit = { version = "*" }
+farmfe_core = { workspace = true }
+farmfe_utils = { workspace = true }
+farmfe_toolkit_plugin_types = { workspace = true }
+farmfe_macro_plugin = { workspace = true }
+farmfe_toolkit = { workspace = true }
 farmfe_compiler = "0.0.11"
 serde = "1.0.213"
 regress = "0.10.1"
+base64 = "0.22.1"

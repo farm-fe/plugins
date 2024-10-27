@@ -87,6 +87,8 @@ jobs:
           osx-version: '12.3'
       - uses: goto-bus-stop/setup-zig@v2
         if: ${{ matrix.settings.zig }}
+        with:
+          version: '0.14.0-dev.1983+6bf52b050'
       - name: Build in docker
         uses: addnab/docker-run-action@v3
         if: ${{ matrix.settings.docker }}
@@ -162,4 +164,10 @@ jobs:
         with:
           name: ${{ github.sha }}-${{ matrix.settings.abi }}-wasm
           path: ./rust-plugins/wasm/npm/${{ matrix.settings.abi }}/index.farm
+          if-no-files-found: ignore
+      - name: Upload Plugin worker
+        uses: actions/upload-artifact@v3
+        with:
+          name: ${{ github.sha }}-${{ matrix.settings.abi }}-worker
+          path: ./rust-plugins/worker/npm/${{ matrix.settings.abi }}/index.farm
           if-no-files-found: ignore
