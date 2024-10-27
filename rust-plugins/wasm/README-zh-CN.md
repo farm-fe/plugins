@@ -1,6 +1,6 @@
 # @farmfe/plugin-wasm
 
-A farm plugin for importing Wasm modules.
+A farm plugin which imports Wasm modules.
 
 ## Installation
 
@@ -24,19 +24,19 @@ export default defineConfig({
 
 ## WebAssembly
 
-Pre-compiled `.wasm` files can be imported using the `?init` query. The default export is an initialization function, which returns a Promise resolving to a [`WebAssembly.Instance`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/WebAssembly/Instance) object:
+预编译的 `.wasm` 文件可以通过`?init`来导入。 默认导出一个初始化函数，返回值为所导出 [`WebAssembly.Instance`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/WebAssembly/Instance) 实例对象的 Promise：
 
 ```ts
-import init from './example.wasm?init';
+import init from './example.wasm?init'
 init().then((instance) => {
-  instance.exports.test();
-});
+  instance.exports.test()
+})
 ```
 
-The `init` function can also take an import object as its second parameter, which is passed to [`WebAssembly.Instance`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/WebAssembly/Instance):
+`init` 函数还可以将传递给 [`WebAssembly.Instance`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/WebAssembly/Instance) 的导入对象作为其第二个参数：
 
 ```ts
-import init from './example.wasm?init';
+import init from './example.wasm?init'
 init({
   imports: {
     someFunc: () => {
@@ -45,7 +45,7 @@ init({
   },
 }).then(() => {
   /* ... */
-});
+})
 ```
 
-In production builds, `.wasm` files smaller than the `assetInlineLimit` will be inlined as base64 strings. Otherwise, they will be treated as static assets and fetched on demand.
+在生产构建当中，体积小于 assetInlineLimit 的 .wasm 文件将会被内联为 base64 字符串。否则，它们将被视为 静态资源 ，并按需获取。
