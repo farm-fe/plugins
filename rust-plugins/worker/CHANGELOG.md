@@ -1,5 +1,11 @@
 # @farmfe/plugin-worker
 
+## 0.0.3
+
+### Patch Changes
+
+- chore: priority & inline option
+
 ## 0.0.2
 
 ### Patch Changes
