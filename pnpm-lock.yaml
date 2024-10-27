@@ -119,9 +119,17 @@ importers:
         specifier: latest
         version: 0.1.1
 
-  rust-plugins/strip: {}
+  rust-plugins/strip:
+    devDependencies:
+      '@farmfe/plugin-tools':
+        specifier: latest
+        version: 0.1.1
 
-  rust-plugins/url: {}
+  rust-plugins/url:
+    devDependencies:
+      '@farmfe/plugin-tools':
+        specifier: latest
+        version: 0.1.1
 
   rust-plugins/virtual: {}
 
