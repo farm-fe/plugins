@@ -6,6 +6,7 @@ export default defineConfig({
     input: {
       index: "./index.html",
     },
+    minify: false,
     persistentCache: false,
     progress: false,
   },
@@ -13,10 +14,10 @@ export default defineConfig({
     react({ runtime: "automatic" }),
     farmPlugin({
       isBuild: true,
-      compilerConfig:{
-        output:{
-          assetsFilename: '[resourceName].worker.[hash].[ext]',
-        }
+      compilerConfig: {
+        output: {
+          assetsFilename: 'worker/[resourceName].worker.[hash].[ext]',
+        },
       }
     })
   ],
