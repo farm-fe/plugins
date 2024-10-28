@@ -13,11 +13,12 @@ export default defineConfig({
   plugins: [
     react({ runtime: "automatic" }),
     farmPlugin({
-      isBuild: true,
-      compilerConfig: {
-        output: {
-          assetsFilename: 'worker/[resourceName].worker.[hash].[ext]',
-        },
+      isBuild: false,
+      compilerConfig:{
+        presetEnv: true,
+        output:{
+          assetsFilename: 'asserts/[resourceName].[hash].[ext]',
+        }
       }
     })
   ],
