@@ -1,4 +1,4 @@
-import { defineConfig } from "@farmfe/core";
+import { defineConfig, UserConfig } from "@farmfe/core";
 import react from '@farmfe/plugin-react';
 import farmPlugin from '@farmfe/plugin-worker';
 export default defineConfig({
@@ -7,7 +7,7 @@ export default defineConfig({
       index: "./index.html",
     },
     minify: false,
-    persistentCache: false,
+    persistentCache: true,
     progress: false,
   },
   plugins: [
@@ -18,8 +18,10 @@ export default defineConfig({
         presetEnv: true,
         output:{
           assetsFilename: 'asserts/[resourceName].[hash].[ext]',
-        }
-      }
+        },
+        minify: false,
+        treeShaking: false,
+      } as UserConfig['compilation']
     })
   ],
 });

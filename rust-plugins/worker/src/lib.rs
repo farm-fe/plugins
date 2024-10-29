@@ -15,7 +15,6 @@ use farmfe_core::{
     config_regex::ConfigRegex,
     partial_bundling::{PartialBundlingConfig, PartialBundlingEnforceResourceConfig},
     persistent_cache::PersistentCacheConfig,
-    preset_env::PresetEnvConfig,
     Config, ModuleFormat, OutputConfig, TargetEnv,
   },
   context::{CompilationContext, EmitFileParams},
@@ -105,7 +104,7 @@ fn emit_worker_file(
     resolved_path: resolved_path.to_string(),
     content: content_bytes,
     name: file_name.to_string(),
-    resource_type: ResourceType::Js,
+    resource_type: ResourceType::Asset("js".to_string()),
   };
   context.emit_file(params);
 }
@@ -345,7 +344,7 @@ impl Plugin for FarmfePluginWorker {
       .find(&param.module_id)
       .is_some()
     {
-      let code = process_worker(ProcessWorkerParam {
+      let content = process_worker(ProcessWorkerParam {
         resolved_path: param.resolved_path,
         module_id: &param.module_id,
         is_build: self.options.is_build.unwrap(),
@@ -357,7 +356,7 @@ impl Plugin for FarmfePluginWorker {
       });
 
       return Ok(Some(PluginLoadHookResult {
-        content: code,
+        content,
         module_type: ModuleType::Js,
         source_map: None,
       }));
@@ -365,47 +364,47 @@ impl Plugin for FarmfePluginWorker {
     return Ok(None);
   }
 
-  // fn plugin_cache_loaded(
-  //   &self,
-  //   cache: &Vec<u8>,
-  //   context: &Arc<CompilationContext>,
-  // ) -> farmfe_core::error::Result<Option<()>> {
-  //   let cached_static_assets = deserialize!(cache, CachedStaticAssets);
+  fn plugin_cache_loaded(
+    &self,
+    cache: &Vec<u8>,
+    context: &Arc<CompilationContext>,
+  ) -> farmfe_core::error::Result<Option<()>> {
+    let cached_static_assets = deserialize!(cache, CachedStaticAssets);
 
-  //   for asset in cached_static_assets.list {
-  //     println!("emit_file: {:?}", asset.name);
-  //     if let ResourceOrigin::Module(m) = asset.origin {
-  //       context.emit_file(EmitFileParams {
-  //         resolved_path: m.to_string(),
-  //         name: asset.name,
-  //         content: asset.bytes,
-  //         resource_type: asset.resource_type,
-  //       });
-  //     }
-  //   }
+    for asset in cached_static_assets.list {
+      println!("plugin_cache_loaded emit_file: {:?}", asset.name);
+      if let ResourceOrigin::Module(m) = asset.origin {
+        context.emit_file(EmitFileParams {
+          resolved_path: m.to_string(),
+          name: asset.name,
+          content: asset.bytes,
+          resource_type: asset.resource_type,
+        });
+      }
+    }
 
-  //   Ok(Some(()))
-  // }
-  // fn write_plugin_cache(
-  //   &self,
-  //   context: &Arc<CompilationContext>,
-  // ) -> farmfe_core::error::Result<Option<Vec<u8>>> {
-  //   let mut list = vec![];
-  //   let resources_map = context.resources_map.lock();
-  //   for (key, resource) in resources_map.iter() {
-  //     println!("write_plugin_cache: {:?}", key);
-  //     if let ResourceOrigin::Module(m) = &resource.origin {
-  //       if context.cache_manager.module_cache.has_cache(m) {
-  //         list.push(resource.clone());
-  //       }
-  //     }
-  //   }
+    Ok(Some(()))
+  }
+  fn write_plugin_cache(
+    &self,
+    context: &Arc<CompilationContext>,
+  ) -> farmfe_core::error::Result<Option<Vec<u8>>> {
+    let mut list = vec![];
+    let resources_map = context.resources_map.lock();
+    for (key, resource) in resources_map.iter() {
+      println!("write_plugin_cache: {:?}", key);
+      if let ResourceOrigin::Module(m) = &resource.origin {
+        if context.cache_manager.module_cache.has_cache(m) {
+          list.push(resource.clone());
+        }
+      }
+    }
 
-  //   if !list.is_empty() {
-  //     let cached_static_assets = CachedStaticAssets { list };
-  //     Ok(Some(serialize!(&cached_static_assets)))
-  //   } else {
-  //     Ok(None)
-  //   }
-  // }
+    if !list.is_empty() {
+      let cached_static_assets = CachedStaticAssets { list };
+      Ok(Some(serialize!(&cached_static_assets)))
+    } else {
+      Ok(None)
+    }
+  }
 }
