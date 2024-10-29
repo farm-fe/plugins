@@ -1,5 +1,11 @@
 # @farmfe/plugin-wasm
 
+## 0.0.3
+
+### Patch Changes
+
+- fix: persistentCache build
+
 ## 0.0.2
 
 ### Patch Changes

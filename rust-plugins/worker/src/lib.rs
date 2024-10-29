@@ -22,7 +22,6 @@ use farmfe_core::{
   module::ModuleType,
   plugin::{Plugin, PluginLoadHookResult},
   resource::{Resource, ResourceOrigin, ResourceType},
-  rkyv::Deserialize,
   serde,
   serde_json::{self, to_value, Map, Value},
   serialize,
@@ -61,8 +60,8 @@ fn merge_configs(
 
   serde_json::from_value(val1)
 }
-fn build_worker(resolved_path: &str, compiler_config: &Config) -> Vec<u8> {
-  let (_worker_url, full_file_name) = get_worker_url(resolved_path, compiler_config);
+fn build_worker(resolved_path: &str, module_id: &str, compiler_config: &Config) -> Vec<u8> {
+  let (_worker_url, full_file_name) = get_worker_url(resolved_path, module_id, compiler_config);
   let mut input = HashMap::new();
   input.insert(full_file_name.clone(), resolved_path.to_string());
   let compiler = Compiler::new(
@@ -104,22 +103,28 @@ fn emit_worker_file(
     resolved_path: module_id.to_string(),
     content: content_bytes,
     name: file_name.to_string(),
-    resource_type: ResourceType::Asset("js".to_string()),
+    resource_type: ResourceType::Js,
   };
   context.emit_file(params);
 }
 
-fn get_worker_url(resolved_path: &str, compiler_config: &Config) -> (String, String) {
+fn get_worker_url(
+  resolved_path: &str,
+  module_id: &str,
+  compiler_config: &Config,
+) -> (String, String) {
   let file_name_ext = Path::new(resolved_path)
     .file_name()
     .map(|x| x.to_string_lossy().to_string())
     .unwrap();
   let (file_name, ext) = file_name_ext.split_once(".").unwrap();
   let assets_filename_config = compiler_config.output.assets_filename.clone();
+
+  // hash_bytes = resolved_path + file_name_ext bytes ,make sure that the files of the same name in different directory will not be covered;
   let file_name = transform_output_filename(
     assets_filename_config,
     &file_name,
-    file_name.as_bytes(),
+    module_id.as_bytes(),
     ext,
   );
   // worker.ts -> worker.js
@@ -159,8 +164,8 @@ fn process_worker(param: ProcessWorkerParam) -> String {
     context,
   } = param;
 
-  let (worker_url, file_name) = get_worker_url(resolved_path, compiler_config);
-  let content_bytes = build_worker(resolved_path, &compiler_config);
+  let (worker_url, file_name) = get_worker_url(resolved_path, module_id, compiler_config);
+  let content_bytes = build_worker(resolved_path, module_id, &compiler_config);
 
   if worker_cache.get(resolved_path).is_none() {
     let content_bytes =
@@ -405,5 +410,4 @@ impl Plugin for FarmfePluginWorker {
       Ok(None)
     }
   }
-
 }
