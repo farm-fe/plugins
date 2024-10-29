@@ -3,7 +3,6 @@ mod cache;
 use std::{
   collections::{HashMap, HashSet},
   path::Path,
-  sync::Arc,
 };
 
 use base64::{engine::general_purpose, Engine};
@@ -17,15 +16,12 @@ use farmfe_core::{
     persistent_cache::PersistentCacheConfig,
     Config, ModuleFormat, OutputConfig, TargetEnv,
   },
-  context::{CompilationContext, EmitFileParams},
-  deserialize,
+  context::EmitFileParams,
   module::ModuleType,
   plugin::{Plugin, PluginLoadHookResult},
-  resource::{Resource, ResourceOrigin, ResourceType},
-  rkyv::Deserialize,
+  resource::{Resource, ResourceType},
   serde,
   serde_json::{self, to_value, Map, Value},
-  serialize,
 };
 use farmfe_macro_plugin::farm_plugin;
 use farmfe_toolkit::fs::transform_output_filename;
@@ -95,13 +91,13 @@ fn build_worker(resolved_path: &str, compiler_config: &Config) -> Vec<u8> {
 }
 
 fn emit_worker_file(
-  resolved_path: &str,
+  module_id: &str,
   file_name: &str,
   content_bytes: Vec<u8>,
   context: &std::sync::Arc<farmfe_core::context::CompilationContext>,
 ) {
   let params = EmitFileParams {
-    resolved_path: resolved_path.to_string(),
+    resolved_path: module_id.to_string(),
     content: content_bytes,
     name: file_name.to_string(),
     resource_type: ResourceType::Asset("js".to_string()),
@@ -165,13 +161,13 @@ fn process_worker(param: ProcessWorkerParam) -> String {
   if worker_cache.get(resolved_path).is_none() {
     let content_bytes =
       insert_worker_cache(&worker_cache, resolved_path.to_string(), content_bytes);
-    emit_worker_file(resolved_path, &file_name, content_bytes, context);
+    emit_worker_file(module_id, &file_name, content_bytes, context);
   } else {
     let catch_content_bytes = worker_cache.get(resolved_path).unwrap();
     if content_bytes != catch_content_bytes {
       let content_bytes =
         insert_worker_cache(&worker_cache, resolved_path.to_string(), content_bytes);
-      emit_worker_file(resolved_path, &file_name, content_bytes, context);
+      emit_worker_file(module_id, &file_name, content_bytes, context);
     }
   }
 
@@ -362,49 +358,5 @@ impl Plugin for FarmfePluginWorker {
       }));
     }
     return Ok(None);
-  }
-
-  fn plugin_cache_loaded(
-    &self,
-    cache: &Vec<u8>,
-    context: &Arc<CompilationContext>,
-  ) -> farmfe_core::error::Result<Option<()>> {
-    let cached_static_assets = deserialize!(cache, CachedStaticAssets);
-
-    for asset in cached_static_assets.list {
-      println!("plugin_cache_loaded emit_file: {:?}", asset.name);
-      if let ResourceOrigin::Module(m) = asset.origin {
-        context.emit_file(EmitFileParams {
-          resolved_path: m.to_string(),
-          name: asset.name,
-          content: asset.bytes,
-          resource_type: asset.resource_type,
-        });
-      }
-    }
-
-    Ok(Some(()))
-  }
-  fn write_plugin_cache(
-    &self,
-    context: &Arc<CompilationContext>,
-  ) -> farmfe_core::error::Result<Option<Vec<u8>>> {
-    let mut list = vec![];
-    let resources_map = context.resources_map.lock();
-    for (key, resource) in resources_map.iter() {
-      println!("write_plugin_cache: {:?}", key);
-      if let ResourceOrigin::Module(m) = &resource.origin {
-        if context.cache_manager.module_cache.has_cache(m) {
-          list.push(resource.clone());
-        }
-      }
-    }
-
-    if !list.is_empty() {
-      let cached_static_assets = CachedStaticAssets { list };
-      Ok(Some(serialize!(&cached_static_assets)))
-    } else {
-      Ok(None)
-    }
   }
 }
