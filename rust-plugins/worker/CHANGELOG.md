@@ -1,5 +1,11 @@
 # @farmfe/plugin-worker
 
+## 0.0.4
+
+### Patch Changes
+
+- persistentCache build file is empty
+
 ## 0.0.3
 
 ### Patch Changes
