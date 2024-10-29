@@ -12,10 +12,7 @@ use farmfe_compiler::Compiler;
 use farmfe_core::{
   cache_item,
   config::{
-    config_regex::ConfigRegex,
-    partial_bundling::{PartialBundlingConfig, PartialBundlingEnforceResourceConfig},
-    persistent_cache::PersistentCacheConfig,
-    Config, ModuleFormat, OutputConfig, TargetEnv,
+    self, config_regex::ConfigRegex, partial_bundling::{PartialBundlingConfig, PartialBundlingEnforceResourceConfig}, persistent_cache::PersistentCacheConfig, Config, ModuleFormat, OutputConfig, TargetEnv
   },
   context::{CompilationContext, EmitFileParams},
   deserialize,
@@ -27,10 +24,32 @@ use farmfe_core::{
   serialize,
 };
 use farmfe_macro_plugin::farm_plugin;
-use farmfe_toolkit::fs::transform_output_filename;
-use regress::Regex as JsRegex;
+use farmfe_toolkit::{fs::transform_output_filename, pluginutils::normalize_path};
+use farmfe_utils::relative;
+use regress::{Match, Regex as JsRegex};
 
 const WORKER_OR_SHARED_WORKER_RE: &str = r#"(?:\?|&)(worker|sharedworker)(?:&|$)"#;
+const WORKER_IMPORT_META_URL_RE: &str = r#"/\bnew\s+(?:Worker|SharedWorker)\s*\(\s*(new\s+URL\s*\(\s*('[^']+'|"[^"]+"|`[^`]+`)\s*,\s*import\.meta\.url\s*\))/dg"#;
+
+fn match_global(regex_str: &str, text: &str) -> Vec<Match> {
+  let re = JsRegex::new(regex_str).unwrap();
+  let mut matchs: Vec<Match> = Vec::new();
+  let mut start = 0;
+  loop {
+    let m = re.find_from(text, start).next();
+    match m {
+      Some(m) => {
+        matchs.push(m.clone());
+        start = m.range().end;
+        if start >= text.len() {
+          break;
+        }
+      }
+      None => break,
+    }
+  }
+  matchs
+}
 
 fn merge_json(a: &mut Value, b: Value, exclude: &HashSet<&str>) {
   match (a, b) {
@@ -369,6 +388,38 @@ impl Plugin for FarmfePluginWorker {
     return Ok(None);
   }
 
+  fn transform(
+    &self,
+    param: &farmfe_core::plugin::PluginTransformHookParam,
+    context: &Arc<CompilationContext>,
+  ) -> farmfe_core::error::Result<Option<farmfe_core::plugin::PluginTransformHookResult>> {
+    let matchs = match_global(WORKER_IMPORT_META_URL_RE, &param.content);
+    matchs.iter().for_each(|m| {
+      let args = &m.captures[0].clone().unwrap();
+      let worker_url = &m.captures[1].clone().unwrap();
+      let arg_code = &param.content[args.start..args.end];
+      let worker_url_code = &param.content[worker_url.start..worker_url.end];
+
+      if arg_code.contains("`") && arg_code.contains("&{") {
+        println!("new URL(url, import.meta.url) is not supported in dynamic template string.")
+      } else {
+        let compiler_config = self.options.compiler_config.as_ref().unwrap();
+        let worker_url = &worker_url_code[1..worker_url_code.len() - 1];
+        if worker_url.starts_with(".") {
+          let full_worker_path = Path::new(param.resolved_path).join(worker_url);
+          let full_worker_path = full_worker_path.to_string_lossy().to_string();
+          let content = build_worker(&full_worker_path, &full_worker_path, compiler_config);
+          let new_worker_url = relative(&context.config.root, &full_worker_path);
+          // update param content
+          // worker_url_code -> new_worker_url
+        }
+      }
+    });
+    return Ok(None);
+  }
+
+  //
+
   fn plugin_cache_loaded(
     &self,
     cache: &Vec<u8>,
@@ -411,3 +462,27 @@ impl Plugin for FarmfePluginWorker {
     }
   }
 }
+
+// struct WorkerFinder {
+//   found: bool,
+//   worker_url: String,
+// }
+
+// impl Visit for WorkerFinder {
+//   fn visit_new_expr(&mut self, n: &NewExpr) {
+//     if let Some(Ident { sym, .. }) = &n.callee.as_ident() {
+//       if sym == "Worker" || sym == "SharedWorker" {
+//         self.found = true;
+//         self.worker_url = n
+//           .args
+//           .get(0)
+//           .unwrap()
+//           .expr
+//           .as_lit()
+//           .unwrap()
+//           .value
+//           .to_string();
+//       }
+//     }
+//   }
+// }
