@@ -1,4 +1,4 @@
-import { defineConfig } from "@farmfe/core";
+import { defineConfig, UserConfig } from "@farmfe/core";
 import react from '@farmfe/plugin-react';
 import farmPlugin from '@farmfe/plugin-worker';
 export default defineConfig({
@@ -6,18 +6,22 @@ export default defineConfig({
     input: {
       index: "./index.html",
     },
-    persistentCache: false,
+    minify: false,
+    persistentCache: true,
     progress: false,
   },
   plugins: [
     react({ runtime: "automatic" }),
     farmPlugin({
-      isBuild: true,
+      isBuild: false,
       compilerConfig:{
+        presetEnv: true,
         output:{
-          assetsFilename: '[resourceName].worker.[hash].[ext]',
-        }
-      }
+          assetsFilename: 'asserts/[resourceName].[hash].[ext]',
+        },
+        minify: false,
+        treeShaking: false,
+      } as UserConfig['compilation']
     })
   ],
 });

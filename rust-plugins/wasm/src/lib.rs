@@ -1,17 +1,25 @@
 #![deny(clippy::all)]
 
 use farmfe_core::{
+  cache_item,
   config::Config,
-  context::EmitFileParams,
+  context::{CompilationContext, EmitFileParams},
+  deserialize,
   module::ModuleType,
   plugin::{Plugin, PluginLoadHookResult, PluginResolveHookResult},
-  resource::ResourceType,
+  resource::{Resource, ResourceOrigin, ResourceType},
+  serialize,
 };
-use std::{fs, path::Path};
+use std::{fs, path::Path, sync::Arc};
 
 use farmfe_macro_plugin::farm_plugin;
 use farmfe_toolkit::fs::transform_output_filename;
 const WASM_HELPER_ID_FARM: &str = "farm/wasm-helper.js";
+
+#[cache_item]
+struct CachedStaticAssets {
+  list: Vec<Resource>,
+}
 
 #[farm_plugin]
 pub struct FarmfePluginWasm {}
@@ -40,15 +48,15 @@ impl Plugin for FarmfePluginWasm {
       }));
     }
 
-    if id.ends_with(".wasm?init") {
-      return Ok(Some(PluginResolveHookResult {
-        resolved_path: id.replace("?init", ""),
-        query: vec![("init".to_string(), "".to_string())]
-          .into_iter()
-          .collect(),
-        ..Default::default()
-      }));
-    }
+    // if id.ends_with(".wasm?init") {
+    //   return Ok(Some(PluginResolveHookResult {
+    //     resolved_path: id.replace("?init", ""),
+    //     query: vec![("init".to_string(), "".to_string())]
+    //       .into_iter()
+    //       .collect(),
+    //     ..Default::default()
+    //   }));
+    // }
 
     // if id.ends_with(".wasm?url") {
     //   return Ok(Some(PluginResolveHookResult {
@@ -87,23 +95,19 @@ impl Plugin for FarmfePluginWasm {
         .unwrap();
       let (file_name, ext) = file_name_ext.split_once(".").unwrap();
       let assets_filename_config = context.config.output.assets_filename.clone();
-      let file_name = transform_output_filename(
-        assets_filename_config,
-        &file_name,
-        file_name.as_bytes(),
-        ext,
-      );
       let wasm_url = if !context.config.output.public_path.is_empty() {
         let normalized_public_path = context.config.output.public_path.trim_end_matches("/");
         format!("{}/{}", normalized_public_path, file_name)
       } else {
         format!("/{}", file_name)
       };
+      let file_name =
+        transform_output_filename(assets_filename_config, &file_name, param.module_id.as_bytes(), ext);
       let params = EmitFileParams {
         name: file_name,
         content,
         resource_type: ResourceType::Asset("wasm".to_string()),
-        resolved_path: param.resolved_path.to_string(),
+        resolved_path: param.module_id.to_string(),
       };
       context.emit_file(params);
       let mut _code = String::new();
@@ -128,5 +132,47 @@ impl Plugin for FarmfePluginWasm {
       }));
     }
     Ok(None)
+  }
+
+  fn plugin_cache_loaded(
+    &self,
+    cache: &Vec<u8>,
+    context: &Arc<CompilationContext>,
+  ) -> farmfe_core::error::Result<Option<()>> {
+    let cached_static_assets = deserialize!(cache, CachedStaticAssets);
+
+    for asset in cached_static_assets.list {
+      if let ResourceOrigin::Module(m) = asset.origin {
+        context.emit_file(EmitFileParams {
+          resolved_path: m.to_string(),
+          name: asset.name,
+          content: asset.bytes,
+          resource_type: asset.resource_type,
+        });
+      }
+    }
+
+    Ok(Some(()))
+  }
+  fn write_plugin_cache(
+    &self,
+    context: &Arc<CompilationContext>,
+  ) -> farmfe_core::error::Result<Option<Vec<u8>>> {
+    let mut list = vec![];
+    let resources_map = context.resources_map.lock();
+    for (_, resource) in resources_map.iter() {
+      if let ResourceOrigin::Module(m) = &resource.origin {
+        if context.cache_manager.module_cache.has_cache(m) {
+          list.push(resource.clone());
+        }
+      }
+    }
+
+    if !list.is_empty() {
+      let cached_static_assets = CachedStaticAssets { list };
+      Ok(Some(serialize!(&cached_static_assets)))
+    } else {
+      Ok(None)
+    }
   }
 }

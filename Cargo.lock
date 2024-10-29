@@ -1106,6 +1106,7 @@ dependencies = [
  "farmfe_macro_plugin",
  "farmfe_toolkit",
  "farmfe_toolkit_plugin_types",
+ "rkyv",
 ]
 
 [[package]]
@@ -1120,6 +1121,7 @@ dependencies = [
  "farmfe_toolkit_plugin_types",
  "farmfe_utils",
  "regress",
+ "rkyv",
  "serde",
 ]
 

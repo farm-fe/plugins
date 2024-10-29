@@ -16,3 +16,4 @@ farmfe_compiler = "0.0.11"
 serde = "1.0.213"
 regress = "0.10.1"
 base64 = "0.22.1"
+rkyv = { version = "0.7.42" }

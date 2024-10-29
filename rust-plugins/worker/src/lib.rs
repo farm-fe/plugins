@@ -1,38 +1,73 @@
 #![deny(clippy::all)]
 mod cache;
-use std::{collections::HashMap, path::Path};
+use std::{
+  collections::{HashMap, HashSet},
+  path::Path,
+  sync::Arc,
+};
 
 use base64::{engine::general_purpose, Engine};
 use cache::WorkerCache;
 use farmfe_compiler::Compiler;
 use farmfe_core::{
+  cache_item,
   config::{
-    bool_or_obj,
     config_regex::ConfigRegex,
     partial_bundling::{PartialBundlingConfig, PartialBundlingEnforceResourceConfig},
+    persistent_cache::PersistentCacheConfig,
     Config, ModuleFormat, OutputConfig, TargetEnv,
   },
-  context::EmitFileParams,
+  context::{CompilationContext, EmitFileParams},
+  deserialize,
   module::ModuleType,
-  plugin::{Plugin, PluginLoadHookResult, PluginTransformHookResult},
-  resource::ResourceType,
-  serde, serde_json,
+  plugin::{Plugin, PluginLoadHookResult},
+  resource::{Resource, ResourceOrigin, ResourceType},
+  serde,
+  serde_json::{self, to_value, Map, Value},
+  serialize,
 };
 use farmfe_macro_plugin::farm_plugin;
 use farmfe_toolkit::fs::transform_output_filename;
 use regress::Regex as JsRegex;
-use serde::{Deserialize, Serialize};
 
 const WORKER_OR_SHARED_WORKER_RE: &str = r#"(?:\?|&)(worker|sharedworker)(?:&|$)"#;
-const INLINE_RE: &str = r#"[?&]inline\b"#;
 
-fn build_worker(resolved_path: &str, compiler_config: &Config) -> Vec<u8> {
-  let (_worker_url, full_file_name) = get_worker_url(resolved_path, compiler_config);
+fn merge_json(a: &mut Value, b: Value, exclude: &HashSet<&str>) {
+  match (a, b) {
+    (Value::Object(ref mut a_map), Value::Object(b_map)) => {
+      for (k, v) in b_map {
+        if !exclude.contains(k.as_str()) {
+          merge_json(a_map.entry(k).or_insert(Value::Null), v, exclude);
+        }
+      }
+    }
+    (Value::Array(ref mut a_arr), Value::Array(b_arr)) => {
+      a_arr.extend(b_arr);
+    }
+    (a, b) => {
+      *a = b;
+    }
+  }
+}
+fn merge_configs(
+  config1: Config,
+  config2: Value,
+  exclude: &HashSet<&str>,
+) -> Result<Config, serde_json::Error> {
+  let mut val1 = to_value(config1)?;
+
+  merge_json(&mut val1, config2, exclude);
+
+  serde_json::from_value(val1)
+}
+fn build_worker(resolved_path: &str, module_id: &str, compiler_config: &Config) -> Vec<u8> {
+  let (_worker_url, full_file_name) = get_worker_url(resolved_path, module_id, compiler_config);
   let mut input = HashMap::new();
   input.insert(full_file_name.clone(), resolved_path.to_string());
   let compiler = Compiler::new(
     Config {
       input,
+      persistent_cache: Box::new(PersistentCacheConfig::Bool(false)),
       partial_bundling: Box::new(PartialBundlingConfig {
         enforce_resources: vec![PartialBundlingEnforceResourceConfig {
           name: full_file_name.to_string(),
@@ -44,7 +79,7 @@ fn build_worker(resolved_path: &str, compiler_config: &Config) -> Vec<u8> {
         target_env: TargetEnv::Custom("library-browser".to_string()),
         ..*compiler_config.output.clone()
       }),
-      minify: Box::new(bool_or_obj::BoolOrObj::Bool(false)),
+      lazy_compilation: false,
       ..compiler_config.clone()
     },
     vec![],
@@ -59,13 +94,13 @@ fn build_worker(resolved_path: &str, compiler_config: &Config) -> Vec<u8> {
 }
 
 fn emit_worker_file(
-  resolved_path: &str,
+  module_id: &str,
   file_name: &str,
   content_bytes: Vec<u8>,
   context: &std::sync::Arc<farmfe_core::context::CompilationContext>,
 ) {
   let params = EmitFileParams {
-    resolved_path: resolved_path.to_string(),
+    resolved_path: module_id.to_string(),
     content: content_bytes,
     name: file_name.to_string(),
     resource_type: ResourceType::Js,
@@ -73,17 +108,23 @@ fn emit_worker_file(
   context.emit_file(params);
 }
 
-fn get_worker_url(resolved_path: &str, compiler_config: &Config) -> (String, String) {
+fn get_worker_url(
+  resolved_path: &str,
+  module_id: &str,
+  compiler_config: &Config,
+) -> (String, String) {
   let file_name_ext = Path::new(resolved_path)
     .file_name()
     .map(|x| x.to_string_lossy().to_string())
     .unwrap();
   let (file_name, ext) = file_name_ext.split_once(".").unwrap();
   let assets_filename_config = compiler_config.output.assets_filename.clone();
+
+  // hash_bytes = resolved_path + file_name_ext bytes ,make sure that the files of the same name in different directory will not be covered;
   let file_name = transform_output_filename(
     assets_filename_config,
     &file_name,
-    file_name.as_bytes(),
+    module_id.as_bytes(),
     ext,
   );
   // worker.ts -> worker.js
@@ -104,6 +145,7 @@ struct ProcessWorkerParam<'a> {
   resolved_path: &'a str,
   module_id: &'a str,
   is_build: bool,
+  is_inline: bool,
   compiler_config: &'a Config,
   worker_cache: &'a WorkerCache,
   is_url: bool,
@@ -118,23 +160,23 @@ fn process_worker(param: ProcessWorkerParam) -> String {
     worker_cache,
     resolved_path,
     is_url,
+    is_inline,
     context,
   } = param;
 
-  let (worker_url, file_name) = get_worker_url(resolved_path, compiler_config);
-
-  let content_bytes = build_worker(resolved_path, &compiler_config);
+  let (worker_url, file_name) = get_worker_url(resolved_path, module_id, compiler_config);
+  let content_bytes = build_worker(resolved_path, module_id, &compiler_config);
 
   if worker_cache.get(resolved_path).is_none() {
     let content_bytes =
       insert_worker_cache(&worker_cache, resolved_path.to_string(), content_bytes);
-    emit_worker_file(resolved_path, &file_name, content_bytes, context);
+    emit_worker_file(module_id, &file_name, content_bytes, context);
   } else {
     let catch_content_bytes = worker_cache.get(resolved_path).unwrap();
     if content_bytes != catch_content_bytes {
       let content_bytes =
         insert_worker_cache(&worker_cache, resolved_path.to_string(), content_bytes);
-      emit_worker_file(resolved_path, &file_name, content_bytes, context);
+      emit_worker_file(module_id, &file_name, content_bytes, context);
     }
   }
 
@@ -162,8 +204,7 @@ fn process_worker(param: ProcessWorkerParam) -> String {
     _ => "{name: options?.name}",
   };
   if is_build {
-    let worker_inline_match = JsRegex::new(INLINE_RE).unwrap().find(&param.module_id);
-    if worker_inline_match.is_some() {
+    if is_inline {
       let content_bytes = worker_cache.get(resolved_path).unwrap();
       let content_base64 = general_purpose::STANDARD.encode(content_bytes);
       let content_base64_code = format!(r#"const encodedJs = "{}";"#, content_base64);
@@ -227,6 +268,7 @@ fn process_worker(param: ProcessWorkerParam) -> String {
   if is_url {
     return format!(r#"export default "{}""#, worker_url);
   }
+
   return format!(
     r#"
       export default function WorkerWrapper(options) {{
@@ -244,7 +286,12 @@ fn insert_worker_cache(worker_cache: &WorkerCache, key: String, content_bytes: V
   worker_cache.get(&key).unwrap()
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[cache_item]
+struct CachedStaticAssets {
+  list: Vec<Resource>,
+}
+
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 #[serde(rename_all = "camelCase")]
 struct Options {
   is_build: Option<bool>,
@@ -258,13 +305,26 @@ pub struct FarmfePluginWorker {
 }
 
 impl FarmfePluginWorker {
-  fn new(_config: &Config, options: String) -> Self {
-    let options: Options = serde_json::from_str(&options).unwrap();
+  fn new(config: &Config, options: String) -> Self {
+    let options: Value = serde_json::from_str(&options).unwrap_or(Value::Object(Map::new()));
+    let mut compiler_config = options
+      .get("compilerConfig")
+      .unwrap_or(&Value::Object(Map::new()))
+      .clone();
+    // Add preset_env to compiler_config if it doesn't exist
+    if let Value::Object(ref mut map) = compiler_config {
+      if !map.contains_key("presetEnv") {
+        map.insert("presetEnv".to_string(), Value::Bool(true));
+      }
+    }
+    let compiler_config =
+      merge_configs(config.clone(), compiler_config, &HashSet::from([])).unwrap();
+    let is_build = options.get("isBuild").and_then(|x| x.as_bool());
     let worker_cache = cache::WorkerCache::new();
     Self {
       options: Options {
-        is_build: Some(options.is_build.unwrap_or(false)),
-        compiler_config: Some(options.compiler_config.unwrap_or(Config::default())),
+        is_build: Some(is_build.unwrap_or(false)),
+        compiler_config: Some(compiler_config),
       },
       worker_cache,
     }
@@ -281,7 +341,7 @@ impl Plugin for FarmfePluginWorker {
   fn load(
     &self,
     param: &farmfe_core::plugin::PluginLoadHookParam,
-    _context: &std::sync::Arc<farmfe_core::context::CompilationContext>,
+    context: &std::sync::Arc<farmfe_core::context::CompilationContext>,
     _hook_context: &farmfe_core::plugin::PluginHookContext,
   ) -> farmfe_core::error::Result<Option<farmfe_core::plugin::PluginLoadHookResult>> {
     if JsRegex::new(WORKER_OR_SHARED_WORKER_RE)
@@ -289,45 +349,65 @@ impl Plugin for FarmfePluginWorker {
       .find(&param.module_id)
       .is_some()
     {
+      let content = process_worker(ProcessWorkerParam {
+        resolved_path: param.resolved_path,
+        module_id: &param.module_id,
+        is_build: self.options.is_build.unwrap(),
+        is_url: param.query.iter().any(|(k, _v)| k == "url"),
+        is_inline: param.query.iter().any(|(k, _v)| k == "inline"),
+        compiler_config: self.options.compiler_config.as_ref().unwrap(),
+        worker_cache: &self.worker_cache,
+        context,
+      });
+
       return Ok(Some(PluginLoadHookResult {
-        content: String::new(),
-        module_type: ModuleType::Custom("worker".to_string()),
+        content,
+        module_type: ModuleType::Js,
         source_map: None,
       }));
     }
     return Ok(None);
   }
 
-  fn transform(
+  fn plugin_cache_loaded(
     &self,
-    param: &farmfe_core::plugin::PluginTransformHookParam,
-    context: &std::sync::Arc<farmfe_core::context::CompilationContext>,
-  ) -> farmfe_core::error::Result<Option<farmfe_core::plugin::PluginTransformHookResult>> {
-    if param.module_type != ModuleType::Custom("worker".to_string()) {
-      return Ok(None);
-    }
-    let worker_match = JsRegex::new(WORKER_OR_SHARED_WORKER_RE)
-      .unwrap()
-      .find(&param.module_id);
-    if worker_match.is_none() {
-      return Ok(None);
+    cache: &Vec<u8>,
+    context: &Arc<CompilationContext>,
+  ) -> farmfe_core::error::Result<Option<()>> {
+    let cached_static_assets = deserialize!(cache, CachedStaticAssets);
+
+    for asset in cached_static_assets.list {
+      if let ResourceOrigin::Module(m) = asset.origin {
+        context.emit_file(EmitFileParams {
+          resolved_path: m.to_string(),
+          name: asset.name,
+          content: asset.bytes,
+          resource_type: asset.resource_type,
+        });
+      }
     }
 
-    let code = process_worker(ProcessWorkerParam {
-      resolved_path: param.resolved_path,
-      module_id: &param.module_id,
-      is_build: self.options.is_build.unwrap(),
-      is_url: param.query.iter().any(|(k, _v)| k == "url"),
-      compiler_config: self.options.compiler_config.as_ref().unwrap(),
-      worker_cache: &self.worker_cache,
-      context,
-    });
+    Ok(Some(()))
+  }
+  fn write_plugin_cache(
+    &self,
+    context: &Arc<CompilationContext>,
+  ) -> farmfe_core::error::Result<Option<Vec<u8>>> {
+    let mut list = vec![];
+    let resources_map = context.resources_map.lock();
+    for (_, resource) in resources_map.iter() {
+      if let ResourceOrigin::Module(m) = &resource.origin {
+        if context.cache_manager.module_cache.has_cache(m) {
+          list.push(resource.clone());
+        }
+      }
+    }
 
-    return Ok(Some(PluginTransformHookResult {
-      content: code,
-      module_type: Some(ModuleType::Js),
-      source_map: None,
-      ..Default::default()
-    }));
+    if !list.is_empty() {
+      let cached_static_assets = CachedStaticAssets { list };
+      Ok(Some(serialize!(&cached_static_assets)))
+    } else {
+      Ok(None)
+    }
   }
 }
