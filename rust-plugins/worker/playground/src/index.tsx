@@ -10,8 +10,7 @@ worker.postMessage([5, 5]);
 worker.onmessage = (e) => {
   console.log(e.data);
 }
-const s = "vue"
-const worker2 = new Worker(new URL(`./worker/vue.worker.ts`,import.meta.url))
+const worker2 = new Worker(new URL("./worker/vue.worker.ts",import.meta.url))
 
 worker2.postMessage([2, 3]);
 worker2.onmessage = (e) => {

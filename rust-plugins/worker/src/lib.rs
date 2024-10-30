@@ -400,7 +400,8 @@ impl Plugin for FarmfePluginWorker {
     if matchs.is_empty() {
       return Ok(None);
     }
-    let mut full_new_worker_url = String::new();
+    let mut content = String::new();
+    let mut last_end = 0;
     matchs.iter().for_each(|m: &Match| {
       let args = &m.captures[0].clone().unwrap();
       let worker_url = &m.captures[1].clone().unwrap();
@@ -428,11 +429,20 @@ impl Plugin for FarmfePluginWorker {
             worker_url_code.to_string(),
             content_bytes,
           );
-          emit_worker_file(&full_worker_path, &new_worker_url, content_bytes, context);
+          let (worker_url,filename)= get_worker_url(&full_worker_path, &new_worker_url, compiler_config);
+          emit_worker_file(&full_worker_path, &filename, content_bytes, context);
+          content.push_str(&param.content[last_end..args.start]);
+          content.push_str(&arg_code.replace(worker_url_code, &format!(r#""{}""#, &worker_url)));
+          last_end = args.end;
         }
       }
     });
-    return Ok(None);
+    content.push_str(&param.content[last_end..]);
+    return Ok(Some(PluginTransformHookResult {
+      content,
+      module_type: Some(param.module_type.clone()),
+      ..Default::default()
+    }));
   }
 
   fn plugin_cache_loaded(
