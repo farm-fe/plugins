@@ -10,9 +10,8 @@ fn test_regex() {
   assert_eq!(re.find(test_str).is_some(), true);
 
   //   let re = Regex::new(WORKER_IMPORT_META_URL_RE).unwrap();
-  let test_str = r#"
-  const s = new Worker(new URL("worker1.js", import.meta.url));
-  const m = new Worker(new URL('worker2.js', import.meta.url))"#;
+  let test_str = r#"import React from 'react';\nimport { createRoot } from 'react-dom/client';\nimport { Main } from './main';\nimport TestWorker from \"./worker/test.worker?worker\"\nimport './index.css'\n\nconsole.log(TestWorker);\nconst worker = new TestWorker();\nworker.postMessage([5, 5]);\nworker.onmessage = (e) => {\n  console.log(e.data);\n}\nconst s = \"vue\"\nconst worker2 = new Worker(new URL(`./worker/${s}.worker.ts`,import.meta.url))\n\nworker2.postMessage([2, 3]);\nworker2.onmessage = (e) => {\n  console.log(e.data);\n}\n\nconst container = document.querySelector('#root');\nconst root = createRoot(container);\n\nroot.render(<Main />);\n"#;
+  
   //   for c in re.find(&test_str).unwrap().groups() {
   //     println!("{:?}", &test_str[c.unwrap()]);
   //     // 我需要递归这个 test_str 后续的字符

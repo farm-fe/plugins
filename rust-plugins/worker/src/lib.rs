@@ -12,12 +12,15 @@ use farmfe_compiler::Compiler;
 use farmfe_core::{
   cache_item,
   config::{
-    self, config_regex::ConfigRegex, partial_bundling::{PartialBundlingConfig, PartialBundlingEnforceResourceConfig}, persistent_cache::PersistentCacheConfig, Config, ModuleFormat, OutputConfig, TargetEnv
+    config_regex::ConfigRegex,
+    partial_bundling::{PartialBundlingConfig, PartialBundlingEnforceResourceConfig},
+    persistent_cache::PersistentCacheConfig,
+    Config, ModuleFormat, OutputConfig, TargetEnv,
   },
   context::{CompilationContext, EmitFileParams},
   deserialize,
-  module::ModuleType,
-  plugin::{Plugin, PluginLoadHookResult},
+  module::{ModuleId, ModuleType},
+  plugin::{Plugin, PluginLoadHookResult, PluginTransformHookResult},
   resource::{Resource, ResourceOrigin, ResourceType},
   serde,
   serde_json::{self, to_value, Map, Value},
@@ -29,7 +32,7 @@ use farmfe_utils::relative;
 use regress::{Match, Regex as JsRegex};
 
 const WORKER_OR_SHARED_WORKER_RE: &str = r#"(?:\?|&)(worker|sharedworker)(?:&|$)"#;
-const WORKER_IMPORT_META_URL_RE: &str = r#"/\bnew\s+(?:Worker|SharedWorker)\s*\(\s*(new\s+URL\s*\(\s*('[^']+'|"[^"]+"|`[^`]+`)\s*,\s*import\.meta\.url\s*\))/dg"#;
+const WORKER_IMPORT_META_URL_RE: &str = r#"\bnew\s+(?:Worker|SharedWorker)\s*\(\s*(new\s+URL\s*\(\s*('[^']+'|"[^"]+"|`[^`]+`)\s*,\s*import\.meta\.url\s*\))"#;
 
 fn match_global(regex_str: &str, text: &str) -> Vec<Match> {
   let re = JsRegex::new(regex_str).unwrap();
@@ -394,24 +397,40 @@ impl Plugin for FarmfePluginWorker {
     context: &Arc<CompilationContext>,
   ) -> farmfe_core::error::Result<Option<farmfe_core::plugin::PluginTransformHookResult>> {
     let matchs = match_global(WORKER_IMPORT_META_URL_RE, &param.content);
-    matchs.iter().for_each(|m| {
+    if matchs.is_empty() {
+      return Ok(None);
+    }
+    let mut full_new_worker_url = String::new();
+    matchs.iter().for_each(|m: &Match| {
       let args = &m.captures[0].clone().unwrap();
       let worker_url = &m.captures[1].clone().unwrap();
       let arg_code = &param.content[args.start..args.end];
       let worker_url_code = &param.content[worker_url.start..worker_url.end];
-
-      if arg_code.contains("`") && arg_code.contains("&{") {
+      if arg_code.contains("`") && arg_code.contains("${") {
         println!("new URL(url, import.meta.url) is not supported in dynamic template string.")
       } else {
         let compiler_config = self.options.compiler_config.as_ref().unwrap();
         let worker_url = &worker_url_code[1..worker_url_code.len() - 1];
+        println!("raw url: {}", worker_url);
         if worker_url.starts_with(".") {
-          let full_worker_path = Path::new(param.resolved_path).join(worker_url);
-          let full_worker_path = full_worker_path.to_string_lossy().to_string();
-          let content = build_worker(&full_worker_path, &full_worker_path, compiler_config);
+          let module_id = ModuleId::from(worker_url);
+          let parent = Path::new(param.resolved_path)
+            .parent()
+            .unwrap()
+            .to_string_lossy()
+            .to_string();
+          let full_worker_path = module_id.resolved_path(&parent);
+          let content_bytes = build_worker(&full_worker_path, &full_worker_path, compiler_config);
           let new_worker_url = relative(&context.config.root, &full_worker_path);
           // update param content
           // worker_url_code -> new_worker_url
+          let content_bytes = insert_worker_cache(
+            &self.worker_cache,
+            worker_url_code.to_string(),
+            content_bytes,
+          );
+          emit_worker_file(&full_worker_path, &new_worker_url, content_bytes, context);
+          full_new_worker_url = new_worker_url;
         }
       }
     });
