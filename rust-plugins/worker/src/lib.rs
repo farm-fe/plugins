@@ -189,15 +189,15 @@ fn process_worker(param: ProcessWorkerParam) -> String {
   let (worker_url, file_name) = get_worker_url(resolved_path, module_id, compiler_config);
   let content_bytes = build_worker(resolved_path, module_id, &compiler_config);
 
-  if worker_cache.get(resolved_path).is_none() {
+  if worker_cache.get(&file_name).is_none() {
     let content_bytes =
-      insert_worker_cache(&worker_cache, resolved_path.to_string(), content_bytes);
+      insert_worker_cache(&worker_cache, file_name.to_string(), content_bytes);
     emit_worker_file(module_id, &file_name, content_bytes, context);
   } else {
-    let catch_content_bytes = worker_cache.get(resolved_path).unwrap();
+    let catch_content_bytes = worker_cache.get(&file_name).unwrap();
     if content_bytes != catch_content_bytes {
       let content_bytes =
-        insert_worker_cache(&worker_cache, resolved_path.to_string(), content_bytes);
+        insert_worker_cache(&worker_cache, file_name.to_string(), content_bytes);
       emit_worker_file(module_id, &file_name, content_bytes, context);
     }
   }
@@ -424,14 +424,9 @@ impl Plugin for FarmfePluginWorker {
           let new_worker_url = relative(&context.config.root, &full_worker_path);
           // update param content
           // worker_url_code -> new_worker_url
-          let content_bytes = insert_worker_cache(
-            &self.worker_cache,
-            worker_url_code.to_string(),
-            content_bytes,
-          );
           let (worker_url, filename) =
             get_worker_url(&full_worker_path, &new_worker_url, compiler_config);
-          emit_worker_file(&full_worker_path, &filename, content_bytes, context);
+          emit_worker_file(&param.module_id, &filename, content_bytes, context);
           content.push_str(&param.content[last_end..args.start]);
           content.push_str(&arg_code.replace(worker_url_code, &format!(r#""{}""#, &worker_url)));
           last_end = args.end;

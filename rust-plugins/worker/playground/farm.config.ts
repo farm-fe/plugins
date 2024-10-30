@@ -7,7 +7,7 @@ export default defineConfig({
       index: "./index.html",
     },
     minify: false,
-    persistentCache: false,
+    persistentCache: true,
     progress: false,
   },
   plugins: [

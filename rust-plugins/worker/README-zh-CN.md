@@ -22,7 +22,7 @@ export default defineConfig({
 });
 ```
 
-## 🚧 通过构造器导入
+## 通过构造器导入
 
 一个 Web Worker 可以使用 [`new Worker()`](https://developer.mozilla.org/zh-CN/docs/Web/API/Web_Workers_API/Using_web_workers) 和 [`new SharedWorker()`](https://developer.mozilla.org/zh-CN/docs/Web/API/SharedWorker) 导入。与 worker 后缀相比，这种语法更接近于标准，是创建 worker 的 推荐 方式。
 

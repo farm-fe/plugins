@@ -22,7 +22,7 @@ export default defineConfig({
 });
 ```
 
-## 🚧 Import via Constructor
+## Import via Constructor
 
 A Web Worker can be imported using [`new Worker()`](https://developer.mozilla.org/zh-CN/docs/Web/API/Web_Workers_API/Using_web_workers) and [`new SharedWorker()`](https://developer.mozilla.org/zh-CN/docs/Web/API/SharedWorker). This syntax is closer to the standard compared to the worker suffix and is the recommended way to create workers.
 

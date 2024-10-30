@@ -1,11 +1,11 @@
-import React from 'react';
 import { createRoot } from 'react-dom/client';
 import { Main } from './main';
 import TestWorker from "./worker/test.worker?worker"
 import './index.css'
 
-console.log(TestWorker);
+// console.log(TestWorker);
 const worker = new TestWorker();
+// const worker = new Worker(new URL("/src/worker/test.worker.ts",import.meta.url));
 worker.postMessage([5, 5]);
 worker.onmessage = (e) => {
   console.log(e.data);
@@ -18,6 +18,6 @@ worker2.onmessage = (e) => {
 }
 
 const container = document.querySelector('#root');
-const root = createRoot(container);
+const root = createRoot(container!);
 
 root.render(<Main />);
