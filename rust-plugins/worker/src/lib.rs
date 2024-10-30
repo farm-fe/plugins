@@ -27,7 +27,7 @@ use farmfe_core::{
   serialize,
 };
 use farmfe_macro_plugin::farm_plugin;
-use farmfe_toolkit::{fs::transform_output_filename, pluginutils::normalize_path};
+use farmfe_toolkit::fs::transform_output_filename;
 use farmfe_utils::relative;
 use regress::{Match, Regex as JsRegex};
 
@@ -429,11 +429,16 @@ impl Plugin for FarmfePluginWorker {
             worker_url_code.to_string(),
             content_bytes,
           );
-          let (worker_url,filename)= get_worker_url(&full_worker_path, &new_worker_url, compiler_config);
+          let (worker_url, filename) =
+            get_worker_url(&full_worker_path, &new_worker_url, compiler_config);
           emit_worker_file(&full_worker_path, &filename, content_bytes, context);
           content.push_str(&param.content[last_end..args.start]);
           content.push_str(&arg_code.replace(worker_url_code, &format!(r#""{}""#, &worker_url)));
           last_end = args.end;
+          let worker_module_id = ModuleId::new(full_worker_path.as_str(),"",&context.config.root);
+          let self_module_id = ModuleId::new(param.resolved_path,"",&context.config.root);
+          let _ =
+            context.add_watch_files(self_module_id, vec![worker_module_id]);
         }
       }
     });
