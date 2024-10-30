@@ -411,7 +411,6 @@ impl Plugin for FarmfePluginWorker {
       } else {
         let compiler_config = self.options.compiler_config.as_ref().unwrap();
         let worker_url = &worker_url_code[1..worker_url_code.len() - 1];
-        println!("raw url: {}", worker_url);
         if worker_url.starts_with(".") {
           let module_id = ModuleId::from(worker_url);
           let parent = Path::new(param.resolved_path)
@@ -430,14 +429,11 @@ impl Plugin for FarmfePluginWorker {
             content_bytes,
           );
           emit_worker_file(&full_worker_path, &new_worker_url, content_bytes, context);
-          full_new_worker_url = new_worker_url;
         }
       }
     });
     return Ok(None);
   }
-
-  //
 
   fn plugin_cache_loaded(
     &self,
@@ -481,27 +477,3 @@ impl Plugin for FarmfePluginWorker {
     }
   }
 }
-
-// struct WorkerFinder {
-//   found: bool,
-//   worker_url: String,
-// }
-
-// impl Visit for WorkerFinder {
-//   fn visit_new_expr(&mut self, n: &NewExpr) {
-//     if let Some(Ident { sym, .. }) = &n.callee.as_ident() {
-//       if sym == "Worker" || sym == "SharedWorker" {
-//         self.found = true;
-//         self.worker_url = n
-//           .args
-//           .get(0)
-//           .unwrap()
-//           .expr
-//           .as_lit()
-//           .unwrap()
-//           .value
-//           .to_string();
-//       }
-//     }
-//   }
-// }
