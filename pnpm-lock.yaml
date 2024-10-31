@@ -133,6 +133,12 @@ importers:
 
   rust-plugins/virtual: {}
 
+  rust-plugins/vue:
+    devDependencies:
+      '@farmfe/plugin-tools':
+        specifier: latest
+        version: 0.1.1
+
   rust-plugins/wasm:
     devDependencies:
       '@farmfe/plugin-tools':
