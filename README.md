@@ -41,6 +41,10 @@ Thanks go to these wonderful people:
 </a>
 
 
+
+## Community plugins
+[farm-plugin-compression](https://github.com/Weeken/farm-plugin-compression) A rust plugin for farm to compress resources.
+
 ## Credits
 
 Thanks to:
