@@ -8,7 +8,7 @@ export default defineConfig({
     input: {
       index: "./index.html",
     },
-    persistentCache: false,
+    persistentCache: true,
     progress: false,
   },
   plugins: [
@@ -22,7 +22,7 @@ export default defineConfig({
       defaultClass: "icon-color",
       customCollections: {
         local: './src/assets',
-        remote: "https://cdn.simpleicons.org/[iconname]/"
+        remote: "https://cdn.simpleicons.org/[iconname]"
       }
     }),
   ],

@@ -3,6 +3,8 @@ mod compiler;
 mod loader;
 mod options;
 // mod svg_id;
+mod cache;
+use cache::HttpClient;
 use compiler::{get_compiler, get_module_type_by_compiler, CompilerParams, GetCompilerParams};
 use farmfe_core::{
   config::Config,
@@ -30,6 +32,7 @@ const PUBLIC_ICON_PREFIX: &str = "virtual:__FARM_ICON_ASSET__:";
 #[farm_plugin]
 pub struct FarmfePluginIcons {
   options: Options,
+  http_client: HttpClient,
 }
 
 impl FarmfePluginIcons {
@@ -41,9 +44,12 @@ impl FarmfePluginIcons {
         .unwrap_or(config.root.clone()),
     );
 
+    let cache_dir = config.persistent_cache.as_obj(&config.root).cache_dir;
+    let cache_name = "icons";
+    let http_client = HttpClient::new(cache_name, &cache_dir);
     let jsx = options::guess_jsx(&config.root);
-
     Self {
+      http_client,
       options: Options {
         collections_node_resolve_path,
         jsx: Some(jsx),
@@ -177,11 +183,14 @@ impl Plugin for FarmfePluginIcons {
         .and_then(|v| v.as_str());
 
       if custom_collection_path.is_some() {
-        svg_raw = get_svg_by_custom_collections(GetSvgByCustomCollectionsParams {
-          custom_collection_path: custom_collection_path.unwrap().to_string(),
-          icon: meta.icon.clone(),
-          project_dir: root_path.clone(),
-        });
+        svg_raw = get_svg_by_custom_collections(
+          &self.http_client,
+          GetSvgByCustomCollectionsParams {
+            custom_collection_path: custom_collection_path.unwrap().to_string(),
+            icon: meta.icon.clone(),
+            project_dir: root_path.clone(),
+          },
+        );
 
         if !svg_raw.is_empty() {
           svg_raw = svg_builder.apply_to_svg(&svg_raw);
