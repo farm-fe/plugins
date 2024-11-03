@@ -21,7 +21,9 @@ fervid = "0.2.0"
 tokio = { version = "1.38.0", features = ["full"] }
 walkdir = "2.5.0"
 xmltree = "0.10.3"
-reqwest = { version = "0.12.9", features =  ["json", "blocking", "rustls-tls"], default-features = false }
+reqwest = { version = "0.12.9", features = [
+  "rustls-tls",
+], default-features = false }
 cached = { version = "0.53.1", features = ["disk_store"] }
 bincode = "1.3.3"
 loading = "0.4.0"
