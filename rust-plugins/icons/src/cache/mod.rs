@@ -36,7 +36,7 @@ impl HttpClient {
         self.cache.connection().remove(url).unwrap();
       }
     }
-    loading.text(format!("{} icon fetched from network", url));
+    loading.text(format!("Fetching {} icon from network...", url));
     let result = reqwest::get(url).await;
     match result {
       Ok(response) => {
