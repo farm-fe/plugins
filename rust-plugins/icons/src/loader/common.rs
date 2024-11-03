@@ -1,6 +1,6 @@
+use crate::cache::HttpClient;
 use farmfe_core::regex::{self, Regex};
 use farmfe_toolkit::fs::read_file_utf8;
-// use reqwest::Client;
 use serde_json::Value;
 use std::{
   fs::File,
@@ -8,7 +8,7 @@ use std::{
   path::{Path, PathBuf},
   process::Command,
 };
-// use tokio::runtime::Runtime;
+use tokio::runtime::Runtime;
 use walkdir::WalkDir;
 
 pub const URL_PREFIXES: [&str; 4] = ["/~icons/", "~icons/", "virtual:icons/", "virtual/icons/"];
@@ -98,21 +98,24 @@ pub struct GetIconPathDataParams {
   pub auto_install: bool,
 }
 
-pub fn get_svg_by_custom_collections(opt: GetSvgByCustomCollectionsParams) -> String {
+pub fn get_svg_by_custom_collections(
+  http_client: &HttpClient,
+  opt: GetSvgByCustomCollectionsParams,
+) -> String {
   let GetSvgByCustomCollectionsParams {
     custom_collection_path,
-    icon: _icon,
+    icon,
     project_dir,
   } = opt;
   if is_valid_icon_path(&custom_collection_path) {
-    let svg_raw = String::new();
-    // let custom_collection_path = custom_collection_path.replace("[iconname]", &icon);
-    // let rt = Runtime::new().unwrap();
-    // rt.block_on(async {
-    //   if let Ok(res) = get_svg_by_url(&custom_collection_path).await {
-    //     svg_raw = res;
-    //   }
-    // });
+    let mut svg_raw = String::new();
+    let custom_collection_path = custom_collection_path.replace("[iconname]", &icon);
+    let rt = Runtime::new().unwrap();
+    rt.block_on(async {
+      if let Ok(res) = http_client.fetch_data(&custom_collection_path).await {
+        svg_raw = res;
+      }
+    });
     return svg_raw;
   }
   let icons_collection_path = Path::new(&project_dir).join(custom_collection_path);
@@ -139,24 +142,6 @@ pub fn get_svg_by_local_path(path: &str) -> String {
   let svg_raw = read_file_utf8(path).unwrap();
   svg_raw
 }
-// async fn get_svg_by_url(url: &str) -> Result<String, reqwest::Error> {
-//   let client = Client::new();
-//   let res = client.get(url).send().await;
-//   match res {
-//     Ok(response) => {
-//       if response.status().is_success() {
-//         let text = response.text().await?;
-//         Ok(text)
-//       } else {
-//         println!("{} icon fetch err: {:?}", url, response.status());
-//         Ok(String::new())
-//       }
-//     }
-//     Err(e) => {
-//       panic!("icon fetch err: {:?}", e);
-//     }
-//   }
-// }
 
 pub fn get_icon_data_by_iconify(opt: GetIconPathDataParams) -> Value {
   let ResolveResult { collection, icon } = resolve_icons_path(&opt.path);

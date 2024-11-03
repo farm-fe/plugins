@@ -1,5 +1,11 @@
 # @farmfe/plugin-icons
 
+## 0.0.5
+
+### Patch Changes
+
+- feat(rust-plugins): 🎸 icons suport cache and network
+
 ## 0.0.4
 
 ### Patch Changes
