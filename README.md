@@ -34,13 +34,11 @@
 
 
 ## Contributors ✨
+
 Thanks go to these wonderful people:
-
 <a href="https://github.com/farm-fe/plugins/graphs/contributors">
-  <img src="https://contrib.rocks/image?repo=farm-fe/plugins" />
+    <img src="https://contri.buzz/api/wall?repo=farm-fe/plugins" alt="Contributors' Wall for farm-fe/plugins" />
 </a>
-
-
 
 ## Community plugins
 [farm-plugin-compression](https://github.com/Weeken/farm-plugin-compression) A rust plugin for farm to compress resources.
