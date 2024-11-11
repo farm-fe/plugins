@@ -4,8 +4,8 @@ import TestWorker from "./worker/test.worker?worker"
 import './index.css'
 
 // console.log(TestWorker);
-const worker = new TestWorker();
-// const worker = new Worker(new URL("/src/worker/test.worker.ts",import.meta.url));
+// const worker = new TestWorker();
+const worker = new Worker(new URL("/src/worker/test.worker.ts",import.meta.url));
 worker.postMessage([5, 5]);
 worker.onmessage = (e) => {
   console.log(e.data);

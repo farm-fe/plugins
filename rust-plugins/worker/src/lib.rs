@@ -34,26 +34,6 @@ use regress::{Match, Regex as JsRegex};
 const WORKER_OR_SHARED_WORKER_RE: &str = r#"(?:\?|&)(worker|sharedworker)(?:&|$)"#;
 const WORKER_IMPORT_META_URL_RE: &str = r#"\bnew\s+(?:Worker|SharedWorker)\s*\(\s*(new\s+URL\s*\(\s*('[^']+'|"[^"]+"|`[^`]+`)\s*,\s*import\.meta\.url\s*\))"#;
 
-fn match_global(regex_str: &str, text: &str) -> Vec<Match> {
-  let re = JsRegex::new(regex_str).unwrap();
-  let mut matchs: Vec<Match> = Vec::new();
-  let mut start = 0;
-  loop {
-    let m = re.find_from(text, start).next();
-    match m {
-      Some(m) => {
-        matchs.push(m.clone());
-        start = m.range().end;
-        if start >= text.len() {
-          break;
-        }
-      }
-      None => break,
-    }
-  }
-  matchs
-}
-
 fn merge_json(a: &mut Value, b: Value, exclude: &HashSet<&str>) {
   match (a, b) {
     (Value::Object(ref mut a_map), Value::Object(b_map)) => {
@@ -190,14 +170,12 @@ fn process_worker(param: ProcessWorkerParam) -> String {
   let content_bytes = build_worker(resolved_path, module_id, &compiler_config);
 
   if worker_cache.get(&file_name).is_none() {
-    let content_bytes =
-      insert_worker_cache(&worker_cache, file_name.to_string(), content_bytes);
+    let content_bytes = insert_worker_cache(&worker_cache, file_name.to_string(), content_bytes);
     emit_worker_file(module_id, &file_name, content_bytes, context);
   } else {
     let catch_content_bytes = worker_cache.get(&file_name).unwrap();
     if content_bytes != catch_content_bytes {
-      let content_bytes =
-        insert_worker_cache(&worker_cache, file_name.to_string(), content_bytes);
+      let content_bytes = insert_worker_cache(&worker_cache, file_name.to_string(), content_bytes);
       emit_worker_file(module_id, &file_name, content_bytes, context);
     }
   }
@@ -396,13 +374,14 @@ impl Plugin for FarmfePluginWorker {
     param: &farmfe_core::plugin::PluginTransformHookParam,
     context: &Arc<CompilationContext>,
   ) -> farmfe_core::error::Result<Option<farmfe_core::plugin::PluginTransformHookResult>> {
-    let matchs = match_global(WORKER_IMPORT_META_URL_RE, &param.content);
-    if matchs.is_empty() {
+    let re = JsRegex::new(WORKER_IMPORT_META_URL_RE).unwrap();
+    let matches = re.find_iter(&param.content).collect::<Vec<Match>>();
+    if matches.is_empty() {
       return Ok(None);
     }
     let mut content = String::new();
     let mut last_end = 0;
-    matchs.iter().for_each(|m: &Match| {
+    matches.iter().for_each(|m: &Match| {
       let args = &m.captures[0].clone().unwrap();
       let worker_url = &m.captures[1].clone().unwrap();
       let arg_code = &param.content[args.start..args.end];
@@ -412,29 +391,34 @@ impl Plugin for FarmfePluginWorker {
       } else {
         let compiler_config = self.options.compiler_config.as_ref().unwrap();
         let worker_url = &worker_url_code[1..worker_url_code.len() - 1];
-        if worker_url.starts_with(".") {
-          let module_id = ModuleId::from(worker_url);
-          let parent = Path::new(param.resolved_path)
-            .parent()
-            .unwrap()
-            .to_string_lossy()
-            .to_string();
-          let full_worker_path = module_id.resolved_path(&parent);
-          let content_bytes = build_worker(&full_worker_path, &full_worker_path, compiler_config);
-          let new_worker_url = relative(&context.config.root, &full_worker_path);
-          // update param content
-          // worker_url_code -> new_worker_url
-          let (worker_url, filename) =
-            get_worker_url(&full_worker_path, &new_worker_url, compiler_config);
-          emit_worker_file(&param.module_id, &filename, content_bytes, context);
-          content.push_str(&param.content[last_end..args.start]);
-          content.push_str(&arg_code.replace(worker_url_code, &format!(r#""{}""#, &worker_url)));
-          last_end = args.end;
-          let worker_module_id = ModuleId::new(full_worker_path.as_str(),"",&context.config.root);
-          let self_module_id = ModuleId::new(param.resolved_path,"",&context.config.root);
-          let _ =
-            context.add_watch_files(self_module_id, vec![worker_module_id]);
-        }
+        let full_worker_path = match &worker_url[0..1] {
+          "/" => context.config.root.to_string() + worker_url,
+          "." => {
+            let module_id = ModuleId::from(worker_url);
+            let parent = Path::new(param.resolved_path)
+              .parent()
+              .unwrap()
+              .to_string_lossy()
+              .to_string();
+            module_id.resolved_path(&parent)
+          }
+          _ => {
+            panic!("worker url must be start with / or .");
+          }
+        };
+        let content_bytes = build_worker(&full_worker_path, &full_worker_path, compiler_config);
+        let new_worker_url = relative(&context.config.root, &full_worker_path);
+        // update param content
+        // worker_url_code -> new_worker_url
+        let (worker_url, filename) =
+          get_worker_url(&full_worker_path, &new_worker_url, compiler_config);
+        emit_worker_file(&param.module_id, &filename, content_bytes, context);
+        content.push_str(&param.content[last_end..args.start]);
+        content.push_str(&arg_code.replace(worker_url_code, &format!(r#""{}""#, &worker_url)));
+        last_end = args.end;
+        let worker_module_id = ModuleId::new(full_worker_path.as_str(), "", &context.config.root);
+        let self_module_id = ModuleId::new(param.resolved_path, "", &context.config.root);
+        let _ = context.add_watch_files(self_module_id, vec![worker_module_id]);
       }
     });
     content.push_str(&param.content[last_end..]);
