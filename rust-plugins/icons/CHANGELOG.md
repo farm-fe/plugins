@@ -1,5 +1,11 @@
 # @farmfe/plugin-icons
 
+## 0.0.6
+
+### Patch Changes
+
+- refactor: svg builder
+
 ## 0.0.5
 
 ### Patch Changes

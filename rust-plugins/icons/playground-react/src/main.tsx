@@ -23,7 +23,7 @@ export function Main() {
           <div className="i-logos-react text-100px text-#00D8FF"></div>
           <ReactLogoIconify className="text-100px text-#00D8FF" />
           <ReactLogoComponent className="text-100px h-1em w-1em" />
-          <LocalReactLogo className="text-100px h-1em w-1em" />
+          <LocalReactLogo />
           <RemoteComponent className="text-100px h-1em w-1em" />
           <div dangerouslySetInnerHTML={
             {

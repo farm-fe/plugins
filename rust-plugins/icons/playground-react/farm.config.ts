@@ -16,7 +16,7 @@ export default defineConfig({
     visualizer(),
     react(),
     icons({
-      scale: 1,
+      scale: 1.2,
       autoInstall: true,
       compiler: "jsx",
       defaultClass: "icon-color",

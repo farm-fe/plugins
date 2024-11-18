@@ -1,4 +1,4 @@
-use super::svg_modifier::SvgModifier;
+use super::svg_builder::SvgCustomizations;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 
@@ -21,6 +21,6 @@ pub struct IconifyIcon {
 
 #[derive(Deserialize, Default)]
 pub struct IconifyLoaderOptions {
-  pub customizations: Option<SvgModifier>,
+  pub customizations: Option<SvgCustomizations>,
   pub scale: Option<f32>,
 }

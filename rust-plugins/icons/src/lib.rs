@@ -21,7 +21,7 @@ use loader::{
   },
   icon_data::gen_svg_for_icon_data,
   struct_config::{IconifyIcon, IconifyLoaderOptions},
-  svg_modifier::SvgModifier,
+  svg_builder::{SvgBuilder, SvgCustomizations},
 };
 use options::Options;
 use serde_json::Value;
@@ -118,17 +118,17 @@ impl Plugin for FarmfePluginIcons {
   ) -> farmfe_core::error::Result<Option<farmfe_core::plugin::PluginLoadHookResult>> {
     if param.query.iter().any(|(k, _)| k == "component") {
       let query_map = param.query.iter().cloned().collect::<HashMap<_, _>>();
-      let svg_builder = SvgModifier::new(SvgModifier {
-        fill: query_map.get("fill").and_then(|v| v.parse().ok()),
-        stroke: query_map.get("stroke").and_then(|v| v.parse().ok()),
-        stroke_width: query_map.get("stroke-width").and_then(|v| v.parse().ok()),
-        width: query_map.get("width").and_then(|v| v.parse().ok()),
-        height: query_map.get("height").and_then(|v| v.parse().ok()),
-        class: self.options.default_class.clone(),
-        style: self.options.default_style.clone(),
-        view_box: None,
-      });
-      let svg = svg_builder.apply_to_svg(&get_svg_by_local_path(param.resolved_path));
+      let svg_content = get_svg_by_local_path(param.resolved_path);
+      let svg = SvgBuilder::new(&svg_content)
+        .fill(query_map.get("fill").cloned())
+        .stroke(query_map.get("stroke").cloned())
+        .stroke_width(query_map.get("stroke-width").cloned())
+        .width(query_map.get("width").cloned())
+        .height(query_map.get("height").cloned())
+        .class(self.options.default_class.clone())
+        .style(self.options.default_style.clone())
+        .view_box(None)
+        .build();
       let compiler = get_compiler(GetCompilerParams {
         jsx: self.options.jsx.clone().unwrap_or_default(),
         compiler: self.options.compiler.clone().unwrap_or_default(),
@@ -159,16 +159,16 @@ impl Plugin for FarmfePluginIcons {
         compiler: self.options.compiler.clone().unwrap_or_default(),
       });
       let query_map = param.query.iter().cloned().collect::<HashMap<_, _>>();
-      let svg_builder = SvgModifier::new(SvgModifier {
-        fill: query_map.get("fill").and_then(|v| v.parse().ok()),
-        stroke: query_map.get("stroke").and_then(|v| v.parse().ok()),
-        stroke_width: query_map.get("stroke-width").and_then(|v| v.parse().ok()),
-        width: query_map.get("width").and_then(|v| v.parse().ok()),
-        height: query_map.get("height").and_then(|v| v.parse().ok()),
-        class: self.options.default_class.clone(),
-        style: self.options.default_style.clone(),
-        view_box: None,
-      });
+      // let svg_builder = SvgModifier::new(SvgModifier {
+      //   fill: query_map.get("fill").and_then(|v| v.parse().ok()),
+      //   stroke: query_map.get("stroke").and_then(|v| v.parse().ok()),
+      //   stroke_width: query_map.get("stroke-width").and_then(|v| v.parse().ok()),
+      //   width: query_map.get("width").and_then(|v| v.parse().ok()),
+      //   height: query_map.get("height").and_then(|v| v.parse().ok()),
+      //   class: self.options.default_class.clone(),
+      //   style: self.options.default_style.clone(),
+      //   view_box: None,
+      // });
       let meta = resolve_icons_path(source);
       let mut svg_raw = String::new();
       let custom_collections = self
@@ -193,7 +193,16 @@ impl Plugin for FarmfePluginIcons {
         );
 
         if !svg_raw.is_empty() {
-          svg_raw = svg_builder.apply_to_svg(&svg_raw);
+          svg_raw = SvgBuilder::new(&svg_raw)
+            .fill(query_map.get("fill").cloned())
+            .stroke(query_map.get("stroke").cloned())
+            .stroke_width(query_map.get("stroke-width").cloned())
+            .width(query_map.get("width").cloned())
+            .height(query_map.get("height").cloned())
+            .class(self.options.default_class.clone())
+            .style(self.options.default_style.clone())
+            .view_box(None)
+            .build();
         }
       } else {
         let data = get_icon_data_by_iconify(GetIconPathDataParams {
@@ -211,7 +220,7 @@ impl Plugin for FarmfePluginIcons {
         let svg_data_height: Option<i64> = data.get("height").and_then(|v| v.as_i64());
         let svg_data_width: Option<i64> = data.get("width").and_then(|v| v.as_i64());
 
-        let customizations = SvgModifier {
+        let customizations = SvgCustomizations {
           fill: query_map.get("fill").and_then(|v| v.parse().ok()),
           stroke: query_map.get("stroke").and_then(|v| v.parse().ok()),
           stroke_width: query_map.get("stroke-width").and_then(|v| v.parse().ok()),
@@ -221,16 +230,16 @@ impl Plugin for FarmfePluginIcons {
         };
 
         if let Some(raw) = gen_svg_for_icon_data(
-          Some(IconifyIcon {
+          IconifyIcon {
             width: svg_data_width.map(|w| w as i32),
             height: svg_data_height.map(|w| w as i32),
             body: svg_path_str.unwrap_or_default(),
             ..Default::default()
-          }),
-          Some(IconifyLoaderOptions {
+          },
+          IconifyLoaderOptions {
             scale: self.options.scale,
             customizations: Some(customizations),
-          }),
+          },
         ) {
           svg_raw = raw;
         }
