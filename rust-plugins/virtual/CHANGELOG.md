@@ -1,5 +1,11 @@
 # @farmfe/plugin-virtual
 
+## 0.0.8
+
+### Patch Changes
+
+- 3ad90e0: refactor virtual plugin
+
 ## 0.0.7
 
 ### Patch Changes
