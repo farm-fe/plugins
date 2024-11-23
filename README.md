@@ -14,13 +14,13 @@
 | [yaml](rust-plugins/yaml)                         | Convert YAML files to ES6 modules                                                                                                              |
 | [mdx](rust-plugins/mdx)                           | Convert md(x) files to React component                                                                                                         |
 | [react-components](rust-plugins/react-components) | On-demand components auto importing for React                                                                                                  |
+| [svgr](rust-plugins/svgr)                         | React svg component generator                                                                                                                  |
 | [strip](rust-plugins/strip)                       | Remove `debugger` statements and functions like `assert.equal` from your code.                                                                 |
 | [url](rust-plugins/url)                           | Imports files as data-URIs or ES Modules.                                                                                                      |
 | [virtual](rust-plugins/virtual)                   | Load virtual modules from memory                                                                                                               |
 | [icons](rust-plugins/icons)                       | Load Access thousands of icons as components on-demand universally. (Inspired by [unplugin-icons](https://github.com/unplugin/unplugin-icons)) |
-| [wasm](rust-plugins/wasm)                       | Add WebAssembly ESM integration support generated modules. |
-| [worker](rust-plugins/worker)                       | A web worker script can be imported using new Worker() and new SharedWorker().(Inspired by [vite](https://github.com/vitejs/vite)) |
-| [svgr](rust-plugins/svgr)                       | React svg component generator |
+| [wasm](rust-plugins/wasm)                         | Add WebAssembly ESM integration support generated modules.                                                                                     |
+| [worker](rust-plugins/worker)                     | A web worker script can be imported using new Worker() and new SharedWorker().(Inspired by [vite](https://github.com/vitejs/vite))             |
 |                                                   |                                                                                                                                                |
 
 ### JavaScript plugins
