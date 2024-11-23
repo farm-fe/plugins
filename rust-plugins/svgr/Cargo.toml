@@ -1,0 +1,19 @@
+[package]
+edition = "2021"
+name = "farm_plugin_svgr"
+version = "0.0.0"
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+farmfe_core = { workspace = true }
+farmfe_utils = { workspace = true }
+farmfe_toolkit_plugin_types = { workspace = true }
+farmfe_macro_plugin = { workspace = true }
+farmfe_toolkit = { workspace = true }
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+svgr-rs = "0.1.2"
+globset = "0.4"
+xmltree = "0.10.3"

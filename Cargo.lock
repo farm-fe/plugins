@@ -816,6 +816,22 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "5443807d6dff69373d433ab9ef5378ad8df50ca6298caf15de6e52e24aaf54d5"
 
 [[package]]
+name = "farm_plugin_svgr"
+version = "0.0.0"
+dependencies = [
+ "farmfe_core",
+ "farmfe_macro_plugin",
+ "farmfe_toolkit",
+ "farmfe_toolkit_plugin_types",
+ "farmfe_utils",
+ "globset",
+ "serde",
+ "serde_json",
+ "svgr-rs",
+ "xmltree",
+]
+
+[[package]]
 name = "farmfe_compiler"
 version = "0.0.11"
 source = "registry+https://github.com/rust-lang/crates.io-index"

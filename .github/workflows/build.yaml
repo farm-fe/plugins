@@ -123,6 +123,12 @@ jobs:
           name: ${{ github.sha }}-${{ matrix.settings.abi }}-virtual
           path: ./rust-plugins/virtual/npm/${{ matrix.settings.abi }}/index.farm
           if-no-files-found: ignore
+      - name: Upload Plugin svgr
+        uses: actions/upload-artifact@v3
+        with:
+          name: ${{ github.sha }}-${{ matrix.settings.abi }}-svgr
+          path: ./rust-plugins/svgr/npm/${{ matrix.settings.abi }}/index.farm
+          if-no-files-found: ignore
       - name: Upload Plugin yaml
         uses: actions/upload-artifact@v3
         with:
