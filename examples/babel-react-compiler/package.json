@@ -1,0 +1,31 @@
+{
+  "name": "babel-react-compiler",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "private": true,
+  "scripts": {
+    "build": "npx farm build",
+    "start": "npx farm start",
+    "dev": "npm run start"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@farmfe/cli": "^1.0.4",
+    "@farmfe/core": "^1.5.0",
+    "@farmfe/js-plugin-babel": "workspace:*",
+    "@farmfe/js-plugin-react-compiler": "workspace:*",
+    "core-js": "^3.36.1",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
+  },
+  "devDependencies": {
+    "@farmfe/plugin-react": "^1.2.0",
+    "@types/node": "^22.7.4",
+    "@types/react": "19.0.1",
+    "@types/react-dom": "19.0.2",
+    "react-refresh": "^0.14.0"
+  }
+}
