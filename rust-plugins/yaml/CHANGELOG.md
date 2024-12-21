@@ -1,5 +1,11 @@
 # @farmfe/plugin-yaml
 
+## 0.0.9
+
+### Patch Changes
+
+- feat: update farm version
+
 ## 0.0.8
 
 ### Patch Changes

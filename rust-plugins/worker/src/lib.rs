@@ -305,7 +305,7 @@ pub struct FarmfePluginWorker {
 }
 
 impl FarmfePluginWorker {
-  fn new(config: &Config, options: String) -> Self {
+  fn new(_config: &Config, options: String) -> Self {
     let options: Value = serde_json::from_str(&options).unwrap_or(Value::Object(Map::new()));
     let mut compiler_config = options
       .get("compilerConfig")
@@ -317,14 +317,15 @@ impl FarmfePluginWorker {
         map.insert("presetEnv".to_string(), Value::Bool(true));
       }
     }
-    let compiler_config =
-      merge_configs(config.clone(), compiler_config, &HashSet::from([])).unwrap();
+    // TODO merge config
+    // let compiler_config =
+    //   merge_configs(config.clone(), compiler_config, &HashSet::from([])).unwrap();
     let is_build = options.get("isBuild").and_then(|x| x.as_bool());
     let worker_cache = cache::WorkerCache::new();
     Self {
       options: Options {
         is_build: Some(is_build.unwrap_or(false)),
-        compiler_config: Some(compiler_config),
+        compiler_config: serde_json::from_value(compiler_config).ok(),
       },
       worker_cache,
     }
