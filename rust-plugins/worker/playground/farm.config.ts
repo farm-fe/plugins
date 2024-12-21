@@ -7,7 +7,7 @@ export default defineConfig({
       index: "./index.html",
     },
     minify: false,
-    persistentCache: true,
+    persistentCache: false,
     progress: false,
   },
   plugins: [
@@ -19,8 +19,6 @@ export default defineConfig({
         output:{
           assetsFilename: 'asserts/[resourceName].[hash].[ext]',
         },
-        minify: false,
-        treeShaking: false,
       } as UserConfig['compilation']
     })
   ],
