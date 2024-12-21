@@ -1,10 +1,16 @@
 # @farmfe/plugin-worker
 
+## 0.0.7
+
+### Patch Changes
+
+- feat: update farm version
+
 ## 0.0.6
 
 ### Patch Changes
 
-- feat: worker*path suport /src/\**/\_ path
+- feat: worker\*path suport /src/\*\*/\_ path
 
 ## 0.0.5
 

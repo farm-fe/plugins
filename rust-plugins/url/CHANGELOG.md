@@ -1,5 +1,11 @@
 # @farmfe/plugin-url
 
+## 0.0.7
+
+### Patch Changes
+
+- feat: update farm version
+
 ## 0.0.6
 
 ### Patch Changes

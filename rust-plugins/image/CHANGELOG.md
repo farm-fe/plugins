@@ -1,5 +1,11 @@
 # @farmfe/plugin-image
 
+## 0.0.6
+
+### Patch Changes
+
+- feat: update farm version
+
 ## 0.0.5
 
 ### Patch Changes
