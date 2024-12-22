@@ -23,7 +23,7 @@ import react from "@farmfe/plugin-react";
 
 defineConfig({
   plugins: [
-    // transform by compiler, default transform `tsx`, `jsx` files
+    // transform by babel & react compiler, default transform `tsx`, `jsx` files
     reactCompiler(),
     // transform jsx
     react(),

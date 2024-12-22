@@ -23,9 +23,9 @@ import react from "@farmfe/plugin-react";
 
 defineConfig({
   plugins: [
-    // transform by compiler, default transform `tsx`, `jsx` files
+    // transform by babel, default transform `js`, `jsx`, `ts`, `tsx` files
     babel(),
-    // transform jsx
+    // transform react
     react(),
   ],
 });
@@ -40,7 +40,7 @@ defineConfig({
 
 ```ts
 {
-    moduleTypes: ["tsx", "jsx"],
+    moduleTypes: ["js", "jsx", "ts", "tsx"],
     resolvedPaths: []
 }
 ```
