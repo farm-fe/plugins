@@ -1,5 +1,11 @@
 # @farmfe/plugin-yaml
 
+## 0.0.10
+
+### Patch Changes
+
+- chore: update farm version
+
 ## 0.0.9
 
 ### Patch Changes

@@ -1,6 +1,6 @@
 {
   "name": "mdx",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "scripts": {
     "dev": "farm start",
     "start": "farm start",
