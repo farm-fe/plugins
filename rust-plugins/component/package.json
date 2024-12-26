@@ -1,10 +1,24 @@
 {
   "name": "@farmfe/plugin-component",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "main": "scripts/index.js",
   "types": "scripts/index.d.ts",
   "type": "module",
   "license": "MIT",
+  "homepage": "https://github.com/farm-fe/plugins",
+  "author": "asasugar <xxj95719@gmail.com>",
+  "bugs": {
+    "url": "https://github.com/farm-fe/plugins/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/farm-fe/plugins.git"
+  },
+  "keywords": [
+    "rust",
+    "component",
+    "farmfe"
+  ],
   "devDependencies": {
     "@farmfe/plugin-tools": "latest"
   },
