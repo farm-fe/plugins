@@ -947,6 +947,18 @@ dependencies = [
 ]
 
 [[package]]
+name = "farmfe_plugin_component"
+version = "0.0.0"
+dependencies = [
+ "farmfe_core",
+ "farmfe_macro_plugin",
+ "farmfe_toolkit_plugin_types",
+ "regex",
+ "serde",
+ "serde_json",
+]
+
+[[package]]
 name = "farmfe_plugin_css"
 version = "0.0.15"
 source = "registry+https://github.com/rust-lang/crates.io-index"
