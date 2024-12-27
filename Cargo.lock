@@ -948,7 +948,7 @@ dependencies = [
 
 [[package]]
 name = "farmfe_plugin_component"
-version = "0.0.0"
+version = "0.0.1"
 dependencies = [
  "farmfe_core",
  "farmfe_macro_plugin",
