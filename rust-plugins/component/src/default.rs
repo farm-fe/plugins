@@ -7,5 +7,5 @@ pub fn default_lib_dir() -> Option<String> {
 }
 
 pub fn default_style_library_path() -> Option<String> {
-  Some(String::from("[module]/index.css"))
+  Some(String::from("index.css"))
 }

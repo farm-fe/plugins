@@ -13,5 +13,5 @@ pub struct Options {
   pub style_lib_dir: Option<String>, // style lib directory, default lib
   pub style_library_name: Option<String>, // the style dir. e.g. custon-theme =>  custon-theme/index.css
   #[serde(default = "default_style_library_path")]
-  pub style_library_path: Option<String>, // custom style path, default "[module]/index.css"
+  pub style_library_path: Option<String>, // custom style path, default "index.css"
 }

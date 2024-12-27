@@ -52,9 +52,9 @@ export default defineConfig({
         /**
          * @description custom style path
          * @type {string}
-         * @default [module]/style/index.css
+         * @default index.css
          */
-        style_library_path: '[module]/style/index.css',
+        style_library_path: 'index.css',
     }],
   ],
 });
@@ -208,7 +208,7 @@ export default defineConfig({
       camel2_dash: false,
       style_lib_dir: 'lib',
       style_library_name: 'theme-default',
-      style_library_path: '[module]/style/index.css'
+      style_library_path: 'style/index.css'
     }]
   ],
 });

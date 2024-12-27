@@ -23,7 +23,7 @@ pub struct FarmfePluginComponent {
 impl FarmfePluginComponent {
   fn new(_config: &Config, options: String) -> Self {
     let options: Options = serde_json::from_str(&options).unwrap();
-    println!("Parsed options: {:?}", options); // 添加调试信息
+    // println!("Parsed options: {:?}", options); // 添加调试信息
     Self { options }
   }
 }
