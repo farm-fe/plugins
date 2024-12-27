@@ -68,7 +68,7 @@ export default defineConfig({
 export default defineConfig({
   plugins: [
     ['@farmfe/plugin-component', {
-      library_name: 'antd',
+      library_name: 'element-ui',
     }]
   ],
 });
@@ -77,14 +77,14 @@ export default defineConfig({
 ###### Converts
 
 ```js
-import { SomeComponent } from 'antd'
+import { SomeComponent } from 'element-ui'
 ```
 
 ###### To
 
 ```js
-import SomeComponent from 'antd/lib/SomeComponent';
-import 'antd/lib/SomeComponent/style/index.css';
+import SomeComponent from 'element-ui/lib/SomeComponent';
+import 'element-ui/lib/SomeComponent/index.css';
 ```
 
 #### Set `lib_dir` Usage
@@ -93,7 +93,7 @@ import 'antd/lib/SomeComponent/style/index.css';
 export default defineConfig({
   plugins: [
     ['@farmfe/plugin-component', {
-      library_name: 'antd',
+      library_name: 'element-ui',
       lib_dir: 'es',
     }]
   ],
@@ -103,14 +103,14 @@ export default defineConfig({
 ###### Converts
 
 ```js
-import { SomeComponent } from 'antd'
+import { SomeComponent } from 'element-ui'
 ```
 
 ###### To
 
 ```js
-import SomeComponent from 'antd/es/SomeComponent';
-import 'antd/lib/SomeComponent/index.css';
+import SomeComponent from 'element-ui/es/SomeComponent';
+import 'element-ui/lib/SomeComponent/index.css';
 ```
 
 #### Set `camel2_dash` Usage
@@ -119,7 +119,7 @@ import 'antd/lib/SomeComponent/index.css';
 export default defineConfig({
   plugins: [
     ['@farmfe/plugin-component', {
-      library_name: 'antd',
+      library_name: 'element-ui',
       lib_dir: 'es',
       camel2_dash: false,
     }]
@@ -130,14 +130,14 @@ export default defineConfig({
 ###### Converts
 
 ```js
-import { SomeComponent } from 'antd'
+import { SomeComponent } from 'element-ui'
 ```
 
 ###### To
 
 ```js
-import SomeComponent from 'antd/es/someComponent';
-import 'antd/lib/someComponent/index.css';
+import SomeComponent from 'element-ui/es/someComponent';
+import 'element-ui/lib/someComponent/index.css';
 ```
 
 #### Set `style_lib_dir` Usage
@@ -146,7 +146,7 @@ import 'antd/lib/someComponent/index.css';
 export default defineConfig({
   plugins: [
     ['@farmfe/plugin-component', {
-      library_name: 'antd',
+      library_name: 'element-ui',
       lib_dir: 'es',
       camel2_dash: false,
       style_lib_dir: 'lib',
@@ -158,14 +158,14 @@ export default defineConfig({
 ###### Converts
 
 ```js
-import { SomeComponent } from 'antd'
+import { SomeComponent } from 'element-ui'
 ```
 
 ###### To
 
 ```js
-import SomeComponent from 'antd/es/someComponent';
-import 'antd/lib/someComponent/index.css';
+import SomeComponent from 'element-ui/es/someComponent';
+import 'element-ui/lib/someComponent/index.css';
 ```
 
 #### Set `style_library_name` Usage
@@ -174,7 +174,7 @@ import 'antd/lib/someComponent/index.css';
 export default defineConfig({
   plugins: [
     ['@farmfe/plugin-component', {
-      library_name: 'antd',
+      library_name: 'element-ui',
       lib_dir: 'es',
       camel2_dash: false,
       style_lib_dir: 'lib',
@@ -187,14 +187,14 @@ export default defineConfig({
 ###### Converts
 
 ```js
-import { SomeComponent } from 'antd'
+import { SomeComponent } from 'element-ui'
 ```
 
 ###### To
 
 ```js
-import SomeComponent from 'antd/es/someComponent';
-import 'antd/lib/theme-default/someComponent/index.css';
+import SomeComponent from 'element-ui/es/someComponent';
+import 'element-ui/lib/theme-default/someComponent/index.css';
 ```
 
 #### Set `style_library_path` Usage
@@ -203,7 +203,7 @@ import 'antd/lib/theme-default/someComponent/index.css';
 export default defineConfig({
   plugins: [
     ['@farmfe/plugin-component', {
-      library_name: 'antd',
+      library_name: 'element-ui',
       lib_dir: 'es',
       camel2_dash: false,
       style_lib_dir: 'lib',
@@ -217,12 +217,12 @@ export default defineConfig({
 ###### Converts
 
 ```js
-import { SomeComponent } from 'antd'
+import { SomeComponent } from 'element-ui'
 ```
 
 ###### To
 
 ```js
-import SomeComponent from 'antd/es/someComponent';
-import 'antd/lib/theme-default/someComponent/style/index.css';
+import SomeComponent from 'element-ui/es/someComponent';
+import 'element-ui/lib/theme-default/someComponent/style/index.css';
 ```
