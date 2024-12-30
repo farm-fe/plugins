@@ -1,6 +1,6 @@
 {
   "name": "@farmfe/plugin-virtual",
-  "version": "0.0.9",
+  "version": "0.0.10",
   "private": false,
   "main": "scripts/index.js",
   "types": "scripts/index.d.ts",

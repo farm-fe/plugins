@@ -1,5 +1,11 @@
 # @farmfe/plugin-dsv
 
+## 0.0.8
+
+### Patch Changes
+
+- chore: update farm version
+
 ## 0.0.7
 
 ### Patch Changes
