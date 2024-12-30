@@ -947,18 +947,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "farmfe_plugin_component"
-version = "0.0.1"
-dependencies = [
- "farmfe_core",
- "farmfe_macro_plugin",
- "farmfe_toolkit_plugin_types",
- "regex",
- "serde",
- "serde_json",
-]
-
-[[package]]
 name = "farmfe_plugin_css"
 version = "0.0.15"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1089,6 +1077,18 @@ dependencies = [
  "farmfe_core",
  "farmfe_testing_helpers",
  "farmfe_toolkit",
+]
+
+[[package]]
+name = "farmfe_plugin_modular_import"
+version = "0.0.1"
+dependencies = [
+ "farmfe_core",
+ "farmfe_macro_plugin",
+ "farmfe_toolkit_plugin_types",
+ "regex",
+ "serde",
+ "serde_json",
 ]
 
 [[package]]
