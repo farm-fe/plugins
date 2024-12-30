@@ -3,6 +3,7 @@ use serde::Deserialize;
 use std::fmt::Debug;
 
 #[derive(Deserialize, Debug)]
+#[serde(rename_all = "camelCase")]
 pub struct Options {
   pub library_name: Option<String>, // library name, default ""
   #[serde(default = "default_lib_dir")]

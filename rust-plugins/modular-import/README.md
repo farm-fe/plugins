@@ -25,35 +25,35 @@ export default defineConfig({
          * @type {string}
          * @default lib
          */
-        lib_dir: 'lib',
+        libDir: 'lib',
         /**
          * @description The components lib directory
          * @type {string}
          */
-        library_name: "",
+        libraryName: "",
         /**
          * @description The UI library name
          * @type {boolean}
          * @default true
          */
-        camel2_dash: true,
+        camel2Dash: true,
         /**
          * @description style lib directory, default "lib"
          * @type {string}
          * @default lib
          */
-        style_lib_dir: 'lib',
+        styleLibDir: 'lib',
         /**
          * @description the style library name. e.g. custon-theme =>  custon-theme/index.css
          * @type {string}
          */
-        style_library_name: '',
+        styleLibraryName: '',
         /**
          * @description custom style path
          * @type {string}
          * @default index.css
          */
-        style_library_path: 'index.css',
+        styleLibraryPath: 'index.css',
     }],
   ],
 });
@@ -67,7 +67,7 @@ export default defineConfig({
 export default defineConfig({
   plugins: [
     ['@farmfe/plugin-modular-import', {
-      library_name: 'element-ui',
+      libraryName: 'element-ui',
     }]
   ],
 });
@@ -86,14 +86,14 @@ import SomeComponent from 'element-ui/lib/SomeComponent';
 import 'element-ui/lib/SomeComponent/index.css';
 ```
 
-#### Set `lib_dir` Usage
+#### Set `libDir` Usage
 
 ```ts
 export default defineConfig({
   plugins: [
     ['@farmfe/plugin-modular-import', {
-      library_name: 'element-ui',
-      lib_dir: 'es',
+      libraryName: 'element-ui',
+      libDir: 'es',
     }]
   ],
 });
@@ -112,15 +112,15 @@ import SomeComponent from 'element-ui/es/SomeComponent';
 import 'element-ui/lib/SomeComponent/index.css';
 ```
 
-#### Set `camel2_dash` Usage
+#### Set `camel2Dash` Usage
 
 ```ts
 export default defineConfig({
   plugins: [
     ['@farmfe/plugin-modular-import', {
-      library_name: 'element-ui',
-      lib_dir: 'es',
-      camel2_dash: false,
+      libraryName: 'element-ui',
+      libDir: 'es',
+      camel2Dash: false,
     }]
   ],
 });
@@ -139,16 +139,16 @@ import SomeComponent from 'element-ui/es/someComponent';
 import 'element-ui/lib/someComponent/index.css';
 ```
 
-#### Set `style_lib_dir` Usage
+#### Set `styleLibDir` Usage
 
 ```ts
 export default defineConfig({
   plugins: [
     ['@farmfe/plugin-modular-import', {
-      library_name: 'element-ui',
-      lib_dir: 'es',
-      camel2_dash: false,
-      style_lib_dir: 'lib',
+      libraryName: 'element-ui',
+      libDir: 'es',
+      camel2Dash: false,
+      styleLibDir: 'lib',
     }]
   ],
 });
@@ -167,17 +167,17 @@ import SomeComponent from 'element-ui/es/someComponent';
 import 'element-ui/lib/someComponent/index.css';
 ```
 
-#### Set `style_library_name` Usage
+#### Set `styleLibraryName` Usage
 
 ```ts
 export default defineConfig({
   plugins: [
     ['@farmfe/plugin-modular-import', {
-      library_name: 'element-ui',
-      lib_dir: 'es',
-      camel2_dash: false,
-      style_lib_dir: 'lib',
-      style_library_name: 'theme-default',
+      libraryName: 'element-ui',
+      libDir: 'es',
+      camel2Dash: false,
+      styleLibDir: 'lib',
+      styleLibraryName: 'theme-default',
     }]
   ],
 });
@@ -196,18 +196,18 @@ import SomeComponent from 'element-ui/es/someComponent';
 import 'element-ui/lib/theme-default/someComponent/index.css';
 ```
 
-#### Set `style_library_path` Usage
+#### Set `styleLibraryPath` Usage
 
 ```ts
 export default defineConfig({
   plugins: [
     ['@farmfe/plugin-modular-import', {
-      library_name: 'element-ui',
-      lib_dir: 'es',
-      camel2_dash: false,
-      style_lib_dir: 'lib',
-      style_library_name: 'theme-default',
-      style_library_path: 'style/index.css'
+      libraryName: 'element-ui',
+      libDir: 'es',
+      camel2Dash: false,
+      styleLibDir: 'lib',
+      styleLibraryName: 'theme-default',
+      styleLibraryPath: 'style/index.css'
     }]
   ],
 });

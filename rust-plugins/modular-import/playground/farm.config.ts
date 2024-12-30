@@ -14,12 +14,12 @@ export default defineConfig({
   vitePlugins: [vue()],
   plugins: [
     ['@farmfe/plugin-modular-import', {
-      library_name: 'element-ui',
-      lib_dir: 'lib',
-      camel2_dash: false,
-      style_lib_dir: 'lib',
-      style_library_name: 'theme-chalk',
-      style_library_path: '.css'
+      libraryName: 'element-ui',
+      libDir: 'lib',
+      camel2Dash: false,
+      styleLibDir: 'lib',
+      styleLibraryName: 'theme-chalk',
+      styleLibraryPath: '.css'
     }]
   ],
 });
