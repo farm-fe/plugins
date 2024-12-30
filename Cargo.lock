@@ -1080,6 +1080,18 @@ dependencies = [
 ]
 
 [[package]]
+name = "farmfe_plugin_modular_import"
+version = "0.0.1"
+dependencies = [
+ "farmfe_core",
+ "farmfe_macro_plugin",
+ "farmfe_toolkit_plugin_types",
+ "regex",
+ "serde",
+ "serde_json",
+]
+
+[[package]]
 name = "farmfe_plugin_partial_bundling"
 version = "0.0.14"
 source = "registry+https://github.com/rust-lang/crates.io-index"
