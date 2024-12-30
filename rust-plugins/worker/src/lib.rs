@@ -382,6 +382,7 @@ impl Plugin for FarmfePluginWorker {
     }
     let mut content = String::new();
     let mut last_end = 0;
+    println!("matches : {:?}", matches);
     matches.iter().for_each(|m: &Match| {
       let args = &m.captures[0].clone().unwrap();
       let worker_url = &m.captures[1].clone().unwrap();
@@ -401,9 +402,9 @@ impl Plugin for FarmfePluginWorker {
             kind: ResolveKind::Import,
           }, context, &PluginHookContext::default()).unwrap().unwrap().resolved_path
         };
-        println!("full_worker_path : {full_worker_path}");
         let content_bytes = build_worker(&full_worker_path, &full_worker_path, compiler_config);
         let new_worker_url = relative(&context.config.root, &full_worker_path);
+        print!("new_worker_url : {new_worker_url}");
         // update param content
         // worker_url_code -> new_worker_url
         let (worker_url, filename) =
@@ -418,6 +419,7 @@ impl Plugin for FarmfePluginWorker {
       }
     });
     content.push_str(&param.content[last_end..]);
+    println!("content : {content}");
     return Ok(Some(PluginTransformHookResult {
       content,
       module_type: Some(param.module_type.clone()),
