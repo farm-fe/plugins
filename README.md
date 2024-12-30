@@ -21,7 +21,7 @@
 | [icons](rust-plugins/icons)                       | Load Access thousands of icons as components on-demand universally. (Inspired by [unplugin-icons](https://github.com/unplugin/unplugin-icons)) |
 | [wasm](rust-plugins/wasm)                         | Add WebAssembly ESM integration support generated modules.                                                                                     |
 | [worker](rust-plugins/worker)                     | A web worker script can be imported using new Worker() and new SharedWorker().(Inspired by [vite](https://github.com/vitejs/vite))             |
-| [component](rust-plugins/component)                         | Modular UI library build plugin for Farm.                                                                                     |
+| [modular-import](rust-plugins/modular-import)                         | Modular UI library build plugin for Farm.                                                                                     |
 |                                                   |                                                                                                                                                |
 
 ### JavaScript plugins
