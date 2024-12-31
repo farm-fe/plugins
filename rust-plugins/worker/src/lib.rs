@@ -119,7 +119,7 @@ fn get_worker_url(
     .file_name()
     .map(|x| x.to_string_lossy().to_string())
     .unwrap_or_else(|| "".to_string());
-  let (file_name, ext) = file_name_ext.split_once(".").unwrap_or(("file_name_ext", "js"));
+  let (file_name, ext) = file_name_ext.split_once(".").unwrap();
   let assets_filename_config = compiler_config.output.assets_filename.clone();
 
   // hash_bytes = resolved_path + file_name_ext bytes ,make sure that the files of the same name in different directory will not be covered;
