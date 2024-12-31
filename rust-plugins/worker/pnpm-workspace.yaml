@@ -1,4 +1,3 @@
 packages: 
   - '.'
   - playground
-  - farm_worker

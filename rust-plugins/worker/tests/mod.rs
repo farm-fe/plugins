@@ -10,34 +10,85 @@ fn test_regex() {
   assert_eq!(re.find(test_str).is_some(), true);
 
   //   let re = Regex::new(WORKER_IMPORT_META_URL_RE).unwrap();
-  let test_str = r#"import React from 'react';\nimport { createRoot } from 'react-dom/client';\nimport { Main } from './main';\nimport TestWorker from \"./worker/test.worker?worker\"\nimport './index.css'\n\nconsole.log(TestWorker);\nconst worker = new TestWorker();\nworker.postMessage([5, 5]);\nworker.onmessage = (e) => {\n  console.log(e.data);\n}\nconst s = \"vue\"\nconst worker2 = new Worker(new URL(`./worker/${s}.worker.ts`,import.meta.url))\n\nworker2.postMessage([2, 3]);\nworker2.onmessage = (e) => {\n  console.log(e.data);\n}\n\nconst container = document.querySelector('#root');\nconst root = createRoot(container);\n\nroot.render(<Main />);\n"#;
+  let test_str = r#"import type { Uri } from "vscode";
+import type { Logger } from "monaco-languageclient/tools";
+import { useWorkerFactory } from "monaco-editor-wrapper/workerFactory";
+import { RegisteredMemoryFile } from "@codingame/monaco-vscode-files-service-override";
+import type { IStoredWorkspace } from "@codingame/monaco-vscode-configuration-service-override";
+import Editor from 'monaco-editor/esm/vs/editor/editor.worker?worker';
+export const disableButton = (id: string, disabled: boolean) => {
+	const button = document.getElementById(id) as HTMLButtonElement | null;
+	if (button !== null) {
+		button.disabled = disabled;
+	}
+};
+
+export const configureMonacoWorkers = (logger?: Logger) => {
+	useWorkerFactory({
+		workerOverrides: {
+			ignoreMapping: true,
+			workerLoaders: {
+				TextEditorWorker: () =>
+					new Editor(),
+				TextMateWorker: () =>
+					new Worker(
+						new URL("@codingame/monaco-vscode-textmate-service-override/worker",import.meta.url),{ type: "module" },
+					),
+			},
+		},
+		logger,
+	});
+};
+
+export const createDefaultWorkspaceFile = (
+	workspaceFile: Uri,
+	workspacePath: string,
+) => {
+	return new RegisteredMemoryFile(
+		workspaceFile,
+		JSON.stringify(
+			<IStoredWorkspace>{
+				folders: [
+					{
+						path: workspacePath,
+					},
+				],
+			},
+			null,
+			2,
+		),
+	);
+};
+"#;
   
   //   for c in re.find(&test_str).unwrap().groups() {
   //     println!("{:?}", &test_str[c.unwrap()]);
   //     // 我需要递归这个 test_str 后续的字符
   //   }
 
-  fn match_global(regex_str: &str, text: &str) -> Vec<Match> {
-    let re = Regex::new(regex_str).unwrap();
-    let mut matchs: Vec<Match> = Vec::new();
-    let mut start = 0;
-    loop {
-      let m = re.find_from(text, start).next();
-      match m {
-        Some(m) => {
-          matchs.push(m.clone());
-          start = m.range().end;
-          if start >= text.len() {
-            break;
-          }
-        }
-        None => break,
-      }
-    }
-    matchs
-  }
+  // fn match_global(regex_str: &str, text: &str) -> Vec<Match> {
+  //   let re = Regex::new(regex_str).unwrap();
+  //   let mut matchs: Vec<Match> = Vec::new();
+  //   let mut start = 0;
+  //   loop {
+  //     let m = re.find_from(text, start).next();
+  //     match m {
+  //       Some(m) => {
+  //         matchs.push(m.clone());
+  //         start = m.range().end;
+  //         if start >= text.len() {
+  //           break;
+  //         }
+  //       }
+  //       None => break,
+  //     }
+  //   }
+  //   matchs
+  // }
 
-  let matches = match_global(WORKER_IMPORT_META_URL_RE, &test_str);
+  // let matches = match_global(WORKER_IMPORT_META_URL_RE, &test_str);
+  let matches = Regex::new(WORKER_IMPORT_META_URL_RE).unwrap().find_iter(&test_str).collect::<Vec<Match>>();
+  println!("matches : {:?}", matches);
   matches.iter().for_each(|m| {
     let args = &m.captures[0].clone().unwrap();
     let worker_url = &m.captures[1].clone().unwrap();
