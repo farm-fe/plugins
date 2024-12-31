@@ -3,7 +3,7 @@ import type { Logger } from "monaco-languageclient/tools";
 import { useWorkerFactory } from "monaco-editor-wrapper/workerFactory";
 import { RegisteredMemoryFile } from "@codingame/monaco-vscode-files-service-override";
 import type { IStoredWorkspace } from "@codingame/monaco-vscode-configuration-service-override";
-
+import Editor from 'monaco-editor/esm/vs/editor/editor.worker?worker';
 export const disableButton = (id: string, disabled: boolean) => {
 	const button = document.getElementById(id) as HTMLButtonElement | null;
 	if (button !== null) {
@@ -17,18 +17,14 @@ export const configureMonacoWorkers = (logger?: Logger) => {
 			ignoreMapping: true,
 			workerLoaders: {
 				TextEditorWorker: () =>
-					new Worker(
-						new URL(
-							"monaco-editor/esm/vs/editor/editor.worker",
-							import.meta.url
-						),
-					),
+					new Editor(),
 				TextMateWorker: () =>
 					new Worker(
 						new URL(
-              "monaco-editor/esm/vs/editor/editor.worker",
+							"@codingame/monaco-vscode-textmate-service-override/worker",
 							import.meta.url,
 						),
+						{ type: "module" },
 					),
 			},
 		},
