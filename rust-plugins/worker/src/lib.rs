@@ -20,7 +20,7 @@ use farmfe_core::{
   context::{CompilationContext, EmitFileParams},
   deserialize,
   module::{ModuleId, ModuleType},
-  plugin::{Plugin, PluginLoadHookResult, PluginTransformHookResult},
+  plugin::{Plugin, PluginHookContext, PluginLoadHookResult, PluginResolveHookParam, PluginTransformHookResult, ResolveKind},
   resource::{Resource, ResourceOrigin, ResourceType},
   serde,
   serde_json::{self, to_value, Map, Value},
@@ -32,7 +32,7 @@ use farmfe_utils::relative;
 use regress::{Match, Regex as JsRegex};
 
 const WORKER_OR_SHARED_WORKER_RE: &str = r#"(?:\?|&)(worker|sharedworker)(?:&|$)"#;
-const WORKER_IMPORT_META_URL_RE: &str = r#"\bnew\s+(?:Worker|SharedWorker)\s*\(\s*(new\s+URL\s*\(\s*('[^']+'|"[^"]+"|`[^`]+`)\s*,\s*import\.meta\.url\s*\))"#;
+const WORKER_IMPORT_META_URL_RE: &str = r#"\bnew\s+(?:Worker|SharedWorker)\s*\(\s*(new\s+URL\s*\(\s*('[^']+'|"[^"]+"|`[^`]+`)\s*,\s*import\.meta\.url[^)]*\))"#;
 
 fn merge_json(a: &mut Value, b: Value, exclude: &HashSet<&str>) {
   match (a, b) {
@@ -118,7 +118,7 @@ fn get_worker_url(
   let file_name_ext = Path::new(resolved_path)
     .file_name()
     .map(|x| x.to_string_lossy().to_string())
-    .unwrap();
+    .unwrap_or_else(|| "".to_string());
   let (file_name, ext) = file_name_ext.split_once(".").unwrap();
   let assets_filename_config = compiler_config.output.assets_filename.clone();
 
@@ -394,18 +394,11 @@ impl Plugin for FarmfePluginWorker {
         let worker_url = &worker_url_code[1..worker_url_code.len() - 1];
         let full_worker_path = match &worker_url[0..1] {
           "/" => context.config.root.to_string() + worker_url,
-          "." => {
-            let module_id = ModuleId::from(worker_url);
-            let parent = Path::new(param.resolved_path)
-              .parent()
-              .unwrap()
-              .to_string_lossy()
-              .to_string();
-            module_id.resolved_path(&parent)
-          }
-          _ => {
-            panic!("worker url must be start with / or .");
-          }
+          _ => context.plugin_driver.resolve( &PluginResolveHookParam {
+            source: worker_url.to_string(),
+            importer: Some(param.module_id.clone().into()),
+            kind: ResolveKind::Import,
+          }, context, &PluginHookContext::default()).unwrap().unwrap().resolved_path
         };
         let content_bytes = build_worker(&full_worker_path, &full_worker_path, compiler_config);
         let new_worker_url = relative(&context.config.root, &full_worker_path);
