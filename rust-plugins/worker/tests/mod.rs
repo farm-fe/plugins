@@ -2,7 +2,7 @@ use std::env::args;
 
 use regress::{Match, Regex};
 const WORKER_OR_SHARED_WORKER_RE: &str = r#"(?:\?|&)(worker|sharedworker)(?:&|$)"#;
-const WORKER_IMPORT_META_URL_RE: &str = r#"\bnew\s+(?:Worker|SharedWorker)\s*\(\s*(new\s+URL\s*\(\s*('[^']+'|"[^"]+"|`[^`]+`)\s*,\s*import\.meta\.url\s*\))"#;
+const WORKER_IMPORT_META_URL_RE: &str = r#"\bnew\s+(?:Worker|SharedWorker)\s*\(\s*(new\s+URL\s*\(\s*('[^']+'|"[^"]+"|`[^`]+`)\s*,\s*import\.meta\.url[^)]*\))"#;
 #[test]
 fn test_regex() {
   let re = Regex::new(WORKER_OR_SHARED_WORKER_RE).unwrap();
@@ -32,7 +32,7 @@ export const configureMonacoWorkers = (logger?: Logger) => {
 					new Editor(),
 				TextMateWorker: () =>
 					new Worker(
-						new URL("@codingame/monaco-vscode-textmate-service-override/worker",import.meta.url),{ type: "module" },
+						new URL("@codingame/monaco-vscode-textmate-service-override/worker",import.meta.url,asdasdas),{ type: "module" },
 					),
 			},
 		},
