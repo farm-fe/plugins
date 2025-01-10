@@ -1,3 +1,3 @@
-# `farmfe-plugin-image-linux-arm64-musl`
+# `@farmfe/plugin-image-linux-arm64-musl`
 
-This is the **aarch64-unknown-linux-musl** binary for `farmfe-plugin-image`
+This is the **aarch64-unknown-linux-musl** binary for `@farmfe/plugin-image`

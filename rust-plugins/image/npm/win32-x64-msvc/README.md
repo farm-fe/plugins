@@ -1,3 +1,3 @@
-# `farmfe-plugin-image-win32-x64-msvc`
+# `@farmfe/plugin-image-win32-x64-msvc`
 
-This is the **x86_64-pc-windows-msvc** binary for `farmfe-plugin-image`
+This is the **x86_64-pc-windows-msvc** binary for `@farmfe/plugin-image`

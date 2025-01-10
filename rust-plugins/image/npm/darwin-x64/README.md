@@ -1,3 +1,3 @@
-# `farmfe-plugin-image-darwin-x64`
+# `@farmfe/plugin-image-darwin-x64`
 
-This is the **x86_64-apple-darwin** binary for `farmfe-plugin-image`
+This is the **x86_64-apple-darwin** binary for `@farmfe/plugin-image`
