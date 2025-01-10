@@ -1,5 +1,11 @@
 # @farmfe/plugin-auto-import
 
+## 0.0.7
+
+### Patch Changes
+
+- rename package name
+
 ## 0.0.6
 
 ### Patch Changes

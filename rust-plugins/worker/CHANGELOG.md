@@ -1,5 +1,11 @@
 # @farmfe/plugin-worker
 
+## 0.0.10
+
+### Patch Changes
+
+- rename package name
+
 ## 0.0.8
 
 ### Patch Changes

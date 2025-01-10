@@ -1,5 +1,11 @@
 # @farmfe/plugin-url
 
+## 0.0.9
+
+### Patch Changes
+
+- rename package name
+
 ## 0.0.8
 
 ### Patch Changes
