@@ -1,3 +1,3 @@
-# `farmfe-plugin-url-win32-ia32-msvc`
+# `@farmfe/plugin-url-win32-ia32-msvc`
 
-This is the i686-pc-windows-msvc binary for `farmfe-plugin-url`
+This is the i686-pc-windows-msvc binary for `@farmfe/plugin-url`

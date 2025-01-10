@@ -1,3 +1,3 @@
-# `farmfe-plugin-auto-import-linux-x64-gnu`
+# `@farmfe/plugin-auto-import-linux-x64-gnu`
 
-This is the **x86_64-unknown-linux-gnu** binary for `farmfe-plugin-auto-import`
+This is the **x86_64-unknown-linux-gnu** binary for `@farmfe/plugin-auto-import`

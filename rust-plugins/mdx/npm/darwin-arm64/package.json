@@ -1,5 +1,5 @@
 {
-  "name": "@farmfe/plugin-plugin-mdx-darwin-arm64",
+  "name": "@farmfe/plugin-mdx-darwin-arm64",
   "version": "0.1.2",
   "os": [
     "darwin"

@@ -1,3 +1,3 @@
-# `farmfe-plugin-icons-linux-x64-gnu`
+# `@farmfe/plugin-icons-linux-x64-gnu`
 
-This is the **x86_64-unknown-linux-gnu** binary for `farmfe-plugin-icons`
+This is the **x86_64-unknown-linux-gnu** binary for `@farmfe/plugin-icons`

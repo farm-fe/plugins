@@ -1,5 +1,5 @@
 {
-  "name": "farmfe-plugin-image-darwin-x64",
+  "name": "@farmfe/plugin-image-darwin-x64",
   "version": "0.0.0",
   "os": [
     "darwin"

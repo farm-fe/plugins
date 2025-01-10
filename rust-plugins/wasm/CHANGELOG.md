@@ -1,5 +1,11 @@
 # @farmfe/plugin-wasm
 
+## 0.0.6
+
+### Patch Changes
+
+- rename package name
+
 ## 0.0.5
 
 ### Patch Changes

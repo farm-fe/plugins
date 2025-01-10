@@ -1,5 +1,11 @@
 # @farmfe/plugin-image
 
+## 0.0.8
+
+### Patch Changes
+
+- rename package name
+
 ## 0.0.7
 
 ### Patch Changes

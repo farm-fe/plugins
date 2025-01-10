@@ -1,5 +1,5 @@
 {
-  "name": "farmfe-plugin-worker-darwin-arm64",
+  "name": "@farmfe/plugin-worker-darwin-arm64",
   "version": "0.0.3",
   "os": [
     "darwin"

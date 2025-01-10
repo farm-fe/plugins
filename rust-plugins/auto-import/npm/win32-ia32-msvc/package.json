@@ -1,5 +1,5 @@
 {
-  "name": "farmfe-plugin-auto-import-win32-ia32-msvc",
+  "name": "@farmfe/plugin-auto-import-win32-ia32-msvc",
   "version": "0.0.0",
   "os": [
     "win32"

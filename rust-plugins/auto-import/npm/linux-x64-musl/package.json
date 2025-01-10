@@ -1,5 +1,5 @@
 {
-  "name": "farmfe-plugin-auto-import-linux-x64-musl",
+  "name": "@farmfe/plugin-auto-import-linux-x64-musl",
   "version": "0.0.0",
   "os": [
     "linux"
