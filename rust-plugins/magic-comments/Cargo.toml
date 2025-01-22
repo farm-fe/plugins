@@ -1,0 +1,20 @@
+[package]
+edition = "2021"
+name = "farm_plugin_magic_string"
+version = "0.0.0"
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+regex = "1.11.1"
+serde = { version = "1.0.217", features = ["derive", "rc"] }
+serde_json = { version = "1.0.137", features = ["preserve_order"] }
+url = "2.5.4"
+farmfe_core = { version = "0.7.3" }
+farmfe_utils = { version = "0.1.6" }
+farmfe_toolkit_plugin_types = { version = "0.0.24" }
+farmfe_macro_plugin = { version = "0.0.4" }
+farmfe_toolkit = "0.0.17"
+farmfe_compiler = { version = "0.0.16" }
+lol_html = "=2.0.0"
