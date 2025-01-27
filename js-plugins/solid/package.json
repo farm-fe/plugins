@@ -1,5 +1,5 @@
 {
-  "name": "farm-plugin-solid",
+  "name": "@farmfe/js-plugin-solid",
   "version": "1.0.0",
   "description": "solid-js integration plugin for farm",
   "type": "module",
@@ -35,15 +35,16 @@
     "@types/babel__core": "^7.20.4",
     "babel-preset-solid": "^1.8.4",
     "merge-anything": "^5.1.7",
-    "solid-refresh": "^0.6.3"
+    "solid-refresh": "0.7.5"
   },
   "devDependencies": {
-    "@farmfe/core": "/Users/adny/rust/farm/packages/core",
     "@babel/preset-env": "^7.23.3",
     "@babel/preset-typescript": "^7.23.3",
+    "@farmfe/core": "/Users/adny/rust/farm/packages/core",
     "@rollup/plugin-babel": "^6.0.4",
     "@rollup/plugin-commonjs": "^25.0.7",
     "@rollup/plugin-node-resolve": "^15.2.3",
+    "@rollup/pluginutils": "^5.1.4",
     "@skypack/package-check": "^0.2.2",
     "@types/node": "^18.18.4",
     "rollup": "^4.5.0",

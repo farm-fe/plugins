@@ -1,0 +1,29 @@
+{
+  "name": "solid-example",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "farm dev",
+    "start": "vite dev --port 5412",
+    "build": "farm build",
+    "preview": "farm preview"
+  },
+  "dependencies": {
+    "@hope-ui/solid": "^0.6.7",
+    "@solidjs/router": "^0.8.3",
+    "@stitches/core": "^1.2.8",
+    "solid-js": "^1.9.3"
+  },
+  "devDependencies": {
+    "@farmfe/cli": "/Users/adny/rust/farm/packages/cli",
+    "@farmfe/core": "/Users/adny/rust/farm/packages/core",
+    "@farmfe/js-plugin-solid": "workspace:*",
+    "typescript": "~5.6.2",
+    "vite": "^6.0.5",
+    "vite-plugin-solid": "^2.11.0"
+  },
+  "overrides": {
+    "@farmfe/js-plugin-solid": "workspace:*"
+  }
+}
