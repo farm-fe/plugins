@@ -1,0 +1,21 @@
+{
+  "include": [
+    "src"
+  ],
+  "exclude": [
+    "**/*.spec.ts"
+  ],
+  "compilerOptions": {
+    "target": "ESNext",
+    "module": "ESNext",
+    "moduleResolution": "node",
+    "strict": false,
+    "declaration": true,
+    "noUnusedLocals": true,
+    "skipLibCheck": true,
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "declarationDir": "dist/types",
+    "baseUrl": "."
+  }
+}
