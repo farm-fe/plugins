@@ -1,5 +1,5 @@
 {
-	"name": "@farmfe/js-plugins-preact",
+	"name": "@farmfe/js-plugin-preact",
 	"version": "0.0.1",
 	"description": "Preact preset for the farm bundler",
 	"main": "./dist/cjs/index.js",
@@ -13,11 +13,10 @@
 	},
 	"types": "dist/cjs/index.d.ts",
 	"scripts": {
-		"dev": "farm dev",
-		"dev:build": "farm build demo",
-		"dev:preview": "farm preview demo",
-		"build": "rimraf dist && tsc && tsc -p tsconfig.cjs.json && node tools/postbuild.mjs",
-		"test": "rimraf demo/node_modules && node --test test",
+		"build:cjs": "cross-env FARM_FORMAT=cjs farm build",
+		"build": "farm build && npm run build:cjs",
+		"start": "farm watch",
+		"dev": "farm build",
 		"prepublishOnly": "npm run build"
 	},
 	"keywords": [
@@ -48,9 +47,10 @@
 		"@babel/core": "7.x"
 	},
 	"devDependencies": {
-		"@farmfe/core": "/Users/adny/rust/farm/packages/core",
-		"@farmfe/cli": "/Users/adny/rust/farm/packages/cli",
 		"@babel/core": "^7.15.8",
+		"@babel/parser": "^7.26.7",
+		"@farmfe/cli": "/Users/adny/rust/farm/packages/cli",
+		"@farmfe/core": "/Users/adny/rust/farm/packages/core",
 		"@types/babel__code-frame": "^7.0.6",
 		"@types/babel__core": "^7.1.14",
 		"@types/debug": "^4.1.5",

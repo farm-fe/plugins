@@ -1,0 +1,21 @@
+{
+	"name": "preact-playground",
+	"private": true,
+	"version": "0.0.0",
+	"type": "module",
+	"scripts": {
+		"dev": "vite dev",
+		"build": "tsc -b && vite build",
+		"preview": "vite preview"
+	},
+	"dependencies": {
+		"preact": "^10.25.3"
+	},
+	"devDependencies": {
+		"@farmfe/js-plugin-preact": "workspace:*",
+		"typescript": "~5.6.2",
+		"vite": "^6.0.5",
+		"@farmfe/core": "/Users/adny/rust/farm/packages/core",
+		"@farmfe/cli": "/Users/adny/rust/farm/packages/cli"
+	}
+}

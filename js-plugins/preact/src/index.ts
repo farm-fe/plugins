@@ -128,11 +128,13 @@ function preactPlugin({
 	];
 	let config: ResolvedConfig;
 
-	let babelOptions = {
+	const babelOptions = {
 		babelrc: false,
 		configFile: false,
 		...babel,
 	} as PreactBabelOptions;
+
+	console.log(babelOptions);
 
 	babelOptions.plugins ||= [];
 	babelOptions.presets ||= [];
@@ -264,21 +266,21 @@ function preactPlugin({
 	return [
 		...(reactAliasesEnabled
 			? [
-					{
-						name: "preact:config",
-						config() {
-							return {
-								resolve: {
-									alias: {
-										"react-dom/test-utils": "preact/test-utils",
-										"react-dom": "preact/compat",
-										react: "preact/compat",
-									},
+				{
+					name: "preact:config",
+					config() {
+						return {
+							resolve: {
+								alias: {
+									"react-dom/test-utils": "preact/test-utils",
+									"react-dom": "preact/compat",
+									react: "preact/compat",
 								},
-							};
-						},
+							},
+						};
 					},
-			  ]
+				},
+			]
 			: []),
 		jsxPlugin,
 		preactDevtoolsPlugin({
