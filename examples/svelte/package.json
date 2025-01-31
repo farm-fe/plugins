@@ -1,0 +1,23 @@
+{
+  "name": "svelte",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "farm dev",
+    "build": "farm build",
+    "preview": "farm preview",
+    "check": "svelte-check --tsconfig ./tsconfig.app.json && tsc -p tsconfig.node.json"
+  },
+  "devDependencies": {
+    "@farmfe/core": "/Users/adny/rust/farm/packages/core",
+    "@farmfe/cli": "/Users/adny/rust/farm/packages/cli",
+    "@sveltejs/vite-plugin-svelte": "^5.0.3",
+    "@farmfe/js-plugin-svelte": "workspace:*",
+    "@tsconfig/svelte": "^5.0.4",
+    "svelte": "^5.15.0",
+    "svelte-check": "^4.1.1",
+    "typescript": "~5.6.2",
+    "vite": "^6.0.5"
+  }
+}
