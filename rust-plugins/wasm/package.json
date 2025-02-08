@@ -6,7 +6,8 @@
   "type": "module",
   "license": "MIT",
   "devDependencies": {
-    "@farmfe/plugin-tools": "latest"
+    "@farmfe/plugin-tools": "latest",
+    "@types/node": "^22.13.1"
   },
   "napi": {
     "name": "farmfe_plugin_wasm",
@@ -33,8 +34,9 @@
   "scripts": {
     "dev": "cargo watch -w src -s 'scripts/watch.sh'",
     "bump": "npx changeset version",
-    "play": "pnpm --filter playground dev",
+    "play": "pnpm build:wasm && pnpm --filter playground dev",
     "build": "farm-plugin-tools build --platform --cargo-name farmfe_plugin_wasm -p farmfe_plugin_wasm --release",
+    "build:wasm": "wasm-pack build rust-wasm --target bundler --out-dir ../wasm",
     "prepublishOnly": "farm-plugin-tools prepublish"
   },
   "files": [
