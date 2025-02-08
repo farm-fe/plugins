@@ -1,12 +1,14 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import "./main.css";
 import reactLogo from "./assets/react.svg";
 import FarmLogo from "./assets/logo.png";
 import init from "./assets/json_typegen_wasm_bg.wasm?init";
+import { greet } from "rust-wasm"
 import { run } from "json_typegen_wasm"
+
 export function Main() {
+  greet();
   const [count, setCount] = useState(0);
-  console.log("rendering Main component")
 
   const transformToInterface = async (json: string) => {
     return run(
@@ -53,7 +55,11 @@ export function Main() {
     console.log('%c [ interface ]-46', 'font-size:13px; background:rgba(66, 184, 131, 0.2); color:#05a15b;', interfaces)
   }
 
-  transform()
+  transform();
+
+  init({}).then((wasm) => {
+    console.log('Loaded json_typegen_wasm by wasm init: ', wasm)
+  })
   return (
     <>
       <div>
