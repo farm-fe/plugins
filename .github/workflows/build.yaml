@@ -106,79 +106,79 @@ jobs:
         run: ${{ matrix.settings.build }}
         shell: bash
       - name: Upload Plugin dsv
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: ${{ github.sha }}-${{ matrix.settings.abi }}-dsv
           path: ./rust-plugins/dsv/npm/${{ matrix.settings.abi }}/index.farm
           if-no-files-found: ignore
       - name: Upload Plugin react-components
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: ${{ github.sha }}-${{ matrix.settings.abi }}-react-components
           path: ./rust-plugins/react-components/npm/${{ matrix.settings.abi }}/index.farm
           if-no-files-found: ignore
       - name: Upload Plugin virtual
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: ${{ github.sha }}-${{ matrix.settings.abi }}-virtual
           path: ./rust-plugins/virtual/npm/${{ matrix.settings.abi }}/index.farm
           if-no-files-found: ignore
       - name: Upload Plugin svgr
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: ${{ github.sha }}-${{ matrix.settings.abi }}-svgr
           path: ./rust-plugins/svgr/npm/${{ matrix.settings.abi }}/index.farm
           if-no-files-found: ignore
       - name: Upload Plugin yaml
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: ${{ github.sha }}-${{ matrix.settings.abi }}-yaml
           path: ./rust-plugins/yaml/npm/${{ matrix.settings.abi }}/index.farm
           if-no-files-found: ignore
       - name: Upload Plugin strip
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: ${{ github.sha }}-${{ matrix.settings.abi }}-strip
           path: ./rust-plugins/strip/npm/${{ matrix.settings.abi }}/index.farm
           if-no-files-found: ignore
       - name: Upload Plugin image
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: ${{ github.sha }}-${{ matrix.settings.abi }}-image
           path: ./rust-plugins/image/npm/${{ matrix.settings.abi }}/index.farm
           if-no-files-found: ignore
       - name: Upload Plugin url
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: ${{ github.sha }}-${{ matrix.settings.abi }}-url
           path: ./rust-plugins/url/npm/${{ matrix.settings.abi }}/index.farm
           if-no-files-found: ignore
       - name: Upload Plugin icons
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: ${{ github.sha }}-${{ matrix.settings.abi }}-icons
           path: ./rust-plugins/icons/npm/${{ matrix.settings.abi }}/index.farm
           if-no-files-found: ignore
       - name: Upload Plugin auto-import
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: ${{ github.sha }}-${{ matrix.settings.abi }}-auto-import
           path: ./rust-plugins/auto-import/npm/${{ matrix.settings.abi }}/index.farm
           if-no-files-found: ignore
       - name: Upload Plugin wasm
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: ${{ github.sha }}-${{ matrix.settings.abi }}-wasm
           path: ./rust-plugins/wasm/npm/${{ matrix.settings.abi }}/index.farm
           if-no-files-found: ignore
       - name: Upload Plugin worker
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: ${{ github.sha }}-${{ matrix.settings.abi }}-worker
           path: ./rust-plugins/worker/npm/${{ matrix.settings.abi }}/index.farm
           if-no-files-found: ignore
       - name: Upload Plugin modular-import
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: ${{ github.sha }}-${{ matrix.settings.abi }}-modular-import
           path: ./rust-plugins/modular-import/npm/${{ matrix.settings.abi }}/index.farm
