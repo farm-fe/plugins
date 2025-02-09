@@ -20,8 +20,7 @@ pub fn parse_wasm<P: AsRef<Path>>(wasm_file_path: P) -> Result<WasmInfo, String>
   let mut imports_map: HashMap<String, Vec<String>> = HashMap::default();
   let mut exports = Vec::new();
 
-  let parser = Parser::new(0);
-  for payload in parser.parse_all(&wasm_binary) {
+  for payload in Parser::new(0).parse_all(&wasm_binary) {
     match payload.map_err(|e| format!("Failed to parse WASM: {}", e))? {
       Payload::ImportSection(imports) => {
         for import in imports {
@@ -52,62 +51,63 @@ pub fn parse_wasm<P: AsRef<Path>>(wasm_file_path: P) -> Result<WasmInfo, String>
 
 pub fn generate_glue_code<P: AsRef<Path>>(
   wasm_file_path: P,
-  names: &GlueNames,
+  wasm_init_name: &str,
+  wasm_url_name: &str,
 ) -> Result<String, String> {
   let wasm_info = parse_wasm(wasm_file_path)?;
 
-  let mut import_statements = Vec::new();
-  let mut import_object_entries = Vec::new();
+  let import_statements: Vec<String> = wasm_info
+    .imports
+    .iter()
+    .enumerate()
+    .map(|(i, import)| {
+      format!(
+        "import * as __farm__wasmImport_{} from {:?};",
+        i, import.from
+      )
+    })
+    .collect();
 
-  for (i, import) in wasm_info.imports.iter().enumerate() {
-    import_statements.push(format!(
-      "import * as __farm__wasmImport_{} from {:?};",
-      i, import.from
-    ));
-
-    let mut import_values = Vec::new();
-    for name in &import.names {
-      import_values.push(format!("{}: __farm__wasmImport_{}[{:?}]", name, i, name));
-    }
-
-    import_object_entries.push(format!(
-      "{:?}: {{ {} }}",
-      import.from,
-      import_values.join(", ")
-    ));
-  }
+  let import_object_entries: Vec<String> = wasm_info
+    .imports
+    .iter()
+    .enumerate()
+    .map(|(i, import)| {
+      let import_values: Vec<String> = import
+        .names
+        .iter()
+        .map(|name| format!("{}: __farm__wasmImport_{}[{:?}]", name, i, name))
+        .collect();
+      format!("{:?}: {{ {} }}", import.from, import_values.join(", "))
+    })
+    .collect();
 
   let init_code = format!(
     r#"const __farm__wasmModule = await {}({{{}}}, {});
-    const __farm__wasmExports = __farm__wasmModule.exports;"#,
-    names.init_wasm,
+const __farm__wasmExports = __farm__wasmModule.exports;"#,
+    wasm_init_name,
     import_object_entries.join(", "),
-    names.wasm_url
+    wasm_url_name
   );
 
-  let mut export_statements = Vec::new();
-  for export in wasm_info.exports {
-    if export == "default" {
-      export_statements.push("export default __farm__wasmExports.default;".to_string());
-    } else {
-      export_statements.push(format!(
-        "export const {} = __farm__wasmExports.{};",
-        export, export
-      ));
-    }
-  }
+  let export_statements: Vec<String> = wasm_info
+    .exports
+    .iter()
+    .map(|export| {
+      if export == "default" {
+        "export default __farm__wasmExports.default;".to_string()
+      } else {
+        format!("export const {} = __farm__wasmExports.{};", export, export)
+      }
+    })
+    .collect();
 
-  let glue_code = [
-    import_statements.join("\n"),
-    init_code,
-    export_statements.join("\n"),
-  ]
-  .join("\n");
-
-  Ok(glue_code)
-}
-
-pub struct GlueNames {
-  pub init_wasm: String,
-  pub wasm_url: String,
+  Ok(
+    [
+      import_statements.join("\n"),
+      init_code,
+      export_statements.join("\n"),
+    ]
+    .join("\n"),
+  )
 }

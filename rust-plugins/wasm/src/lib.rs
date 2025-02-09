@@ -11,7 +11,7 @@ use farmfe_core::{
   serialize,
 };
 use std::{fs, path::Path, sync::Arc};
-use utils::{generate_glue_code, GlueNames};
+use utils::generate_glue_code;
 
 use farmfe_macro_plugin::farm_plugin;
 use farmfe_toolkit::fs::transform_output_filename;
@@ -59,19 +59,19 @@ impl Plugin for FarmfePluginWasm {
     context: &std::sync::Arc<farmfe_core::context::CompilationContext>,
     _hook_context: &farmfe_core::plugin::PluginHookContext,
   ) -> farmfe_core::error::Result<Option<farmfe_core::plugin::PluginLoadHookResult>> {
-    let resolved_path = param.resolved_path;
-    if resolved_path == WASM_HELPER_ID_FARM {
+    let wasm_file_path = param.resolved_path;
+    if wasm_file_path == WASM_HELPER_ID_FARM {
       return Ok(Some(PluginLoadHookResult {
         content: include_str!("wasm_runtime.js").to_string(),
-        module_type: ModuleType::Ts,
+        module_type: ModuleType::Js,
         source_map: None,
       }));
     }
 
-    if resolved_path.ends_with(".wasm") {
+    if wasm_file_path.ends_with(".wasm") {
       let init = param.query.iter().any(|(k, _)| k == "init");
-      let content = fs::read(resolved_path).unwrap();
-      let file_name_ext = Path::new(resolved_path)
+      let content = fs::read(wasm_file_path).unwrap();
+      let file_name_ext = Path::new(wasm_file_path)
         .file_name()
         .map(|x| x.to_string_lossy().to_string())
         .unwrap();
@@ -85,7 +85,7 @@ impl Plugin for FarmfePluginWasm {
         ext,
       );
       let params = EmitFileParams {
-        name: output_file_name.clone(),
+        name: output_file_name,
         content,
         resource_type: ResourceType::Asset("wasm".to_string()),
         resolved_path: param.module_id.to_string(),
@@ -99,28 +99,20 @@ impl Plugin for FarmfePluginWasm {
       //   format!("/{}", resolved_path)
       // };
 
-      let wasm_url = resolved_path;
       let content = if init {
         format!(
           r#"import initWasm from "{WASM_HELPER_ID_FARM}";
-          import wasmUrl from "{wasm_url}?url";
+          import wasmUrl from "{wasm_file_path}?url";
           export default opts => initWasm(opts, wasmUrl)"#,
         )
       } else {
         format!(
           r#"URL = globalThis.URL;
           import initWasm from "{WASM_HELPER_ID_FARM}";
-          import wasmUrl from "{wasm_url}?url";
+          import wasmUrl from "{wasm_file_path}?url";
           {}
           "#,
-          generate_glue_code(
-            param.resolved_path,
-            &GlueNames {
-              init_wasm: "initWasm".to_string(),
-              wasm_url: "wasmUrl".to_string()
-            }
-          )
-          .unwrap()
+          generate_glue_code(wasm_file_path, "initWasm", "wasmUrl").unwrap()
         )
       };
       return Ok(Some(PluginLoadHookResult {
