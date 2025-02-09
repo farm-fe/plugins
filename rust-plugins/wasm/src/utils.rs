@@ -1,6 +1,6 @@
+use farmfe_core::error::{CompilationError, Result};
 use std::collections::HashMap;
 use std::fs;
-use std::path::Path;
 use wasmparser::{Parser, Payload};
 
 #[derive(Debug)]
@@ -15,16 +15,25 @@ pub struct ImportInfo {
   pub names: Vec<String>,
 }
 
-pub fn parse_wasm<P: AsRef<Path>>(wasm_file_path: P) -> Result<WasmInfo, String> {
-  let wasm_binary = fs::read(wasm_file_path).map_err(|e| format!("Failed to read file: {}", e))?;
+pub fn parse_wasm(wasm_file_path: &str) -> Result<WasmInfo> {
+  let wasm_binary = fs::read(wasm_file_path).map_err(|e| CompilationError::LoadError {
+    resolved_path: wasm_file_path.to_string(),
+    source: Some(Box::new(e)),
+  })?;
   let mut imports_map: HashMap<String, Vec<String>> = HashMap::default();
   let mut exports = Vec::new();
 
   for payload in Parser::new(0).parse_all(&wasm_binary) {
-    match payload.map_err(|e| format!("Failed to parse WASM: {}", e))? {
+    match payload.map_err(|e| CompilationError::ParseError {
+      resolved_path: wasm_file_path.to_string(),
+      msg: format!("Failed to parse WASM: {}", e),
+    })? {
       Payload::ImportSection(imports) => {
         for import in imports {
-          let import = import.map_err(|e| format!("Failed to read import: {}", e))?;
+          let import = import.map_err(|e| CompilationError::ParseError {
+            resolved_path: wasm_file_path.to_string(),
+            msg: format!("Failed to read import: {}", e),
+          })?;
           imports_map
             .entry(import.module.to_string())
             .or_default()
@@ -33,7 +42,10 @@ pub fn parse_wasm<P: AsRef<Path>>(wasm_file_path: P) -> Result<WasmInfo, String>
       }
       Payload::ExportSection(exports_section) => {
         for export in exports_section {
-          let export = export.map_err(|e| format!("Failed to read export: {}", e))?;
+          let export = export.map_err(|e| CompilationError::ParseError {
+            resolved_path: wasm_file_path.to_string(),
+            msg: format!("Failed to read export: {}", e),
+          })?;
           exports.push(export.name.to_string());
         }
       }
@@ -49,11 +61,11 @@ pub fn parse_wasm<P: AsRef<Path>>(wasm_file_path: P) -> Result<WasmInfo, String>
   Ok(WasmInfo { imports, exports })
 }
 
-pub fn generate_glue_code<P: AsRef<Path>>(
-  wasm_file_path: P,
+pub fn generate_glue_code(
+  wasm_file_path: &str,
   wasm_init_name: &str,
   wasm_url_name: &str,
-) -> Result<String, String> {
+) -> Result<String> {
   let wasm_info = parse_wasm(wasm_file_path)?;
 
   let import_statements: Vec<String> = wasm_info

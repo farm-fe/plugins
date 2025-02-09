@@ -112,7 +112,7 @@ impl Plugin for FarmfePluginWasm {
           import wasmUrl from "{wasm_file_path}?url";
           {}
           "#,
-          generate_glue_code(wasm_file_path, "initWasm", "wasmUrl").unwrap()
+          generate_glue_code(wasm_file_path, "initWasm", "wasmUrl")?
         )
       };
       return Ok(Some(PluginLoadHookResult {
