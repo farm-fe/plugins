@@ -12,6 +12,7 @@ export default defineConfig({
       assetsFilename: 'static/[resourceName].[hash].[ext]'
     },
     persistentCache: true,
+    presetEnv: false,
     progress: false,
   },
   plugins: [
