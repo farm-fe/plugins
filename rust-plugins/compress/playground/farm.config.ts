@@ -12,11 +12,12 @@ export default defineConfig({
   },
   plugins: [
     react({ runtime: "automatic" }),
-    // farmPlugin({
-    //   // algorithm: 'deflateRaw',
-    //   // // filter: '?????????',
-    //   // deleteOriginFile: true,
-    // })
-    farmPlugin(),
+    farmPlugin({
+      algorithm: 'brotli',
+      filter: '\\.(js|mjs|json|css|html)$',
+      level: 11,
+      threshold: 2048,
+      deleteOriginFile: true,
+    })
   ],
 });

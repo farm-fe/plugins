@@ -9,8 +9,6 @@ use farmfe_core::{config::Config, plugin::Plugin};
 
 use farmfe_macro_plugin::farm_plugin;
 
-use utils::compress_buffer;
-
 mod utils;
 
 #[derive(serde::Deserialize, serde::Serialize, Default)]
@@ -31,6 +29,10 @@ fn default_level() -> u32 {
   6
 }
 
+fn default_threshold() -> usize {
+  1024
+}
+
 #[derive(serde::Deserialize, serde::Serialize, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct Options {
@@ -38,6 +40,8 @@ pub struct Options {
   pub algorithm: CompressAlgorithm,
   #[serde(default = "default_level")]
   pub level: u32,
+  #[serde(default = "default_threshold")]
+  pub threshold: usize,
   #[serde(default = "default_filter")]
   pub filter: String,
   pub delete_origin_file: Option<bool>,
@@ -78,13 +82,13 @@ impl Plugin for FarmfePluginCompress {
     let start = std::time::Instant::now();
     let ext_name = utils::get_ext_name(&self.options.algorithm);
     let filter = Regex::new(&self.options.filter)
-      .map_err(|e| CompilationError::GenericError(format!("Invalid regex expression: {}", e)))?;
+      .map_err(|e| CompilationError::GenericError(format!("Invalid regex expression for compress plugin: {}", e)))?;
 
     let compressed_buffers = param
       .resources_map
       .par_iter_mut()
       .filter_map(|(resource_id, resource)| {
-        if !filter.is_match(&resource_id) {
+        if !filter.is_match(&resource_id) || resource.bytes.len() < self.options.threshold {
           return None;
         }
         if self.options.delete_origin_file.unwrap_or(false) {
@@ -93,7 +97,7 @@ impl Plugin for FarmfePluginCompress {
         Some((
           resource_id.to_string(),
           resource.origin.clone(),
-          compress_buffer(&resource.bytes, &self.options.algorithm, self.options.level),
+          utils::compress_buffer(&resource.bytes, &self.options.algorithm, self.options.level),
           resource.bytes.len(),
         ))
       })
