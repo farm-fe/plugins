@@ -7,17 +7,21 @@ use farmfe_core::{
 
 use crate::CompressAlgorithm;
 
-pub fn compress_buffer(buffer: &[u8], algorithm: &CompressAlgorithm) -> Result<Vec<u8>> {
+pub fn compress_buffer(
+  buffer: &[u8],
+  algorithm: &CompressAlgorithm,
+  level: u32,
+) -> Result<Vec<u8>> {
   match algorithm {
-    CompressAlgorithm::Brotli => brotli_compress(buffer),
-    CompressAlgorithm::Gzip => gzip_compress(buffer),
-    CompressAlgorithm::DeflateRaw => deflate_raw_compress(buffer),
-    CompressAlgorithm::Deflate => deflate_compress(buffer),
+    CompressAlgorithm::Brotli => brotli_compress(buffer, level),
+    CompressAlgorithm::Gzip => gzip_compress(buffer, level),
+    CompressAlgorithm::DeflateRaw => deflate_raw_compress(buffer, level),
+    CompressAlgorithm::Deflate => deflate_compress(buffer, level),
   }
 }
 
-pub fn gzip_compress(buffer: &[u8]) -> Result<Vec<u8>> {
-  let mut encoder = flate2::write::GzEncoder::new(Vec::new(), flate2::Compression::default());
+pub fn gzip_compress(buffer: &[u8], level: u32) -> Result<Vec<u8>> {
+  let mut encoder = flate2::write::GzEncoder::new(Vec::new(), flate2::Compression::new(level));
   encoder
     .write_all(buffer)
     .map_err(|e| CompilationError::GenerateResourcesError {
@@ -34,8 +38,8 @@ pub fn gzip_compress(buffer: &[u8]) -> Result<Vec<u8>> {
     })
 }
 
-pub fn deflate_compress(buffer: &[u8]) -> Result<Vec<u8>> {
-  let mut encoder = flate2::write::ZlibEncoder::new(Vec::new(), flate2::Compression::best());
+pub fn deflate_compress(buffer: &[u8], level: u32) -> Result<Vec<u8>> {
+  let mut encoder = flate2::write::ZlibEncoder::new(Vec::new(), flate2::Compression::new(level));
   encoder
     .write_all(buffer)
     .map_err(|e| CompilationError::GenerateResourcesError {
@@ -52,8 +56,8 @@ pub fn deflate_compress(buffer: &[u8]) -> Result<Vec<u8>> {
     })
 }
 
-pub fn deflate_raw_compress(buffer: &[u8]) -> Result<Vec<u8>> {
-  let mut encoder = flate2::write::DeflateEncoder::new(Vec::new(), flate2::Compression::default());
+pub fn deflate_raw_compress(buffer: &[u8], level: u32) -> Result<Vec<u8>> {
+  let mut encoder = flate2::write::DeflateEncoder::new(Vec::new(), flate2::Compression::new(level));
   encoder
     .write_all(buffer)
     .map_err(|e| CompilationError::GenerateResourcesError {
@@ -70,8 +74,9 @@ pub fn deflate_raw_compress(buffer: &[u8]) -> Result<Vec<u8>> {
     })
 }
 
-pub fn brotli_compress(buffer: &[u8]) -> Result<Vec<u8>> {
-  let mut encoder = brotli::CompressorWriter::new(Vec::new(), 4096, 11, 22);
+pub fn brotli_compress(buffer: &[u8], level: u32) -> Result<Vec<u8>> {
+  let mut encoder = brotli::CompressorWriter::new(Vec::new(), 4096, level, 22);
+  // let mut encoder = brotli::CompressorWriter::with_params(Vec::new(), 4096, &BrotliEncoderInitParams());
   encoder
     .write_all(buffer)
     .map_err(|e| CompilationError::GenerateResourcesError {

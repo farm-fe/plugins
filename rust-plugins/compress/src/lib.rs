@@ -27,11 +27,17 @@ fn default_filter() -> String {
   "\\.(js|mjs|json|css|html)$".to_string()
 }
 
+fn default_level() -> u32 {
+  6
+}
+
 #[derive(serde::Deserialize, serde::Serialize, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct Options {
   #[serde(default)]
   pub algorithm: CompressAlgorithm,
+  #[serde(default = "default_level")]
+  pub level: u32,
   #[serde(default = "default_filter")]
   pub filter: String,
   pub delete_origin_file: Option<bool>,
@@ -87,7 +93,7 @@ impl Plugin for FarmfePluginCompress {
         Some((
           resource_id.to_string(),
           resource.origin.clone(),
-          compress_buffer(&resource.bytes, &self.options.algorithm),
+          compress_buffer(&resource.bytes, &self.options.algorithm, self.options.level),
           resource.bytes.len(),
         ))
       })
