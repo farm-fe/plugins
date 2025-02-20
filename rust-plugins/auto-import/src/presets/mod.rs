@@ -40,7 +40,7 @@ pub enum PresetItem {
 }
 
 pub struct Preset {
-  form: String,
+  from: String,
   import: String,
   alias: Option<String>,
 }
@@ -62,29 +62,29 @@ pub fn parse_presets(presets: &Vec<PresetItem>) -> Vec<Preset> {
             continue;
           }
         };
-        let form = preset.from;
+        let from = preset.from;
         for import in &preset.imports {
           parsed_presets.push(Preset {
-            form: form.clone(),
+            from: from.clone(),
             import: import.clone(),
             alias: None,
           });
         }
       }
       PresetItem::Custom(custom_preset) => {
-        for (form, imports) in &custom_preset.imports {
+        for (from, imports) in &custom_preset.imports {
           for import in imports {
             match import {
               ImportItem::String(import) => {
                 parsed_presets.push(Preset {
-                  form: form.clone(),
+                  from: from.clone(),
                   import: import.clone(),
                   alias: None,
                 });
               }
               ImportItem::Alias(aliases) => {
                 parsed_presets.push(Preset {
-                  form: form.clone(),
+                  from: from.clone(),
                   import: aliases[0].clone(),
                   alias: Some(aliases[1].clone()),
                 });
@@ -94,10 +94,10 @@ pub fn parse_presets(presets: &Vec<PresetItem>) -> Vec<Preset> {
         }
       }
       PresetItem::ImportPreset(import_preset) => {
-        let form = import_preset.from.clone();
+        let from = import_preset.from.clone();
         for import in &import_preset.imports {
           parsed_presets.push(Preset {
-            form: form.clone(),
+            from: from.clone(),
             import: import.clone(),
             alias: None,
           });
@@ -113,7 +113,7 @@ pub fn resolve_presets(presets: &Vec<PresetItem>) -> Vec<Import> {
   for p in parsed_presets {
     if p.alias.is_some() {
       let import = Import {
-        form: p.form,
+        from: p.from,
         name: p.import,
         priority: 0,
         export_type: ExportType::Namespace,
@@ -124,7 +124,7 @@ pub fn resolve_presets(presets: &Vec<PresetItem>) -> Vec<Import> {
       continue;
     } else {
       let import = Import {
-        form: p.form,
+        from: p.from,
         name: p.import,
         priority: 0,
         export_type: ExportType::Declaration,

@@ -168,6 +168,7 @@ impl Plugin for FarmfePluginAutoImport {
       //   map.to_writer(&mut buf).expect("failed to write sourcemap");
       //   Some(String::from_utf8(buf).unwrap())
       // };
+      println!("content:{}", content);
       Ok(Some(farmfe_core::plugin::PluginTransformHookResult {
         content,
         source_map: None,
