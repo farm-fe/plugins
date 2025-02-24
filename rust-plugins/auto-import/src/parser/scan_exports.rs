@@ -11,7 +11,7 @@ const FILE_EXTENSION_LOOKUP: [&'static str; 8] =
 
 #[derive(Debug, Default, Clone, PartialEq, Eq)]
 pub struct Import {
-  pub form: String,
+  pub from: String,
   pub name: String,
   pub priority: usize,
   pub export_type: ExportType,
@@ -26,25 +26,25 @@ pub struct Import {
 impl Import {
   pub fn stringify_import(&self) -> String {
     match self.export_type {
-      ExportType::DefaultDecl => format!("import {} from '{}';\n", self.name, self.form),
+      ExportType::DefaultDecl => format!("import {} from '{}';\n", self.name, self.from),
       ExportType::Declaration | ExportType::Named => {
-        format!("import {{ {} }} from '{}';\n", self.name, self.form)
+        format!("import {{ {} }} from '{}';\n", self.name, self.from)
       }
       ExportType::Namespace => {
         if let Some(as_name) = &self.as_name {
           if as_name == &self.name {
-            format!("import {{ {} }} from '{}';\n", self.name, self.form)
+            format!("import {{ {} }} from '{}';\n", self.name, self.from)
           } else {
             format!(
               "import {{ {} as {} }} from '{}';\n",
-              self.name, as_name, self.form
+              self.name, as_name, self.from
             )
           }
         } else {
-          format!("import {{ {} }} from '{}';\n", self.name, self.form)
+          format!("import {{ {} }} from '{}';\n", self.name, self.from)
         }
       }
-      ExportType::Type => format!("import {{ type {} }} from '{}';\n", self.name, self.form),
+      ExportType::Type => format!("import {{ type {} }} from '{}';\n", self.name, self.from),
       _ => String::new(),
     }
   }
@@ -93,7 +93,7 @@ pub fn scan_exports(file_path: &str, content: Option<&str>) -> Vec<Import> {
         if let Some(type_named_export) = type_named_exports {
           for (_k, v) in type_named_export {
             exports_names.push(Import {
-              form: file_path.to_string(),
+              from: file_path.to_string(),
               tp: Some(true),
               export_type: export_type.clone(),
               name: v,
@@ -109,7 +109,7 @@ pub fn scan_exports(file_path: &str, content: Option<&str>) -> Vec<Import> {
       }
       ExportType::DefaultDecl => {
         exports_names.push(Import {
-          form: file_path.to_string(),
+          from: file_path.to_string(),
           name: filename.clone(),
           export_type,
           priority: 0,
@@ -123,7 +123,7 @@ pub fn scan_exports(file_path: &str, content: Option<&str>) -> Vec<Import> {
       }
       ExportType::Declaration => {
         exports_names.push(Import {
-          form: file_path.to_string(),
+          from: file_path.to_string(),
           name: name.unwrap(),
           export_type,
           priority: 0,
@@ -136,7 +136,7 @@ pub fn scan_exports(file_path: &str, content: Option<&str>) -> Vec<Import> {
         });
       }
       ExportType::Namespace => exports_names.push(Import {
-        form: file_path.to_string(),
+        from: file_path.to_string(),
         name: name.clone().unwrap(),
         export_type,
         priority: 0,
@@ -151,7 +151,7 @@ pub fn scan_exports(file_path: &str, content: Option<&str>) -> Vec<Import> {
         if let Some(named_export) = named_exports {
           for (_k, v) in named_export {
             exports_names.push(Import {
-              form: file_path.to_string(),
+              from: file_path.to_string(),
               name: v,
               export_type: export_type.clone(),
               priority: 0,
