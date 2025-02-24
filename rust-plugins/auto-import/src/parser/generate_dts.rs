@@ -24,12 +24,12 @@ pub fn remove_tsx_jsx_suffix(s: &str) -> String {
 pub fn stringify_presets(item: &Import) -> String {
   format!(
     "\tconst {}: typeof import('{}')['{}']\n",
-    item.as_name.clone().unwrap_or(item.name.clone()), item.form, item.name
+    item.as_name.clone().unwrap_or(item.name.clone()), item.from, item.name
   )
 }
 
 pub fn stringify_imports_dts(dts_file_path: &str, item: &Import) -> String {
-  let related = format!("./{}", relative(dts_file_path, &item.form));
+  let related = format!("./{}", relative(dts_file_path, &item.from));
   let import_path = remove_tsx_jsx_suffix(&related);
   let is_export_decl = match item.export_type {
     ExportType::DefaultDecl => false,
