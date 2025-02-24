@@ -82,7 +82,6 @@ jobs:
       - name: Install Dependencies
         run: |
           npm config set registry https://registry.npmmirror.com
-          corepack disable
           npm install -g pnpm@9.1.0
           pnpm i --frozen-lockfile
       - run: rustup target add ${{ matrix.settings.target }}
