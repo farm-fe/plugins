@@ -5,6 +5,7 @@ use farmfe_core::{
   config::Config,
   context::{CompilationContext, EmitFileParams},
   deserialize,
+  error::CompilationError,
   module::ModuleType,
   plugin::{Plugin, PluginLoadHookResult, PluginResolveHookResult},
   resource::{Resource, ResourceOrigin, ResourceType},
@@ -70,11 +71,10 @@ impl Plugin for FarmfePluginWasm {
 
     if wasm_file_path.ends_with(".wasm") {
       let init = param.query.iter().any(|(k, _)| k == "init");
-      let content =
-        fs::read(wasm_file_path).map_err(|e| farmfe_core::error::CompilationError::LoadError {
-          resolved_path: wasm_file_path.to_string(),
-          source: e,
-        })?;
+      let content = fs::read(wasm_file_path).map_err(|e| CompilationError::LoadError {
+        resolved_path: wasm_file_path.to_string(),
+        source: Some(Box::new(e)),
+      })?;
       let file_name_ext = Path::new(wasm_file_path)
         .file_name()
         .map(|x| x.to_string_lossy().to_string())
