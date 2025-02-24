@@ -77,7 +77,7 @@ jobs:
           node-version: 18
       - name: Install Dependencies
         run: |
-          npm install -g corepack@latest
+          npm install -g corepack@latest --force
           npm config set registry https://registry.npmmirror.com
           npm install -g pnpm@9.1.0
           # COREPACK_ENABLE_STRICT=0 corepack enable
