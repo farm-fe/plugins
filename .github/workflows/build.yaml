@@ -17,7 +17,6 @@ jobs:
               set -e &&
               unset CC_x86_64_unknown_linux_gnu &&
               unset CC &&
-              npm config set registry https://registry.npmmirror.com &&
               corepack disable || true &&
               npm install -g pnpm@9.1.0 &&
               export PNPM_HOME="/root/.local/share/pnpm" &&
