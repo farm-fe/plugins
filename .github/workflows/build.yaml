@@ -61,7 +61,7 @@ jobs:
             target: aarch64-unknown-linux-gnu
             zig: true
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 2
       # - run: |
@@ -77,9 +77,10 @@ jobs:
           node-version: 18
       - name: Install Dependencies
         run: |
+          npm install -g corepack@latest
           npm config set registry https://registry.npmmirror.com
           npm install -g pnpm@9.1.0
-          COREPACK_ENABLE_STRICT=0 corepack enable
+          # COREPACK_ENABLE_STRICT=0 corepack enable
           pnpm i --frozen-lockfile
       - run: rustup target add ${{ matrix.settings.target }}
         if: ${{ matrix.settings.target }}
@@ -98,7 +99,7 @@ jobs:
         if: ${{ matrix.settings.docker }}
         with:
           image: ${{ matrix.settings.docker }}
-          options: --user 0:0 -v ${{ env.HOME }}/.cargo/git:/root/.cargo/git -v ${{ env.HOME }}/.cargo/registry:/root/.cargo/registry -v ${{ github.workspace }}:/build -w /build
+          options: -v ${{ env.HOME }}/.cargo/git:/root/.cargo/git -v ${{ env.HOME }}/.cargo/registry:/root/.cargo/registry -v ${{ github.workspace }}:/build -w /build
           run: ${{ matrix.settings.build }}
       - name: Default Build
         if: ${{ !matrix.settings.docker && !matrix.settings.build }}
