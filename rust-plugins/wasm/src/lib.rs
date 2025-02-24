@@ -111,8 +111,7 @@ impl Plugin for FarmfePluginWasm {
         )
       } else {
         format!(
-          r#"URL = globalThis.URL;
-          import initWasm from "{WASM_HELPER_ID_FARM}";
+          r#"import initWasm from "{WASM_HELPER_ID_FARM}";
           import wasmUrl from "{wasm_file_path}?url";
           {}
           "#,
