@@ -77,10 +77,9 @@ jobs:
           node-version: 18
       - name: Install Dependencies
         run: |
-          npm install -g corepack@latest --force
           npm config set registry https://registry.npmmirror.com
+          corepack disable
           npm install -g pnpm@9.1.0
-          # COREPACK_ENABLE_STRICT=0 corepack enable
           pnpm i --frozen-lockfile
       - run: rustup target add ${{ matrix.settings.target }}
         if: ${{ matrix.settings.target }}
