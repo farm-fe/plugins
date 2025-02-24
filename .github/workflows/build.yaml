@@ -17,6 +17,11 @@ jobs:
               set -e &&
               unset CC_x86_64_unknown_linux_gnu &&
               unset CC &&
+              npm config set registry https://registry.npmmirror.com &&
+              corepack disable || true &&
+              npm install -g pnpm@9.1.0 &&
+              export PNPM_HOME="/root/.local/share/pnpm" &&
+              export PATH="$PNPM_HOME:$PATH" &&
               pnpm --filter "{rust-plugins}[HEAD~1]" --sequential build --target x86_64-unknown-linux-gnu --abi linux-x64-gnu
           - os: ubuntu-latest
             docker: ghcr.io/napi-rs/napi-rs/nodejs-rust:lts-alpine
