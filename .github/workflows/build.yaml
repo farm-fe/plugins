@@ -30,7 +30,7 @@ jobs:
               set -e &&
               unset CC_x86_64_unknown_linux_musl &&
               unset CC &&
-              pnpm  --filter "{rust-plugins}[HEAD~1]" --sequential build --target x86_64-unknown-linux-musl --abi linux-x64-musl
+              pnpm --filter "{rust-plugins}[HEAD~1]" --sequential build --target x86_64-unknown-linux-musl --abi linux-x64-musl
           - os: windows-latest
             abi: win32-x64-msvc
           - os: macos-latest
@@ -80,7 +80,10 @@ jobs:
         with:
           node-version: 18
       - name: Install Dependencies
-        run: npm config set registry https://registry.npmmirror.com && npm install -g pnpm@9.1.0 && pnpm i --frozen-lockfile
+        run: |
+          npm config set registry https://registry.npmmirror.com
+          npm install -g pnpm@9.1.0
+          pnpm i --frozen-lockfile
       - run: rustup target add ${{ matrix.settings.target }}
         if: ${{ matrix.settings.target }}
       # Use the v1 of this action
