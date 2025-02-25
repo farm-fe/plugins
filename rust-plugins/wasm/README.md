@@ -1,6 +1,6 @@
 # @farmfe/plugin-wasm
 
-A farm plugin for importing Wasm modules.
+A Farm plugin for seamless WebAssembly integration and support `wasm-pack` generated modules.
 
 ## Installation
 
@@ -48,4 +48,9 @@ init({
 });
 ```
 
-In production builds, `.wasm` files smaller than the `assetInlineLimit` will be inlined as base64 strings. Otherwise, they will be treated as static assets and fetched on demand.
+You can also directly import WASM packages like ESM modules without using the `?init` query:
+
+```ts
+import { someFunc } from 'wasm-project';
+someFunc(); // Run this wasm function
+```
