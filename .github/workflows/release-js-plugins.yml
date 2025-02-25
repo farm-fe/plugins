@@ -12,7 +12,7 @@ jobs:
     name: release
     steps:
       - name: Checkout repo
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           fetch-depth: 2
 
@@ -20,7 +20,7 @@ jobs:
       #     git fetch --no-tags --prune --depth=1 origin +refs/heads/main:refs/remotes/HEAD~1
 
       - name: Setup Node
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: 20
           registry-url: https://registry.npmjs.org/
