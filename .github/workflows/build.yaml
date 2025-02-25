@@ -65,7 +65,7 @@ jobs:
             target: aarch64-unknown-linux-gnu
             zig: true
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 2
       # - run: |
@@ -76,7 +76,7 @@ jobs:
         with:
           shared-key: rust-build-${{ matrix.settings.abi }}
 
-      - uses: actions/setup-node@v3
+      - uses: actions/setup-node@v4
         with:
           node-version: 18
       - name: Install Dependencies
