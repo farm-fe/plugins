@@ -22,6 +22,7 @@
 | [wasm](rust-plugins/wasm)                         | Add WebAssembly ESM integration support generated modules.                                                                                     |
 | [worker](rust-plugins/worker)                     | A web worker script can be imported using new Worker() and new SharedWorker().(Inspired by [vite](https://github.com/vitejs/vite))             |
 | [modular-import](rust-plugins/modular-import)                         | Modular UI library build plugin for Farm.                                                                                     |
+| [compress](rust-plugins/compress)                         | A Farm plugin which compresses assets like JavaScript, CSS, and HTML files.                                                                                     |
 |                                                   |                                                                                                                                                |
 
 ### JavaScript plugins
@@ -41,9 +42,6 @@ Thanks go to these wonderful people:
 <a href="https://github.com/farm-fe/plugins/graphs/contributors">
     <img src="https://contri.buzz/api/wall?repo=farm-fe/plugins" alt="Contributors' Wall for farm-fe/plugins" />
 </a>
-
-## Community plugins
-[farm-plugin-compression](https://github.com/Weeken/farm-plugin-compression) A rust plugin for farm to compress resources.
 
 ## Credits
 
