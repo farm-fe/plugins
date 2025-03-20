@@ -1,5 +1,11 @@
 # @farmfe/plugin-mdx
 
+## 0.0.7
+
+### Patch Changes
+
+- update ci config to release packages
+
 ## 0.0.6
 
 ### Patch Changes

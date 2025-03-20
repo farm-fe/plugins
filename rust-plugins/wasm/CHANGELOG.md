@@ -1,5 +1,11 @@
 # @farmfe/plugin-wasm
 
+## 0.0.8
+
+### Patch Changes
+
+- ab6a0a0: Rewrite wasm plugin to parse wasm binary imports
+
 ## 0.0.6
 
 ### Patch Changes
