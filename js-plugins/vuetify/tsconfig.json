@@ -2,8 +2,8 @@
   "exclude": ["node_modules"],
   "include": ["src/**/*"],
   "compilerOptions": {
-    "noUnusedParameters": false,
-    "noUnusedLocals": false,
+    "noUnusedParameters": true,
+    "noUnusedLocals": true,
     "outDir": "dist",
     "rootDir": "src",
     "lib": ["DOM", "ESNext"],

@@ -48,7 +48,7 @@ export default function farmPlugin(_options?: Options): JsPlugin[] {
 
       if (!vuePlugin) {
         throw new Error(
-          "No Vue plugin found, please install neither @vitejs/plugin-vue nor unplugin-vue.",
+          "No Vue plugin found, please install either @vitejs/plugin-vue nor unplugin-vue.",
         );
       }
 
@@ -137,7 +137,7 @@ export default function farmPlugin(_options?: Options): JsPlugin[] {
             // this is a workaround and may not work properly.
             const target = source.replace(/\.css$/, ".sass");
             const file = path.relative(path.join(vuetifyBase, "lib"), target);
-            const contents = `@use "${normalizePath(configFile)}\n@use "${normalizePath(target)}"`;
+            const contents = `@use "${normalizePath(configFile)};\n@use "${normalizePath(target)}";`;
             tempFiles.set(file, contents);
             return { resolvedPath: `${VIRTUAL_MODULE_ID}:${file}` };
           }
