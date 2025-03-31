@@ -21,26 +21,23 @@
 | [icons](rust-plugins/icons)                       | Load Access thousands of icons as components on-demand universally. (Inspired by [unplugin-icons](https://github.com/unplugin/unplugin-icons)) |
 | [wasm](rust-plugins/wasm)                         | Add WebAssembly ESM integration support generated modules.                                                                                     |
 | [worker](rust-plugins/worker)                     | A web worker script can be imported using new Worker() and new SharedWorker().(Inspired by [vite](https://github.com/vitejs/vite))             |
-| [modular-import](rust-plugins/modular-import)                         | Modular UI library build plugin for Farm.                                                                                     |
-| [compress](rust-plugins/compress)                         | A Farm plugin which compresses assets like JavaScript, CSS, and HTML files.                                                                                     |
+| [modular-import](rust-plugins/modular-import)     | Modular UI library build plugin for Farm.                                                                                                      |
+| [compress](rust-plugins/compress)                 | A Farm plugin which compresses assets like JavaScript, CSS, and HTML files.                                                                    |
 |                                                   |                                                                                                                                                |
 
 ### JavaScript plugins
 
-|                         |                                                                                                              |
-| ----------------------- | ------------------------------------------------------------------------------------------------------------ |
-| [copy](js-plugins/copy) | Copy files and folders Inspired by [rollup-plugin-copy](https://github.com/vladshcherbin/rollup-plugin-copy) |
-|                         |                                                                                                              |
-
-
-
-
+|                               |                                                                                                              |
+| ----------------------------- | ------------------------------------------------------------------------------------------------------------ |
+| [copy](js-plugins/copy)       | Copy files and folders Inspired by [rollup-plugin-copy](https://github.com/vladshcherbin/rollup-plugin-copy) |
+|                               |                                                                                                              |
+| [vuetify](js-plugins/vuetify) | Plugin for [Vuetify](https://vuetifyjs.com/)                                                                 |
 
 ## Contributors ✨
 
 Thanks go to these wonderful people:
 <a href="https://github.com/farm-fe/plugins/graphs/contributors">
-    <img src="https://contri.buzz/api/wall?repo=farm-fe/plugins" alt="Contributors' Wall for farm-fe/plugins" />
+<img src="https://contri.buzz/api/wall?repo=farm-fe/plugins" alt="Contributors' Wall for farm-fe/plugins" />
 </a>
 
 ## Credits
@@ -50,6 +47,7 @@ Thanks to:
 - The [rollup/plugins](https://github.com/rollup/plugins) project, which Provides a lot of inspiration.
 
 ## License
+
 [MIT](./LICENSE)
 
 ## Star History

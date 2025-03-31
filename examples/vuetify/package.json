@@ -1,0 +1,38 @@
+{
+  "name": "vuetify",
+  "private": true,
+  "type": "module",
+  "version": "0.0.0",
+  "scripts": {
+    "dev": "farm",
+    "build": "run-p type-check \"build-only {@}\" --",
+    "preview": "farm preview",
+    "build-only": "farm build",
+    "type-check": "vue-tsc --build --force"
+  },
+  "dependencies": {
+    "@mdi/font": "7.4.47",
+    "roboto-fontface": "^0.10.0",
+    "vue": "^3.5.13",
+    "vuetify": "^3.7.19"
+  },
+  "devDependencies": {
+    "@farmfe/cli": "^1.0.4",
+    "@farmfe/core": "^1.7.1",
+    "@farmfe/js-plugin-vuetify": "workspace:*",
+    "@tsconfig/node22": "^22.0.1",
+    "@types/node": "^22.13.14",
+    "@vitejs/plugin-vue": "^4",
+    "@vue/eslint-config-typescript": "^14.5.0",
+    "@vue/tsconfig": "^0.5.1",
+    "core-js": "^3.36.1",
+    "npm-run-all2": "^7.0.2",
+    "sass": "1.77.8",
+    "sass-embedded": "^1.86.0",
+    "typescript": "~5.6.3",
+    "unplugin-fonts": "^1.3.1",
+    "unplugin-vue": "^6.0.1",
+    "unplugin-vue-components": "^0.27.5",
+    "vue-tsc": "^2.2.8"
+  }
+}
