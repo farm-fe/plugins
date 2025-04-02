@@ -1,5 +1,11 @@
 # @farmfe/plugin-auto-import
 
+## 0.0.8
+
+### Patch Changes
+
+- fix: scan_dirs_exports exprot all
+
 ## 0.0.7
 
 ### Patch Changes

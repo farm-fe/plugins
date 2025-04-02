@@ -17,18 +17,9 @@ export default defineConfig({
       presets: [
         "react",
         "react-router",
-        {
-          '@vueuse/core': [
-            'useMouse',
-            ['useFetch', 'useMyFetch']
-          ],
-        },
-        {
-          from: 'vue-router',
-          imports: ['RouteLocationRaw'],
-        },
+        "react-router-dom",
       ],
-      dirs: ["src/apis"],
+      dirs: ['src/apis'],
       ignore:[]
     }),
     visualizer()

@@ -4,8 +4,9 @@ import FarmLogo from "./assets/logo.png";
 export function Main() {
   const [count, setCount] = useState(0);
   const data = getName()
+  const css = getCss()
   console.log(data);
-
+  console.log(css);
   console.log("rendering Main component")
   return (
     <>

@@ -166,19 +166,33 @@ pub fn scan_exports(file_path: &str, content: Option<&str>) -> Vec<Import> {
         }
       }
       ExportType::All => {
-        let specifier_path = Path::new(file_path).join(specifier.unwrap());
-        let specifier_path = normalize_path(specifier_path.to_str().unwrap());
-        let file_exts = FILE_EXTENSION_LOOKUP.to_vec();
-        // check specifier_path is a directory
-        if metadata(&specifier_path).unwrap().is_dir() {
-          // check if specifier_path has index.tsx ...
-          for ext in &file_exts {
-            let index_path = format!("{}/index{}", specifier_path, ext);
-            if metadata(&index_path).is_ok() {
-              let index_content = read_to_string(&index_path).unwrap();
-              let index_exports = scan_exports(&index_path, Some(&index_content));
-              exports_names.extend(index_exports);
-              break;
+        // file_path is a file , need to get the file parent dir path
+        let file_path = Path::new(file_path);
+        if let Some(parent_dir_path) = file_path.parent() {
+          let specifier_path = parent_dir_path.join(specifier.unwrap());
+          let specifier_path = normalize_path(specifier_path.to_str().unwrap());
+          let file_exts = FILE_EXTENSION_LOOKUP.to_vec();
+          if metadata(&specifier_path).unwrap().is_dir() {
+            // check if specifier_path has index.tsx ...
+            for ext in &file_exts {
+              let index_path = format!("{}/index{}", specifier_path, ext);
+              if metadata(&index_path).is_ok() {
+                let index_content = read_to_string(&index_path).unwrap();
+                let index_exports = scan_exports(&index_path, Some(&index_content));
+                exports_names.extend(index_exports);
+                break;
+              }
+            }
+          } else {
+            // check if specifier_path is a file
+            for ext in &file_exts {
+              let index_path = format!("{}{}", specifier_path, ext);
+              if metadata(&index_path).is_ok() {
+                let index_content = read_to_string(&index_path).unwrap();
+                let index_exports = scan_exports(&index_path, Some(&index_content));
+                exports_names.extend(index_exports);
+                break;
+              }
             }
           }
         }

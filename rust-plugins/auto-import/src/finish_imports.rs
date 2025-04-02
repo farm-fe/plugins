@@ -47,10 +47,14 @@ pub fn finish_imports(params: FinishImportsParams) {
     .into_iter()
     .filter(|import| !ignore.iter().any(|ignore| ignore.is_match(&import.name)))
     .collect::<Vec<_>>();
-  let local_imports = scan_dirs_exports(&root_path, &dirs.clone())
-    .into_iter()
-    .filter(|import| !ignore.iter().any(|ignore| ignore.is_match(&import.name)))
-    .collect::<Vec<_>>();
+  let local_imports = if dirs.len() > 0 {
+    scan_dirs_exports(&root_path, &dirs.clone())
+      .into_iter()
+      .filter(|import| !ignore.iter().any(|ignore| ignore.is_match(&import.name)))
+      .collect::<Vec<_>>()
+  } else {
+    vec![]
+  };
   let mut context_imports_guard = match context_imports.lock() {
     Ok(guard) => guard,
     Err(poisoned) => poisoned.into_inner(),
@@ -79,6 +83,12 @@ pub fn finish_imports(params: FinishImportsParams) {
   }
   if has_new_or_removed_imports {
     presets_imports.extend(local_imports);
-    *context_imports_guard = presets_imports;
+    let mut new_imports = vec![];
+    for import in presets_imports {
+      if !new_imports.iter().any(|i: &Import| i.name == import.name) {
+        new_imports.push(import);
+      }
+    }
+    *context_imports_guard = new_imports;
   }
 }
