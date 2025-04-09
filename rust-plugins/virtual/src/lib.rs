@@ -15,7 +15,7 @@ use utils::{normalize_path, path_join};
 
 use farmfe_macro_plugin::farm_plugin;
 
-const VIRTUAL_PREFIX: &str = "\0virtual:";
+const VIRTUAL_PREFIX: &str = "farm-virtual:";
 
 /// Error types specific to virtual module operations
 #[derive(Debug, Error)]
