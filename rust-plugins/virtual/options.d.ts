@@ -1,1 +1,1 @@
-export type IPluginOptions = Record<string, any>;
+export type IPluginOptions = Record<string, string>;
