@@ -1,5 +1,17 @@
 # @farmfe/plugin-virtual
 
+## 0.0.12
+
+### Patch Changes
+
+- update version
+
+## 0.0.11
+
+### Patch Changes
+
+- fix \0 prefix
+
 ## 0.0.10
 
 ### Patch Changes

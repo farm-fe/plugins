@@ -20,6 +20,6 @@
     "core-js": "^3.36.1",
     "@types/react-dom": "18",
     "react-refresh": "^0.14.0",
-    "@farmfe/plugin-virtual":"workspace:*"
+    "@farmfe/plugin-virtual": "workspace:*"
   }
 }
