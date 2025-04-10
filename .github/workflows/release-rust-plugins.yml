@@ -52,11 +52,6 @@ jobs:
       - name: Install Dependencies
         run: npm install -g pnpm@9.1.0 && pnpm i --frozen-lockfile
 
-      - name: Create Release Pull Request or Publish to npm
-        id: changesets
-        uses: changesets/action@v1
-        with:
-          publish: npm config set access public && pnpm --filter "{rust-plugins}[HEAD~1]" publish --no-git-checks
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+      - name: Publish to npm
+        run: |
+          npm set //registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }} && npm config set access public && pnpm --filter "{rust-plugins}[HEAD~1]" publish --no-git-checks
