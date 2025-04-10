@@ -41,7 +41,11 @@ jobs:
       - name: Build Packages
         run: |
           pnpm --filter "{js-plugins}[HEAD~1]" build
-
-      - name: Release and Publish Packages
-        run: |
-          npm set //registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }} && npm config set access public && pnpm --filter "{js-plugins}[HEAD~1]" publish --no-git-checks
+      - name: Create Release Pull Request or Publish to npm
+        id: changesets
+        uses: changesets/action@v1
+        with:
+          publish: npm config set access public && pnpm --filter "{js-plugins}[HEAD~1]" publish --no-git-checks
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
