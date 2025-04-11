@@ -1,6 +1,5 @@
 name: Building Rust Binding And Upload Artifacts
 on: workflow_call
-
 jobs:
   build:
     name: Build and Upload Artifacts - ${{ matrix.settings.abi }}
@@ -12,50 +11,50 @@ jobs:
           - os: ubuntu-latest
             docker: ghcr.io/napi-rs/napi-rs/nodejs-rust:lts-debian
             abi: linux-x64-gnu
-            build: >-
-              git config --global --add safe.directory /build &&
-              set -e &&
-              unset CC_x86_64_unknown_linux_gnu &&
-              unset CC &&
-              corepack disable || true &&
-              npm install -g pnpm@9.1.0 &&
-              export PNPM_HOME="/root/.local/share/pnpm" &&
-              export PATH="$PNPM_HOME:$PATH" &&
-              pnpm --filter "{rust-plugins}[HEAD~1]" --sequential build --target x86_64-unknown-linux-gnu --abi linux-x64-gnu
+            build: git config --global --add safe.directory /build && set -e && unset
+              CC_x86_64_unknown_linux_gnu && unset CC && corepack disable ||
+              true && npm install -g pnpm@9.1.0 && export
+              PNPM_HOME="/root/.local/share/pnpm" && export
+              PATH="$PNPM_HOME:$PATH" && pnpm --filter "{rust-plugins}[HEAD~1]"
+              --sequential build --target x86_64-unknown-linux-gnu --abi
+              linux-x64-gnu
           - os: ubuntu-latest
             docker: ghcr.io/napi-rs/napi-rs/nodejs-rust:lts-alpine
             abi: linux-x64-musl
-            build: >-
-              git config --global --add safe.directory /build &&
-              set -e &&
-              unset CC_x86_64_unknown_linux_musl &&
-              unset CC &&
-              pnpm --filter "{rust-plugins}[HEAD~1]" --sequential build --target x86_64-unknown-linux-musl --abi linux-x64-musl
+            build: git config --global --add safe.directory /build && set -e && unset
+              CC_x86_64_unknown_linux_musl && unset CC && pnpm --filter
+              "{rust-plugins}[HEAD~1]" --sequential build --target
+              x86_64-unknown-linux-musl --abi linux-x64-musl
           - os: windows-latest
             abi: win32-x64-msvc
           - os: macos-latest
             abi: darwin-arm64
           - os: macos-13
             abi: darwin-x64
-          # cross compile
-          # windows. Note swc plugins is not supported on ia32 and arm64
           - os: windows-latest
             abi: win32-ia32-msvc
             target: i686-pc-windows-msvc
-            build: |
+            build: >
               export CARGO_PROFILE_RELEASE_LTO=false
+
               cargo install cargo-xwin --locked
-              pnpm --filter "{rust-plugins}[HEAD~1]" --sequential build --target i686-pc-windows-msvc --abi win32-ia32-msvc --cargo-flags="--no-default-features"
+
+              pnpm --filter "{rust-plugins}[HEAD~1]" --sequential build --target
+              i686-pc-windows-msvc --abi win32-ia32-msvc
+              --cargo-flags="--no-default-features"
           - os: windows-latest
             abi: win32-arm64-msvc
             target: aarch64-pc-windows-msvc
-            build: |
+            build: >
               export CARGO_PROFILE_RELEASE_CODEGEN_UNITS=256
-              export CARGO_PROFILE_RELEASE_LTO=false
-              cargo install cargo-xwin --locked
-              pnpm --filter "{rust-plugins}[HEAD~1]" --sequential build --target aarch64-pc-windows-msvc --abi win32-arm64-msvc --cargo-flags="--no-default-features"
 
-          # linux
+              export CARGO_PROFILE_RELEASE_LTO=false
+
+              cargo install cargo-xwin --locked
+
+              pnpm --filter "{rust-plugins}[HEAD~1]" --sequential build --target
+              aarch64-pc-windows-msvc --abi win32-arm64-msvc
+              --cargo-flags="--no-default-features"
           - os: ubuntu-latest
             abi: linux-arm64-musl
             target: aarch64-unknown-linux-musl
@@ -68,14 +67,10 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 2
-      # - run: |
-      # git fetch --no-tags --prune --depth=1 origin +refs/heads/main:refs/remotes/HEAD~1
-
       - name: Cache rust artifacts
         uses: Swatinem/rust-cache@v2
         with:
           shared-key: rust-build-${{ matrix.settings.abi }}
-
       - uses: actions/setup-node@v4
         with:
           node-version: 18
@@ -86,79 +81,52 @@ jobs:
           pnpm i --frozen-lockfile
       - run: rustup target add ${{ matrix.settings.target }}
         if: ${{ matrix.settings.target }}
-      # Use the v1 of this action
       - uses: mbround18/setup-osxcross@v1
         if: ${{ matrix.settings.osxcross }}
-        # This builds executables & sets env variables for rust to consume.
         with:
           osx-version: "12.3"
       - uses: goto-bus-stop/setup-zig@v2
         if: ${{ matrix.settings.zig }}
         with:
-          version: "0.13.0"
+          version: 0.13.0
       - name: Build in docker
         uses: addnab/docker-run-action@v3
         if: ${{ matrix.settings.docker }}
         with:
           image: ${{ matrix.settings.docker }}
-          options: -v ${{ env.HOME }}/.cargo/git:/root/.cargo/git -v ${{ env.HOME }}/.cargo/registry:/root/.cargo/registry -v ${{ github.workspace }}:/build -w /build
+          options: -v ${{ env.HOME }}/.cargo/git:/root/.cargo/git -v ${{ env.HOME
+            }}/.cargo/registry:/root/.cargo/registry -v ${{ github.workspace
+            }}:/build -w /build
           run: ${{ matrix.settings.build }}
       - name: Default Build
         if: ${{ !matrix.settings.docker && !matrix.settings.build }}
-        run: |
-          pnpm --filter "{rust-plugins}[HEAD~1]" --sequential build --abi ${{ matrix.settings.abi }} ${{ matrix.settings.target && format('--target {0}', matrix.settings.target) || '' }} ${{ matrix.settings.zig && '--zig' || '' }}
+        run: >
+          pnpm --filter "{rust-plugins}[HEAD~1]" --sequential build --abi ${{
+          matrix.settings.abi }} ${{ matrix.settings.target && format('--target
+          {0}', matrix.settings.target) || '' }} ${{ matrix.settings.zig &&
+          '--zig' || '' }}
         shell: bash
       - name: Build
         if: ${{ !matrix.settings.docker && matrix.settings.build }}
         run: ${{ matrix.settings.build }}
         shell: bash
+      - name: Upload Plugin auto-import
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ github.sha }}-${{ matrix.settings.abi }}-auto-import
+          path: ./rust-plugins/auto-import/npm/${{ matrix.settings.abi }}/index.farm
+          if-no-files-found: ignore
+      - name: Upload Plugin compress
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ github.sha }}-${{ matrix.settings.abi }}-compress
+          path: ./rust-plugins/compress/npm/${{ matrix.settings.abi }}/index.farm
+          if-no-files-found: ignore
       - name: Upload Plugin dsv
         uses: actions/upload-artifact@v4
         with:
           name: ${{ github.sha }}-${{ matrix.settings.abi }}-dsv
           path: ./rust-plugins/dsv/npm/${{ matrix.settings.abi }}/index.farm
-          if-no-files-found: ignore
-      - name: Upload Plugin react-components
-        uses: actions/upload-artifact@v4
-        with:
-          name: ${{ github.sha }}-${{ matrix.settings.abi }}-react-components
-          path: ./rust-plugins/react-components/npm/${{ matrix.settings.abi }}/index.farm
-          if-no-files-found: ignore
-      - name: Upload Plugin virtual
-        uses: actions/upload-artifact@v4
-        with:
-          name: ${{ github.sha }}-${{ matrix.settings.abi }}-virtual
-          path: ./rust-plugins/virtual/npm/${{ matrix.settings.abi }}/index.farm
-          if-no-files-found: ignore
-      - name: Upload Plugin svgr
-        uses: actions/upload-artifact@v4
-        with:
-          name: ${{ github.sha }}-${{ matrix.settings.abi }}-svgr
-          path: ./rust-plugins/svgr/npm/${{ matrix.settings.abi }}/index.farm
-          if-no-files-found: ignore
-      - name: Upload Plugin yaml
-        uses: actions/upload-artifact@v4
-        with:
-          name: ${{ github.sha }}-${{ matrix.settings.abi }}-yaml
-          path: ./rust-plugins/yaml/npm/${{ matrix.settings.abi }}/index.farm
-          if-no-files-found: ignore
-      - name: Upload Plugin strip
-        uses: actions/upload-artifact@v4
-        with:
-          name: ${{ github.sha }}-${{ matrix.settings.abi }}-strip
-          path: ./rust-plugins/strip/npm/${{ matrix.settings.abi }}/index.farm
-          if-no-files-found: ignore
-      - name: Upload Plugin image
-        uses: actions/upload-artifact@v4
-        with:
-          name: ${{ github.sha }}-${{ matrix.settings.abi }}-image
-          path: ./rust-plugins/image/npm/${{ matrix.settings.abi }}/index.farm
-          if-no-files-found: ignore
-      - name: Upload Plugin url
-        uses: actions/upload-artifact@v4
-        with:
-          name: ${{ github.sha }}-${{ matrix.settings.abi }}-url
-          path: ./rust-plugins/url/npm/${{ matrix.settings.abi }}/index.farm
           if-no-files-found: ignore
       - name: Upload Plugin icons
         uses: actions/upload-artifact@v4
@@ -166,11 +134,53 @@ jobs:
           name: ${{ github.sha }}-${{ matrix.settings.abi }}-icons
           path: ./rust-plugins/icons/npm/${{ matrix.settings.abi }}/index.farm
           if-no-files-found: ignore
-      - name: Upload Plugin auto-import
+      - name: Upload Plugin image
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ github.sha }}-${{ matrix.settings.abi }}-auto-import
-          path: ./rust-plugins/auto-import/npm/${{ matrix.settings.abi }}/index.farm
+          name: ${{ github.sha }}-${{ matrix.settings.abi }}-image
+          path: ./rust-plugins/image/npm/${{ matrix.settings.abi }}/index.farm
+          if-no-files-found: ignore
+      - name: Upload Plugin mdx
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ github.sha }}-${{ matrix.settings.abi }}-mdx
+          path: ./rust-plugins/mdx/npm/${{ matrix.settings.abi }}/index.farm
+          if-no-files-found: ignore
+      - name: Upload Plugin modular-import
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ github.sha }}-${{ matrix.settings.abi }}-modular-import
+          path: ./rust-plugins/modular-import/npm/${{ matrix.settings.abi }}/index.farm
+          if-no-files-found: ignore
+      - name: Upload Plugin react-components
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ github.sha }}-${{ matrix.settings.abi }}-react-components
+          path: ./rust-plugins/react-components/npm/${{ matrix.settings.abi }}/index.farm
+          if-no-files-found: ignore
+      - name: Upload Plugin strip
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ github.sha }}-${{ matrix.settings.abi }}-strip
+          path: ./rust-plugins/strip/npm/${{ matrix.settings.abi }}/index.farm
+          if-no-files-found: ignore
+      - name: Upload Plugin svgr
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ github.sha }}-${{ matrix.settings.abi }}-svgr
+          path: ./rust-plugins/svgr/npm/${{ matrix.settings.abi }}/index.farm
+          if-no-files-found: ignore
+      - name: Upload Plugin url
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ github.sha }}-${{ matrix.settings.abi }}-url
+          path: ./rust-plugins/url/npm/${{ matrix.settings.abi }}/index.farm
+          if-no-files-found: ignore
+      - name: Upload Plugin virtual
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ github.sha }}-${{ matrix.settings.abi }}-virtual
+          path: ./rust-plugins/virtual/npm/${{ matrix.settings.abi }}/index.farm
           if-no-files-found: ignore
       - name: Upload Plugin wasm
         uses: actions/upload-artifact@v4
@@ -184,21 +194,9 @@ jobs:
           name: ${{ github.sha }}-${{ matrix.settings.abi }}-worker
           path: ./rust-plugins/worker/npm/${{ matrix.settings.abi }}/index.farm
           if-no-files-found: ignore
-      - name: Upload Plugin modular-import
+      - name: Upload Plugin yaml
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ github.sha }}-${{ matrix.settings.abi }}-modular-import
-          path: ./rust-plugins/modular-import/npm/${{ matrix.settings.abi }}/index.farm
-          if-no-files-found: ignore
-      - name: Upload Plugin mdx
-        uses: actions/upload-artifact@v4
-        with:
-          name: ${{ github.sha }}-${{ matrix.settings.abi }}-mdx
-          path: ./rust-plugins/mdx/npm/${{ matrix.settings.abi }}/index.farm
-          if-no-files-found: ignore
-      - name: Upload Plugin compress
-        uses: actions/upload-artifact@v4
-        with:
-          name: ${{ github.sha }}-${{ matrix.settings.abi }}-compress
-          path: ./rust-plugins/compress/npm/${{ matrix.settings.abi }}/index.farm
+          name: ${{ github.sha }}-${{ matrix.settings.abi }}-yaml
+          path: ./rust-plugins/yaml/npm/${{ matrix.settings.abi }}/index.farm
           if-no-files-found: ignore
