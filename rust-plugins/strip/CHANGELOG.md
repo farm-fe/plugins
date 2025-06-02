@@ -1,5 +1,11 @@
 # @farmfe/plugin-strip
 
+## 0.0.9
+
+### Patch Changes
+
+- fix: content suport tsx
+
 ## 0.0.8
 
 ### Patch Changes

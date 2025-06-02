@@ -1,6 +1,6 @@
 {
   "name": "@farmfe/plugin-strip",
-  "version": "0.0.8",
+  "version": "0.0.9",
   "private": false,
   "main": "scripts/index.js",
   "types": "scripts/index.d.ts",
@@ -45,6 +45,9 @@
     "./package.json": "./package.json"
   },
   "scripts": {
+    "dev": "cargo watch -w src -s 'scripts/watch.sh'",
+    "bump": "npx changeset version",
+    "play": "pnpm --filter playground dev",
     "build": "farm-plugin-tools build --platform --cargo-name farmfe_plugin_strip -p farmfe_plugin_strip --release",
     "prepublishOnly": "farm-plugin-tools prepublish"
   },

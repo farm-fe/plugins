@@ -4,14 +4,7 @@ use regex::Regex;
 use std::{error::Error, path::PathBuf, sync::Arc};
 
 use farmfe_core::{
-  config::{config_regex::ConfigRegex, Config},
-  context::CompilationContext,
-  error::Result as HookResult,
-  plugin::{Plugin, PluginTransformHookParam, PluginTransformHookResult},
-  serde_json,
-  swc_common::DUMMY_SP,
-  swc_ecma_ast::*,
-  swc_ecma_parser::Syntax,
+  config::{config_regex::ConfigRegex, Config}, context::CompilationContext, error::Result as HookResult, module::ModuleType, plugin::{Plugin, PluginTransformHookParam, PluginTransformHookResult}, serde_json, swc_common::DUMMY_SP, swc_ecma_ast::*, swc_ecma_parser::{Syntax, TsSyntax}
 };
 use farmfe_macro_plugin::farm_plugin;
 
@@ -50,17 +43,29 @@ impl Plugin for FarmPulginStrip {
   fn name(&self) -> &str {
     PLUGIN_NAME
   }
-
+  
   fn transform(
     &self,
     param: &PluginTransformHookParam,
     context: &std::sync::Arc<CompilationContext>,
   ) -> HookResult<Option<PluginTransformHookResult>> {
+    if ![
+      ModuleType::Jsx,
+      ModuleType::Tsx,
+      ModuleType::Js,
+      ModuleType::Ts,
+    ]
+    .contains(&param.module_type)
+    {
+      return Ok(None);
+    }
     let options = self.options.clone();
     let include = options.include.unwrap_or(vec![]);
-    let exclude = options.exclude.unwrap_or(vec![]);
+    let exclude = options
+      .exclude
+      .unwrap_or_else(|| vec![ConfigRegex::new("node_modules/.*")]);
     let filter = PathFilter::new(&include, &exclude);
-    if !filter.execute(&param.module_id) {
+    if !filter.execute(&param.resolved_path) {
       return Ok(None);
     }
 
@@ -103,7 +108,13 @@ impl Plugin for FarmPulginStrip {
     let ParseScriptModuleResult { mut ast, comments } = match parse_module(
       &param.module_id,
       &param.content,
-      Syntax::Es(Default::default()),
+      Syntax::Typescript(TsSyntax {
+        tsx: true,
+        decorators: true,
+        dts: false,
+        no_early_errors: true,
+        disallow_ambiguous_jsx_like: true,
+      }),
       EsVersion::EsNext,
     ) {
       Ok(res) => res,
