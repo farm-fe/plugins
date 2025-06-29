@@ -159,7 +159,6 @@ impl Plugin for FarmfePluginAutoImport {
       }
       let content =
         parser::inject_imports::inject_imports(&content, imports.clone().to_vec(), None, options.inject_at_end.unwrap_or(false));
-      println!("content: {}", content);
       // let (cm, src) = create_swc_source_map(Source {
       //   path: PathBuf::from(param.resolved_path),
       //   content: Arc::new(content.clone()),
