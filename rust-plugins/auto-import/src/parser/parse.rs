@@ -1,8 +1,7 @@
 use std::{collections::HashMap, fs};
 
 use farmfe_core::{
-  swc_ecma_ast::*,
-  swc_ecma_parser::{Syntax, TsSyntax},
+  swc_common::Span, swc_ecma_ast::*, swc_ecma_parser::{Syntax, TsSyntax}
 };
 use farmfe_toolkit::{
   script::{parse_module, ParseScriptModuleResult},
@@ -69,6 +68,7 @@ pub struct ESMImport {
   pub namespaced_import: Option<String>,
   pub named_imports: Option<HashMap<String, String>>,
   pub type_named_imports: Option<HashMap<String, String>>,
+  pub span: Span,
 }
 
 pub struct ImportsVisitor {
@@ -124,6 +124,7 @@ impl Visit for ImportsVisitor {
                 namespaced_import: None,
                 named_imports: None,
                 type_named_imports: None,
+                span: import.span
               });
             }
             ImportSpecifier::Namespace(namespace) => {
@@ -135,6 +136,7 @@ impl Visit for ImportsVisitor {
                 default_import: None,
                 named_imports: None,
                 type_named_imports: None,
+                span: import.span
               });
             }
           }
@@ -147,6 +149,7 @@ impl Visit for ImportsVisitor {
             namespaced_import: None,
             type_named_imports: None,
             named_imports: Some(named_imports),
+            span: import.span
           });
         }
         if !type_named_imports.is_empty() {
@@ -157,6 +160,7 @@ impl Visit for ImportsVisitor {
             namespaced_import: None,
             type_named_imports: Some(type_named_imports),
             named_imports: None,
+            span: import.span
           });
         }
       }
