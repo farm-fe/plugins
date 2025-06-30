@@ -32,6 +32,7 @@
 | [copy](js-plugins/copy)       | Copy files and folders Inspired by [rollup-plugin-copy](https://github.com/vladshcherbin/rollup-plugin-copy) |
 |                               |                                                                                                              |
 | [vuetify](js-plugins/vuetify) | Plugin for [Vuetify](https://vuetifyjs.com/)                                                                 |
+| [mcp](js-plugins/mcp)         | Farm plugin mcp inspired by [nuxt-mcp](https://github.com/antfu/nuxt-mcp)                                    |
 
 ## Contributors ✨
 
