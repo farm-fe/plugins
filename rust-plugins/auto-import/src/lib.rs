@@ -84,6 +84,7 @@ impl Default for Dts {
 }
 
 #[derive(serde::Deserialize, serde::Serialize, Clone, Debug)]
+#[serde(rename_all = "camelCase")]
 pub struct Options {
   pub dirs: Option<Vec<ConfigRegex>>,
   pub dts: Option<Dts>,
@@ -92,6 +93,7 @@ pub struct Options {
   pub import_mode: Option<ImportMode>,
   pub include: Option<Vec<ConfigRegex>>,
   pub exclude: Option<Vec<ConfigRegex>>,
+  pub inject_at_end: Option<bool>,
 }
 
 #[farm_plugin]
@@ -157,7 +159,7 @@ impl Plugin for FarmfePluginAutoImport {
         vue_template_addon(&mut content, &imports);
       }
       let content =
-        parser::inject_imports::inject_imports(&content, imports.clone().to_vec(), None);
+        parser::inject_imports::inject_imports(&content, imports.clone().to_vec(), None, options.inject_at_end.unwrap_or(false));
       // let (cm, src) = create_swc_source_map(Source {
       //   path: PathBuf::from(param.resolved_path),
       //   content: Arc::new(content.clone()),

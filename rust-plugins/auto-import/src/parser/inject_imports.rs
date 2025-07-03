@@ -54,7 +54,7 @@ fn get_exclude_imports(content: &str, imports: Vec<Import>) -> Vec<Import> {
     .collect()
 }
 
-pub fn inject_imports(content: &str, imports: Vec<Import>, priority: Option<usize>) -> String {
+pub fn inject_imports(content: &str, imports: Vec<Import>, priority: Option<usize>, inject_at_end: bool) -> String {
   let esm_imports = parse_esm_imports(None, Some(content));
   let imports = get_exclude_imports(&content, imports)
     .into_iter()
@@ -132,7 +132,14 @@ pub fn inject_imports(content: &str, imports: Vec<Import>, priority: Option<usiz
       })
     })
     .collect::<Vec<Import>>();
+  let inject_idx = if inject_at_end {
+    esm_imports.last().map_or(0, |i| i.span.hi.0 as usize)
+  } else {
+    0
+  };
   let mut content_str = stringify_imports(imports);
-  content_str.push_str(content);
-  content_str
+  let mut content = content.to_string();
+  content.insert_str(inject_idx, &content_str);
+  // content_str.push_str(content);
+  content
 }
