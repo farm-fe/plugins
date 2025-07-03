@@ -46,5 +46,5 @@ export interface IPluginOptions {
   presets?: Preset[];
   include?: string[];
   exclude?: string[];
-  inject_at_end?: boolean;
+  injectAtEnd?: boolean;
 }

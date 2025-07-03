@@ -20,7 +20,8 @@ export default defineConfig({
         "react-router-dom",
       ],
       dirs: ['src/apis'],
-      ignore:[]
+      ignore:[],
+      injectAtEnd: true,
     }),
     visualizer()
   ],

@@ -84,6 +84,7 @@ impl Default for Dts {
 }
 
 #[derive(serde::Deserialize, serde::Serialize, Clone, Debug)]
+#[serde(rename_all = "camelCase")]
 pub struct Options {
   pub dirs: Option<Vec<ConfigRegex>>,
   pub dts: Option<Dts>,
