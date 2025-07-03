@@ -132,8 +132,8 @@ pub fn inject_imports(content: &str, imports: Vec<Import>, priority: Option<usiz
       })
     })
     .collect::<Vec<Import>>();
-  let inject_idx = if inject_at_end == true {
-    esm_imports.last().map_or(0, |i| i.span.hi.0) as usize
+  let inject_idx = if inject_at_end {
+    esm_imports.last().map_or(0, |i| i.span.hi.0 as usize)
   } else {
     0
   };
