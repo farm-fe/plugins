@@ -5,9 +5,7 @@ use std::{
 
 use super::parse::{parse_esm_exports, DeclarationType, ESMExport, ExportType};
 use farmfe_toolkit::pluginutils::normalize_path::normalize_path;
-
-const FILE_EXTENSION_LOOKUP: [&'static str; 8] =
-  [".mts", ".cts", ".ts", ".mjs", ".cjs", ".js", ".jsx", ".tsx"];
+use farm_plugin_shared::{to_pascal_case, get_filename_by_path, extensions::TS_JS_EXTENSIONS};
 
 #[derive(Debug, Default, Clone, PartialEq, Eq)]
 pub struct Import {
@@ -24,6 +22,7 @@ pub struct Import {
 }
 
 impl Import {
+  #[inline]
   pub fn stringify_import(&self) -> String {
     match self.export_type {
       ExportType::DefaultDecl => format!("import {} from '{}';\n", self.name, self.from),
@@ -50,34 +49,9 @@ impl Import {
   }
 }
 
-fn to_pascal_case(s: &str) -> String {
-  if s.contains('-') || s.contains('_') {
-    s.split(|c| c == '-' || c == '_')
-      .filter(|part| !part.is_empty())
-      .map(|part| {
-        let mut chars = part.chars();
-        chars.next().unwrap().to_uppercase().collect::<String>() + chars.as_str()
-      })
-      .collect()
-  } else {
-    let chars = s.chars();
-    chars.as_str().to_string()
-  }
-}
-
-fn get_filename_by_path(file_path: &str) -> String {
-  let path = Path::new(file_path);
-  let filename = path
-    .file_stem()
-    .and_then(|filename_osstr| filename_osstr.to_str())
-    .map(|filename_str| filename_str.to_owned())
-    .unwrap();
-  to_pascal_case(&filename)
-}
-
 pub fn scan_exports(file_path: &str, content: Option<&str>) -> Vec<Import> {
   let exports = parse_esm_exports(Some(file_path), content);
-  let filename = get_filename_by_path(file_path);
+  let filename = to_pascal_case(&get_filename_by_path(file_path));
   let mut exports_names = Vec::new();
   for export in exports {
     let ESMExport {

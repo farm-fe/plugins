@@ -4,10 +4,7 @@ mod finish_imports;
 mod parser;
 mod presets;
 
-use std::{
-  fmt,
-  sync::{Arc, Mutex},
-};
+use std::sync::{Arc, Mutex};
 
 use farmfe_core::{
   config::{config_regex::ConfigRegex, Config},
@@ -22,65 +19,15 @@ use farmfe_toolkit::common::PathFilter;
 use finish_imports::FinishImportsParams;
 use parser::scan_exports::Import;
 use presets::PresetItem;
-use serde::de::{self, Visitor};
-use serde::{Deserialize, Deserializer, Serialize, Serializer};
+use serde::{Deserialize, Serialize};
+
+// Use shared utilities
+use farm_plugin_shared::{Dts, init_plugin};
 
 #[derive(serde::Deserialize, serde::Serialize, Clone, Debug)]
 pub enum ImportMode {
   Relative,
   Absolute,
-}
-
-#[derive(Clone, Debug)]
-pub enum Dts {
-  Bool(bool),
-  Filename(String),
-}
-
-impl Serialize for Dts {
-  fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-  where
-    S: Serializer,
-  {
-    match *self {
-      Dts::Bool(ref b) => serializer.serialize_bool(*b),
-      Dts::Filename(ref s) => serializer.serialize_str(s),
-    }
-  }
-}
-
-impl<'de> Deserialize<'de> for Dts {
-  fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
-  where
-    D: Deserializer<'de>,
-  {
-    struct StringOrBoolVisitor;
-    impl<'de> Visitor<'de> for StringOrBoolVisitor {
-      type Value = Dts;
-      fn expecting(&self, formatter: &mut std::fmt::Formatter) -> fmt::Result {
-        formatter.write_str("a boolean or a string")
-      }
-      fn visit_bool<E>(self, value: bool) -> Result<Self::Value, E>
-      where
-        E: de::Error,
-      {
-        Ok(Dts::Bool(value))
-      }
-      fn visit_str<E>(self, value: &str) -> Result<Self::Value, E>
-      where
-        E: de::Error,
-      {
-        Ok(Dts::Filename(value.to_owned()))
-      }
-    }
-    deserializer.deserialize_any(StringOrBoolVisitor)
-  }
-}
-
-impl Default for Dts {
-  fn default() -> Self {
-    Dts::Bool(true)
-  }
 }
 
 #[derive(serde::Deserialize, serde::Serialize, Clone, Debug)]
@@ -96,18 +43,20 @@ pub struct Options {
 
 #[farm_plugin]
 pub struct FarmfePluginAutoImport {
-  options: Options,
+  options: Arc<Options>, // Use Arc to avoid cloning
   collect_imports: Arc<Mutex<Vec<Import>>>,
 }
 
 impl FarmfePluginAutoImport {
   fn new(config: &Config, options: String) -> Self {
-    let options: Options = serde_json::from_str(&options).unwrap();
-    let collect_imports: Arc<Mutex<Vec<Import>>> = Arc::new(Mutex::new(vec![]));
-    let dirs = options.dirs.clone().unwrap_or(vec![]);
+    let options: Options = init_plugin(&options).unwrap_or_else(|e| {
+      panic!("Failed to initialize auto-import plugin: {}", e);
+    });
+    let collect_imports: Arc<Mutex<Vec<Import>>> = Arc::new(Mutex::new(Vec::new()));
+    let dirs = options.dirs.clone().unwrap_or_default();
     let root_path = config.root.clone();
-    let presets = options.presets.clone().unwrap_or(vec![]);
-    let ignore = options.ignore.clone().unwrap_or(vec![]);
+    let presets = options.presets.clone().unwrap_or_default();
+    let ignore = options.ignore.clone().unwrap_or_default();
     finish_imports::finish_imports(FinishImportsParams {
       root_path,
       presets,
@@ -117,7 +66,7 @@ impl FarmfePluginAutoImport {
       context_imports: &collect_imports,
     });
     Self {
-      options,
+      options: Arc::new(options),
       collect_imports,
     }
   }
@@ -142,12 +91,14 @@ impl Plugin for FarmfePluginAutoImport {
     {
       return Ok(None);
     }
-    let options = self.options.clone();
-    let include = options.include.unwrap_or(vec![]);
-    let exclude = options
+    let default_include = vec![];
+    let default_exclude = vec![ConfigRegex::new("node_modules")];
+    let include = self.options.include.as_ref().unwrap_or(&default_include);
+    let exclude = self.options
       .exclude
-      .unwrap_or(vec![ConfigRegex::new("node_modules")]);
-    let filter = PathFilter::new(&include, &exclude);
+      .as_ref()
+      .unwrap_or(&default_exclude);
+    let filter = PathFilter::new(include, exclude);
     if !filter.execute(&param.module_id) {
       return Ok(None);
     } else {
@@ -157,7 +108,7 @@ impl Plugin for FarmfePluginAutoImport {
         vue_template_addon(&mut content, &imports);
       }
       let content =
-        parser::inject_imports::inject_imports(&content, imports.clone().to_vec(), None);
+        parser::inject_imports::inject_imports(&content, imports.to_vec(), None);
       // let (cm, src) = create_swc_source_map(Source {
       //   path: PathBuf::from(param.resolved_path),
       //   content: Arc::new(content.clone()),

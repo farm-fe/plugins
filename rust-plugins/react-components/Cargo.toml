@@ -14,6 +14,7 @@ farmfe_utils = { workspace = true }
 farmfe_toolkit_plugin_types = { workspace = true }
 farmfe_macro_plugin = { workspace = true }
 farmfe_toolkit = { workspace = true }
+farm-plugin-shared = { path = "../shared" }
 
 serde = { version = "1.0.197", features = ["derive"] }
 glob = "0.3.1"

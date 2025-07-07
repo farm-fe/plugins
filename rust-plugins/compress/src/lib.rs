@@ -3,11 +3,11 @@
 use farmfe_core::error::CompilationError;
 use farmfe_core::parking_lot::Mutex;
 use farmfe_core::rayon::iter::{IntoParallelRefMutIterator, ParallelIterator};
-use farmfe_core::regex::Regex;
 use farmfe_core::resource::{Resource, ResourceType};
 use farmfe_core::{config::Config, plugin::Plugin};
-
 use farmfe_macro_plugin::farm_plugin;
+use farm_plugin_shared::{get_regex, init_plugin};
+use std::sync::Arc;
 
 mod utils;
 
@@ -25,10 +25,12 @@ fn default_filter() -> String {
   "\\.(js|mjs|json|css|html)$".to_string()
 }
 
+#[inline]
 fn default_level() -> u32 {
   6
 }
 
+#[inline]
 fn default_threshold() -> usize {
   1024
 }
@@ -49,16 +51,18 @@ pub struct Options {
 
 #[farm_plugin]
 pub struct FarmfePluginCompress {
-  options: Options,
+  options: Arc<Options>,
   time_cost: Mutex<std::time::Duration>,
   saved: Mutex<usize>,
 }
 
 impl FarmfePluginCompress {
   fn new(_config: &Config, options: String) -> Self {
-    let options: Options = serde_json::from_str(&options).unwrap();
+    let options: Options = init_plugin(&options).unwrap_or_else(|e| {
+      panic!("Failed to initialize compress plugin: {}", e);
+    });
     Self {
-      options,
+      options: Arc::new(options),
       time_cost: Default::default(),
       saved: Mutex::new(0),
     }
@@ -81,7 +85,7 @@ impl Plugin for FarmfePluginCompress {
   ) -> farmfe_core::error::Result<Option<()>> {
     let start = std::time::Instant::now();
     let ext_name = utils::get_ext_name(&self.options.algorithm);
-    let filter = Regex::new(&self.options.filter)
+    let filter = get_regex(&self.options.filter)
       .map_err(|e| CompilationError::GenericError(format!("Invalid regex expression for compress plugin: {}", e)))?;
 
     let compressed_buffers = param

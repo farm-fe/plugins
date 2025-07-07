@@ -852,6 +852,19 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "5443807d6dff69373d433ab9ef5378ad8df50ca6298caf15de6e52e24aaf54d5"
 
 [[package]]
+name = "farm-plugin-shared"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "farmfe_core",
+ "farmfe_utils",
+ "once_cell",
+ "regex",
+ "serde",
+ "serde_json",
+]
+
+[[package]]
 name = "farm_plugin_svgr"
 version = "0.0.0"
 dependencies = [
@@ -959,6 +972,7 @@ dependencies = [
 name = "farmfe_plugin_auto_import"
 version = "0.0.0"
 dependencies = [
+ "farm-plugin-shared",
  "farmfe_core",
  "farmfe_macro_plugin",
  "farmfe_toolkit",
@@ -987,6 +1001,7 @@ name = "farmfe_plugin_compress"
 version = "0.0.0"
 dependencies = [
  "brotli",
+ "farm-plugin-shared",
  "farmfe_core",
  "farmfe_macro_plugin",
  "farmfe_toolkit_plugin_types",
@@ -1178,6 +1193,7 @@ dependencies = [
 name = "farmfe_plugin_react_components"
 version = "0.0.1"
 dependencies = [
+ "farm-plugin-shared",
  "farmfe_core",
  "farmfe_macro_plugin",
  "farmfe_toolkit",

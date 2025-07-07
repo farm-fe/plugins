@@ -1,5 +1,11 @@
 # @farmfe/plugin-auto-import
 
+## 0.0.9
+
+### Patch Changes
+
+- refactor code
+
 ## 0.0.8
 
 ### Patch Changes

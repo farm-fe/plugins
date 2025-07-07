@@ -62,10 +62,17 @@ pub fn finish_imports(params: FinishImportsParams) {
   let has_new_or_removed_imports =
     maybe_has_new_or_removed_imports(&context_imports_guard, &local_imports, &presets_imports);
   let filename = match dts {
-    Dts::Filename(filename) => filename,
+    Dts::FilePath(filename) => filename,
     Dts::Bool(b) => {
       if b {
         "auto_import.d.ts".to_string()
+      } else {
+        "".to_string()
+      }
+    }
+    Dts::Config { enabled, file_path, .. } => {
+      if enabled {
+        file_path.unwrap_or_else(|| "auto_import.d.ts".to_string())
       } else {
         "".to_string()
       }

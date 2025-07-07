@@ -10,10 +10,11 @@ use farmfe_toolkit::{
   script::{parse_module, ParseScriptModuleResult},
   swc_ecma_visit::{Visit, VisitWith},
 };
+use farm_plugin_shared::{to_pascal_case, extensions::is_ts_js_file};
 use glob::Pattern;
 use std::fs;
 use std::path::PathBuf;
-use std::{collections::HashSet, path::Path};
+use std::{collections::{HashSet, HashMap}, path::Path};
 use walkdir::{DirEntry, WalkDir};
 
 #[derive(Debug, Hash, Eq, PartialEq, Clone)]
@@ -31,6 +32,7 @@ pub enum ExportType {
   Named,
   Default,
 }
+
 #[derive(Clone)]
 pub struct ComponentFinder {
   all_components: Vec<String>,
@@ -42,25 +44,13 @@ pub struct ComponentFinder {
 
 #[derive(Clone)]
 pub struct ExportComponentsFinder {
-  exported_components: HashSet<ComponentInfo>,
+  exported_components: HashMap<String, ComponentInfo>, // Use HashMap for O(1) lookup
   all_components: Vec<String>,
   filename: String,
   path: String,
 }
-fn to_pascal_case(s: &str) -> String {
-  if s.contains('-') || s.contains('_') {
-    s.split(|c| c == '-' || c == '_')
-      .filter(|part| !part.is_empty())
-      .map(|part| {
-        let mut chars = part.chars();
-        chars.next().unwrap().to_uppercase().collect::<String>() + chars.as_str()
-      })
-      .collect()
-  } else {
-    let mut chars = s.chars();
-    chars.next().unwrap().to_uppercase().collect::<String>() + chars.as_str()
-  }
-}
+
+#[inline]
 fn is_uppercase(ident: &Ident) -> bool {
   ident.sym.chars().next().map_or(false, |c| c.is_uppercase())
 }
