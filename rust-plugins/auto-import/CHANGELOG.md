@@ -1,5 +1,11 @@
 # @farmfe/plugin-auto-import
 
+## 0.0.9
+
+### Patch Changes
+
+- feat: auto import support inject at end
+
 ## 0.0.8
 
 ### Patch Changes
