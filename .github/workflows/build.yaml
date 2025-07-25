@@ -44,7 +44,7 @@ jobs:
             target: i686-pc-windows-msvc
             build: |
               export CARGO_PROFILE_RELEASE_LTO=false
-              cargo install cargo-xwin --locked
+              cargo install cargo-xwin --version "0.18.6" --locked
               pnpm --filter "{rust-plugins}[HEAD~1]" --sequential build --target i686-pc-windows-msvc --abi win32-ia32-msvc --cargo-flags="--no-default-features"
           - os: windows-latest
             abi: win32-arm64-msvc
@@ -52,7 +52,7 @@ jobs:
             build: |
               export CARGO_PROFILE_RELEASE_CODEGEN_UNITS=256
               export CARGO_PROFILE_RELEASE_LTO=false
-              cargo install cargo-xwin --locked
+              cargo install cargo-xwin --version "0.18.6" --locked
               pnpm --filter "{rust-plugins}[HEAD~1]" --sequential build --target aarch64-pc-windows-msvc --abi win32-arm64-msvc --cargo-flags="--no-default-features"
 
           # linux
