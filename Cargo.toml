@@ -4,9 +4,9 @@ members = [
 ]
 resolver = "2"
 [workspace.dependencies]
-farmfe_core = { version = "0.7.2" }
-farmfe_utils = { version = "0.1.6" }
-farmfe_toolkit_plugin_types = { version = "0.0.23" }
-farmfe_macro_plugin = { version = "0.0.4" }
-farmfe_toolkit = "0.0.16"
-farmfe_compiler = { version = "0.0.14" }
+farmfe_core = { version = "2.0.0" }
+farmfe_utils = { version = "2.0.0" }
+farmfe_toolkit_plugin_types = { version = "0.0.24" }
+farmfe_macro_plugin = { version = "2.0.0" }
+farmfe_toolkit = "2.0.0"
+farmfe_compiler = { version = "0.0.16" }

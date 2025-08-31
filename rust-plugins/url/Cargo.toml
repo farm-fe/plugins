@@ -12,9 +12,9 @@ crate-type = ["cdylib", "rlib"]
 farmfe_core = { workspace = true }
 farmfe_toolkit_plugin_types = { workspace = true }
 farmfe_macro_plugin = { workspace = true }
-serde = { version = "1.0.197", features = ["derive"] }
 farmfe_toolkit = { workspace = true }
+farmfe_utils = { workspace = true }
+serde = { version = "1.0.197", features = ["derive"] }
 base64 = "0.22.1"
 mime_guess = "2.0.5"
 lazy_static = "1.5.0"
-farmfe_utils = "0.1.4"
