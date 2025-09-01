@@ -7,7 +7,7 @@ pub fn preact_complier(param: CompilerParams) -> String {
   let code = react_complier(
     svg,
     Config {
-      jsx_runtime: Some(JSXRuntime::ClassicPreact),
+      jsx_runtime: JSXRuntime::ClassicPreact,
       ..Default::default()
     },
     Default::default(),

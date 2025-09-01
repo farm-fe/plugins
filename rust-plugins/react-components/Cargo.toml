@@ -18,3 +18,4 @@ farmfe_toolkit = { workspace = true }
 serde = { version = "1.0.197", features = ["derive"] }
 glob = "0.3.1"
 walkdir = "2.5.0"
+rustc-hash = "2.1.1"

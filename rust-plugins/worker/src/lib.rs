@@ -1,7 +1,7 @@
 #![deny(clippy::all)]
 mod cache;
 use std::{
-  collections::{HashMap, HashSet},
+  collections::{HashSet},
   path::Path,
   sync::Arc,
 };
@@ -10,26 +10,15 @@ use base64::{engine::general_purpose, Engine};
 use cache::WorkerCache;
 use farmfe_compiler::Compiler;
 use farmfe_core::{
-  cache_item,
-  config::{
-    config_regex::ConfigRegex,
-    partial_bundling::{PartialBundlingConfig, PartialBundlingEnforceResourceConfig},
-    persistent_cache::PersistentCacheConfig,
-    Config, ModuleFormat, OutputConfig, TargetEnv,
-  },
-  context::{CompilationContext, EmitFileParams},
-  deserialize,
-  module::{ModuleId, ModuleType},
-  plugin::{Plugin, PluginHookContext, PluginLoadHookResult, PluginResolveHookParam, PluginTransformHookResult, ResolveKind},
-  resource::{Resource, ResourceOrigin, ResourceType},
-  serde,
-  serde_json::{self, to_value, Map, Value},
-  serialize,
+  Cacheable, cache_item, config::{
+    Config, ModuleFormat, ModuleFormatConfig, OutputConfig, TargetEnv, config_regex::ConfigRegex, partial_bundling::{PartialBundlingConfig, PartialBundlingEnforceResourceConfig}, persistent_cache::PersistentCacheConfig
+  }, context::{CompilationContext, EmitFileParams}, deserialize, module::{ModuleId, ModuleType}, plugin::{Plugin, PluginHookContext, PluginLoadHookResult, PluginResolveHookParam, PluginTransformHookResult, ResolveKind}, resource::{Resource, ResourceOrigin, ResourceType}, serde, serde_json::{self, Map, Value, to_value}, serialize
 };
 use farmfe_macro_plugin::farm_plugin;
-use farmfe_toolkit::fs::transform_output_filename;
+use farmfe_toolkit::{fs::{TransformOutputFileNameParams, transform_output_filename}, runtime};
 use farmfe_utils::relative;
 use regress::{Match, Regex as JsRegex};
+use rustc_hash::FxHashMap;
 
 const WORKER_OR_SHARED_WORKER_RE: &str = r#"(?:\?|&)(worker|sharedworker)(?:&|$)"#;
 const WORKER_IMPORT_META_URL_RE: &str = r#"\bnew\s+(?:Worker|SharedWorker)\s*\(\s*(new\s+URL\s*\(\s*('[^']+'|"[^"]+"|`[^`]+`)\s*,\s*import\.meta\.url[^)]*\))"#;
@@ -64,7 +53,7 @@ fn merge_configs(
 }
 fn build_worker(resolved_path: &str, module_id: &str, compiler_config: &Config) -> Vec<u8> {
   let (_worker_url, full_file_name) = get_worker_url(resolved_path, module_id, compiler_config);
-  let mut input = HashMap::new();
+  let mut input = FxHashMap::default();
   input.insert(full_file_name.clone(), resolved_path.to_string());
   let compiler = Compiler::new(
     Config {
@@ -121,14 +110,16 @@ fn get_worker_url(
     .unwrap_or_else(|| "".to_string());
   let (file_name, ext) = file_name_ext.split_once(".").unwrap();
   let assets_filename_config = compiler_config.output.assets_filename.clone();
-
+      let transform_output_file_name_params = TransformOutputFileNameParams {
+        filename_config: assets_filename_config,
+        name: file_name,
+        name_hash: "",
+        bytes: &module_id.as_bytes(),
+        ext,
+        special_placeholders: &Default::default(),
+      };
   // hash_bytes = resolved_path + file_name_ext bytes ,make sure that the files of the same name in different directory will not be covered;
-  let file_name = transform_output_filename(
-    assets_filename_config,
-    &file_name,
-    module_id.as_bytes(),
-    ext,
-  );
+  let file_name = transform_output_filename(transform_output_file_name_params);
   // worker.ts -> worker.js
   let file_name = if file_name.ends_with(".ts") {
     file_name.replace(".ts", ".js")
@@ -194,7 +185,7 @@ fn process_worker(param: ProcessWorkerParam) -> String {
     "module"
   } else {
     match &compiler_config.output.format {
-      ModuleFormat::EsModule => "module",
+      ModuleFormatConfig::Single(ModuleFormat::EsModule) => "module",
       _ => "classic",
     }
   };

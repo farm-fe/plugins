@@ -7,7 +7,7 @@ pub fn react_complier(param: CompilerParams) -> String {
   let code = _react_complier(
     svg,
     Config {
-      jsx_runtime: Some(JSXRuntime::Classic),
+      jsx_runtime: JSXRuntime::Classic,
       ..Default::default()
     },
     Default::default(),

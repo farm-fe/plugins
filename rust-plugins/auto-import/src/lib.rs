@@ -18,7 +18,7 @@ use farmfe_core::{
 
 use addons::vue_template::vue_template_addon;
 use farmfe_macro_plugin::farm_plugin;
-use farmfe_toolkit::common::PathFilter;
+use farmfe_toolkit::plugin_utils::path_filter::PathFilter;
 use finish_imports::FinishImportsParams;
 use parser::scan_exports::Import;
 use presets::PresetItem;

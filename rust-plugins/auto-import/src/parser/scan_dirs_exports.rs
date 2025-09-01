@@ -1,6 +1,6 @@
 use super::scan_exports::{scan_exports, Import};
 use farmfe_core::config::config_regex::ConfigRegex;
-use farmfe_toolkit::{common::PathFilter, pluginutils::normalize_path::normalize_path};
+use farmfe_toolkit::plugin_utils::{normalize_path::normalize_path, path_filter::PathFilter};
 use glob::Pattern;
 use walkdir::{DirEntry, WalkDir};
 

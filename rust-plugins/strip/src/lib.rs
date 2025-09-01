@@ -1,16 +1,25 @@
 #![deny(clippy::all)]
 
 use regex::Regex;
-use std::{error::Error, path::PathBuf, sync::Arc};
+use std::{error::Error, sync::Arc};
 
 use farmfe_core::{
-  config::{config_regex::ConfigRegex, Config}, context::CompilationContext, error::Result as HookResult, module::ModuleType, plugin::{Plugin, PluginTransformHookParam, PluginTransformHookResult}, serde_json, swc_common::DUMMY_SP, swc_ecma_ast::*, swc_ecma_parser::{Syntax, TsSyntax}
+  config::{config_regex::ConfigRegex, Config},
+  context::{create_swc_source_map, CompilationContext},
+  error::Result as HookResult,
+  module::ModuleType,
+  plugin::{Plugin, PluginTransformHookParam, PluginTransformHookResult},
+  serde_json,
+  swc_common::{source_map::DefaultSourceMapGenConfig, SyntaxContext, DUMMY_SP},
+  swc_ecma_ast::*,
+  swc_ecma_parser::{Syntax, TsSyntax},
 };
 use farmfe_macro_plugin::farm_plugin;
 
 use farmfe_toolkit::{
-  common::{build_source_map, create_swc_source_map, PathFilter, Source},
+  plugin_utils::path_filter::PathFilter,
   script::{codegen_module, parse_module, CodeGenCommentsConfig, ParseScriptModuleResult},
+  swc_ecma_codegen,
   swc_ecma_visit::{VisitMut, VisitMutWith},
 };
 
@@ -43,7 +52,7 @@ impl Plugin for FarmPulginStrip {
   fn name(&self) -> &str {
     PLUGIN_NAME
   }
-  
+
   fn transform(
     &self,
     param: &PluginTransformHookParam,
@@ -101,13 +110,13 @@ impl Plugin for FarmPulginStrip {
       return Ok(None);
     }
 
-    let (cm, _) = create_swc_source_map(Source {
-      path: PathBuf::from(param.resolved_path),
-      content: Arc::new(param.content.clone()),
-    });
-    let ParseScriptModuleResult { mut ast, comments } = match parse_module(
-      &param.module_id,
-      &param.content,
+    let (cm, _) =
+      create_swc_source_map(&param.resolved_path.into(), Arc::new(param.content.clone()));
+    let ParseScriptModuleResult {
+      mut ast, comments, ..
+    } = match parse_module(
+      &param.module_id.clone().into(),
+      Arc::new(param.content.clone()),
       Syntax::Typescript(TsSyntax {
         tsx: true,
         decorators: true,
@@ -129,10 +138,9 @@ impl Plugin for FarmPulginStrip {
     let mut src_map = vec![];
     let transformed_content = codegen_module(
       &ast,
-      context.config.script.target.clone(),
       cm.clone(),
-      if source_map { Some(&mut src_map) } else { None },
-      context.config.minify.enabled(),
+      Some(&mut src_map),
+      swc_ecma_codegen::Config::default(),
       Some(CodeGenCommentsConfig {
         comments: &comments,
         config: &context.config.comments,
@@ -143,7 +151,7 @@ impl Plugin for FarmPulginStrip {
     let output_code = String::from_utf8(transformed_content).unwrap();
 
     let map = if source_map {
-      let map = build_source_map(cm, &src_map);
+      let map = cm.build_source_map(&src_map, None, DefaultSourceMapGenConfig);
       let mut buf = vec![];
       map.to_writer(&mut buf).expect("failed to write sourcemap");
       Some(String::from_utf8(buf).unwrap())
@@ -225,6 +233,7 @@ fn void_expr() -> Box<Expr> {
     sym: "(void 0)".into(),
     span: DUMMY_SP,
     optional: false,
+    ctxt: SyntaxContext::empty(),
   }))
 }
 

@@ -5,13 +5,10 @@ use farmfe_core::{
   swc_ecma_parser::{Syntax, TsSyntax},
 };
 use farmfe_toolkit::{
-  common::PathFilter,
-  pluginutils::normalize_path::normalize_path,
-  script::{parse_module, ParseScriptModuleResult},
-  swc_ecma_visit::{Visit, VisitWith},
+  plugin_utils::{normalize_path::normalize_path, path_filter::PathFilter}, script::{ParseScriptModuleResult, parse_module}, swc_ecma_visit::{Visit, VisitWith}
 };
 use glob::Pattern;
-use std::fs;
+use std::{fs, sync::Arc};
 use std::path::PathBuf;
 use std::{collections::HashSet, path::Path};
 use walkdir::{DirEntry, WalkDir};
@@ -330,10 +327,11 @@ impl Visit for ExportComponentsFinder {
 fn gen_components_by_file(file_path: &PathBuf) -> HashSet<ComponentInfo> {
   let file_content = fs::read_to_string(file_path)
     .unwrap_or_else(|_| panic!("Unable to read file: {:?}", file_path));
+  let file_content = Arc::new(file_content);
   let components_path = file_path.to_string_lossy().into_owned();
-  let ParseScriptModuleResult { ast, comments: _ } = match parse_module(
-    &components_path,
-    &file_content,
+  let ParseScriptModuleResult { ast,..} = match parse_module(
+    &components_path.clone().into(),
+    file_content,
     Syntax::Typescript(TsSyntax {
       tsx: true,
       decorators: true,
