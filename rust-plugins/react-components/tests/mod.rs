@@ -1,4 +1,3 @@
-use std::collections::HashMap;
 use std::env;
 use std::fs::read_to_string;
 use std::fs::File;
@@ -19,6 +18,7 @@ use farmfe_plugin_react_components::resolvers::ResolverOption;
 use farmfe_plugin_react_components::Dts;
 use farmfe_plugin_react_components::ImportMode;
 use farmfe_plugin_react_components::{FarmPluginReactComponents, Options};
+use rustc_hash::FxHashMap;
 #[test]
 fn transform() {
   let current_dir = env::current_dir().unwrap();
@@ -73,9 +73,9 @@ fn transform() {
     module_id: id.clone(),
     module_type: ModuleType::Tsx,
     resolved_path: &id,
-    query: vec![],
-    meta: HashMap::new(),
+    meta: FxHashMap::default(),
     source_map_chain: vec![],
+    query: vec![],
   };
   let res = farm_plugin_react_components
     .transform(&transform_param, &context)

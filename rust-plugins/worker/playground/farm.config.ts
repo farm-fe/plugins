@@ -19,6 +19,9 @@ export default defineConfig({
         output:{
           assetsFilename: 'asserts/[resourceName].[hash].[ext]',
         },
+        runtime: {
+          path: "/"
+        }
       } as UserConfig['compilation']
     })
   ],

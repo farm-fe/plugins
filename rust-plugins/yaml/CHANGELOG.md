@@ -1,5 +1,11 @@
 # @farmfe/plugin-yaml
 
+## 0.1.0-beta.0
+
+### Minor Changes
+
+- feat(rust-plugins): update farm v2-beta
+
 ## 0.0.10
 
 ### Patch Changes

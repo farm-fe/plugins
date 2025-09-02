@@ -7,9 +7,9 @@ version = "0.0.0"
 crate-type = ["cdylib", "rlib"]
 
 [dependencies]
-farmfe_core = { version = "*" }
-farmfe_toolkit_plugin_types = { version = "*" }
-farmfe_macro_plugin = { version = "*" }
-farmfe_toolkit = { version = "*" }
-rkyv = { version = "0.7.42" }
+farmfe_core = { workspace = true }
+farmfe_toolkit_plugin_types = { workspace = true }
+farmfe_macro_plugin = { workspace = true }
+farmfe_toolkit = { workspace = true }
+rkyv = { version = "0.8.10" }
 wasmparser = "0.225.0"

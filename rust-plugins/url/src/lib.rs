@@ -21,8 +21,8 @@ use farmfe_core::{
 
 use farmfe_macro_plugin::farm_plugin;
 use farmfe_toolkit::{
-  common::PathFilter,
-  fs::{read_file_raw, transform_output_filename},
+  fs::{TransformOutputFileNameParams, read_file_raw, transform_output_filename},
+  plugin_utils::path_filter::PathFilter,
 };
 use farmfe_utils::relative;
 use mime_guess::{from_path, mime::IMAGE};
@@ -127,8 +127,15 @@ impl Plugin for FarmfePluginUrl {
       if filename_config.contains("[dirname]") {
         filename_config = filename_config.replace("[dirname]", &relative_dir);
       }
-
-      let output_file_name = transform_output_filename(filename_config, filename, &raw_bytes, ext);
+      let transform_output_file_name_params = TransformOutputFileNameParams {
+        filename_config,
+        name: filename,
+        name_hash: "",
+        bytes: &raw_bytes,
+        ext,
+        special_placeholders: &Default::default()
+      };
+      let output_file_name = transform_output_filename(transform_output_file_name_params);
       res = format!("{}{}", &public_path, &output_file_name);
       let content = read_file_raw(param.resolved_path).unwrap();
       context.emit_file(EmitFileParams {
@@ -157,7 +164,7 @@ impl Plugin for FarmfePluginUrl {
 
   fn finalize_resources(
     &self,
-    _param: &mut farmfe_core::plugin::PluginFinalizeResourcesHookParams,
+    _param: &mut farmfe_core::plugin::PluginFinalizeResourcesHookParam,
     context: &Arc<farmfe_core::context::CompilationContext>,
   ) -> farmfe_core::error::Result<Option<()>> {
     if matches!(context.config.mode, Mode::Production) {

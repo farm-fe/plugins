@@ -1,5 +1,5 @@
 use std::{collections::HashMap, fs};
-
+use std::sync::Arc;
 use farmfe_core::{
   swc_common::Span, swc_ecma_ast::*, swc_ecma_parser::{Syntax, TsSyntax}
 };
@@ -402,9 +402,10 @@ pub fn parse_esm_imports_exports(
   } else {
     content.unwrap()
   };
-  let ParseScriptModuleResult { ast, comments: _ } = match parse_module(
-    &file_path,
-    &content,
+  let content = Arc::new(content.to_string());
+  let ParseScriptModuleResult { ast, .. } = match parse_module(
+    &file_path.into(),
+    content,
     Syntax::Typescript(TsSyntax {
       tsx: true,
       decorators: true,
@@ -441,9 +442,10 @@ pub fn parse_esm_imports(file_path: Option<&str>, content: Option<&str>) -> Vec<
   } else {
     content.unwrap()
   };
-  let ParseScriptModuleResult { ast, comments: _ } = match parse_module(
-    &file_path,
-    &content,
+  let content = Arc::new(content.to_string());
+  let ParseScriptModuleResult { ast, .. } = match parse_module(
+    &file_path.into(),
+    content,
     Syntax::Typescript(TsSyntax {
       tsx: true,
       decorators: false,
@@ -480,9 +482,10 @@ pub fn parse_esm_exports(file_path: Option<&str>, content: Option<&str>) -> Vec<
   } else {
     content.unwrap()
   };
-  let ParseScriptModuleResult { ast, comments: _ } = match parse_module(
-    &file_path,
-    &content,
+  let content = Arc::new(content.to_string());
+  let ParseScriptModuleResult { ast, .. } = match parse_module(
+    &file_path.into(),
+    content,
     Syntax::Typescript(TsSyntax {
       tsx: true,
       decorators: true,

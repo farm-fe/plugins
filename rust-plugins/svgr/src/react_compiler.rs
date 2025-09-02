@@ -12,8 +12,7 @@ pub fn react_compiler(param: CompilerParams) -> String {
   let code = _react_compiler(
     svg,
     Config {
-      expand_props: svgr_rs::ExpandProps::Bool(true),
-      jsx_runtime: Some(JSXRuntime::Classic),
+      jsx_runtime: JSXRuntime::Classic,
       ..Default::default()
     },
     Default::default(),

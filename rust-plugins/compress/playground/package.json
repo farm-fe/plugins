@@ -17,8 +17,8 @@
   },
   "devDependencies": {
     "@farmfe/cli": "^1.0.4",
-    "@farmfe/core": "^1.6.6",
-    "@farmfe/plugin-react": "^1.2.6",
+    "@farmfe/core": "^2.0.0-beta.2",
+    "@farmfe/plugin-react": "^2.0.0-beta.2",
     "@types/react": "^18.3.18",
     "@types/react-dom": "^18.3.5",
     "core-js": "^3.40.0",

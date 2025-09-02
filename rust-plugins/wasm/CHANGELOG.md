@@ -1,5 +1,11 @@
 # @farmfe/plugin-wasm
 
+## 0.1.0-beta.0
+
+### Minor Changes
+
+- feat(rust-plugins): update farm v2-beta
+
 ## 0.0.8
 
 ### Patch Changes

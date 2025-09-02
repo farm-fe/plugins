@@ -1,0 +1,32 @@
+{
+  "mode": "pre",
+  "tag": "beta",
+  "initialVersions": {
+    "@farmfe/js-plugin-babel": "0.0.3",
+    "@farmfe/js-plugin-copy": "0.0.4",
+    "@farmfe/js-plugin-react-compiler": "0.0.3",
+    "@farmfe/js-plugin-vuetify": "0.0.1",
+    "@farmfe/plugin-auto-import": "0.0.9",
+    "@farmfe/plugin-compress": "0.0.2",
+    "@farmfe/plugin-dsv": "0.0.8",
+    "@farmfe/plugin-icons": "0.0.9",
+    "@farmfe/plugin-image": "0.0.8",
+    "@farmfe/plugin-mdx": "0.0.7",
+    "@farmfe/plugin-modular-import": "0.0.1",
+    "@farmfe/plugin-react-components": "1.0.12",
+    "@farmfe/plugin-strip": "0.0.9",
+    "@farmfe/plugin-svgr": "0.0.3",
+    "@farmfe/plugin-url": "0.0.9",
+    "@farmfe/plugin-virtual": "0.0.12",
+    "@farmfe/plugin-wasm": "0.0.8",
+    "@farmfe/plugin-worker": "0.0.10",
+    "@farmfe/plugin-yaml": "0.0.10",
+    "babel-react-compiler": "1.0.2",
+    "mdx": "1.0.1",
+    "virtual": "1.0.0",
+    "vuetify": "0.0.0"
+  },
+  "changesets": [
+    "blue-crabs-fail"
+  ]
+}

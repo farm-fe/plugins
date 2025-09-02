@@ -8,7 +8,8 @@ use farmfe_core::plugin::PluginLoadHookResult;
 use farmfe_core::serde_json;
 use farmfe_core::{config::Config, plugin::Plugin};
 use farmfe_macro_plugin::farm_plugin;
-use farmfe_toolkit::{common::PathFilter, fs::read_file_raw};
+use farmfe_toolkit::fs::read_file_raw;
+use farmfe_toolkit::plugin_utils::path_filter::PathFilter;
 use mime_guess::from_path;
 use mime_guess::mime::IMAGE;
 

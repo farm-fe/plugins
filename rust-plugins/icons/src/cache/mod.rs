@@ -1,9 +1,9 @@
 use cached::stores::DiskCache;
 use loading::Loading;
 use reqwest::{header::CACHE_CONTROL, Error, Response};
-use serde::{Deserialize, Serialize};
+use bincode::{config, Decode, Encode};
 use std::time::{Duration, SystemTime};
-#[derive(Serialize, Deserialize, Clone)]
+#[derive(Encode, Decode, Debug)]
 struct CacheValue {
   data: String,
   expiration: SystemTime,
@@ -24,13 +24,14 @@ impl HttpClient {
 
   pub async fn fetch_data(&self, url: &str) -> Result<String, Error> {
     let loading = Loading::default();
+    let config = config::standard();
     if let Ok(Some(entry)) = self.cache.connection().get(url) {
-      let cached_value: CacheValue = bincode::deserialize(&entry).unwrap();
-      if cached_value.expiration > SystemTime::now() {
+      let cached_value:(CacheValue, usize) = bincode::decode_from_slice(&entry, config).unwrap();
+      if cached_value.0.expiration > SystemTime::now() {
         // Return cached value if not expired
         loading.success(format!("{} icon fetched from cache", url));
         loading.end();
-        return Ok(cached_value.data);
+        return Ok(cached_value.0.data);
       } else {
         // Remove expired cache
         self.cache.connection().remove(url).unwrap();
@@ -49,7 +50,7 @@ impl HttpClient {
             data: text,
             expiration: SystemTime::now() + cache_duration,
           };
-          let serialized_data = bincode::serialize(&cache_value).unwrap();
+          let serialized_data = bincode::encode_to_vec(&cache_value, config).unwrap();
           self
             .cache
             .connection()

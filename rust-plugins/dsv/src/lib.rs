@@ -1,5 +1,6 @@
 #![deny(clippy::all)]
 
+use farmfe_toolkit::plugin_utils::path_filter::PathFilter;
 use serde_json::Value;
 use std::{error::Error, path::Path};
 
@@ -14,7 +15,6 @@ use farmfe_core::{
 };
 
 use farmfe_macro_plugin::farm_plugin;
-use farmfe_toolkit::common::PathFilter;
 
 #[derive(serde::Deserialize, Clone)]
 pub struct Options {

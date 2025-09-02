@@ -44,7 +44,7 @@ impl FarmfePluginIcons {
         .unwrap_or(config.root.clone()),
     );
 
-    let cache_dir = config.persistent_cache.as_obj(&config.root).cache_dir;
+    let cache_dir = config.persistent_cache.as_obj(&config.root).cache_dir.unwrap();
     let cache_name = "icons";
     let http_client = HttpClient::new(cache_name, &cache_dir);
     let jsx = options::guess_jsx(&config.root);

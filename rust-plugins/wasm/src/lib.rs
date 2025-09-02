@@ -9,13 +9,13 @@ use farmfe_core::{
   module::ModuleType,
   plugin::{Plugin, PluginLoadHookResult, PluginResolveHookResult},
   resource::{Resource, ResourceOrigin, ResourceType},
-  serialize,
+  serialize, Cacheable,
 };
 use std::{fs, path::Path, sync::Arc};
 use utils::generate_glue_code;
 
 use farmfe_macro_plugin::farm_plugin;
-use farmfe_toolkit::fs::transform_output_filename;
+use farmfe_toolkit::fs::{transform_output_filename, TransformOutputFileNameParams};
 
 const WASM_HELPER_ID_FARM: &str = "farm/wasm-helper.js";
 
@@ -81,13 +81,15 @@ impl Plugin for FarmfePluginWasm {
         .unwrap();
       let (file_name, ext) = file_name_ext.split_once('.').unwrap();
       let assets_filename_config = context.config.output.assets_filename.clone();
-
-      let output_file_name = transform_output_filename(
-        assets_filename_config,
-        file_name,
-        param.module_id.as_bytes(),
+      let transform_output_file_name_params = TransformOutputFileNameParams {
+        filename_config: assets_filename_config,
+        name: file_name,
+        name_hash: "",
+        bytes: &param.module_id.as_bytes(),
         ext,
-      );
+        special_placeholders: &Default::default(),
+      };
+      let output_file_name = transform_output_filename(transform_output_file_name_params);
       let params = EmitFileParams {
         name: output_file_name,
         content,
