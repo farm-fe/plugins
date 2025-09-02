@@ -8,6 +8,7 @@ use farmfe_core::resource::{Resource, ResourceType};
 use farmfe_core::{config::Config, plugin::Plugin};
 
 use farmfe_macro_plugin::farm_plugin;
+use farmfe_toolkit::hash::sha256;
 
 mod utils;
 
@@ -76,18 +77,22 @@ impl Plugin for FarmfePluginCompress {
 
   fn finalize_resources(
     &self,
-    param: &mut farmfe_core::plugin::PluginFinalizeResourcesHookParams,
+    param: &mut farmfe_core::plugin::PluginFinalizeResourcesHookParam,
     _context: &std::sync::Arc<farmfe_core::context::CompilationContext>,
   ) -> farmfe_core::error::Result<Option<()>> {
     let start = std::time::Instant::now();
     let ext_name = utils::get_ext_name(&self.options.algorithm);
-    let filter = Regex::new(&self.options.filter)
-      .map_err(|e| CompilationError::GenericError(format!("Invalid regex expression for compress plugin: {}", e)))?;
+    let filter = Regex::new(&self.options.filter).map_err(|e| {
+      CompilationError::GenericError(format!(
+        "Invalid regex expression for compress plugin: {}",
+        e
+      ))
+    })?;
 
     let compressed_buffers = param
       .resources_map
       .par_iter_mut()
-      .filter_map(|(resource_id, resource)| {
+      .filter_map(|(resource_id,resource)| {
         if !filter.is_match(&resource_id) || resource.bytes.len() < self.options.threshold {
           return None;
         }
@@ -99,24 +104,39 @@ impl Plugin for FarmfePluginCompress {
           resource.origin.clone(),
           utils::compress_buffer(&resource.bytes, &self.options.algorithm, self.options.level),
           resource.bytes.len(),
+          resource.meta.clone(),
+          resource.should_transform_output_filename,
+          resource.special_placeholders.clone(),
         ))
       })
       .collect::<Vec<_>>();
 
     let mut saved = 0;
-    for (resource_id, origin, buffer, origin_file_size) in compressed_buffers {
+    for (
+      resource_id,
+      origin,
+      buffer,
+      origin_file_size,
+      meta,
+      should_transform_output_filename,
+      special_placeholders,
+    ) in compressed_buffers
+    {
       let bytes = buffer?;
       let name = format!("{}.{}", resource_id, ext_name);
       saved += origin_file_size - bytes.len();
       param.resources_map.insert(
         name.clone(),
         Resource {
-          name,
+          name: name.clone(),
           bytes,
           emitted: false,
           resource_type: ResourceType::Custom(ext_name.to_string()),
           origin,
-          info: None,
+          name_hash: sha256(&name.as_bytes(), 8),
+          meta,
+          should_transform_output_filename,
+          special_placeholders,
         },
       );
     }

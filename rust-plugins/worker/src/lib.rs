@@ -8,8 +8,6 @@ use farmfe_compiler::Compiler;
 use farmfe_core::{
   cache_item,
   config::{
-    config_regex::ConfigRegex,
-    partial_bundling::{PartialBundlingConfig, PartialBundlingEnforceResourceConfig},
     persistent_cache::PersistentCacheConfig,
     Config, ModuleFormat, ModuleFormatConfig, OutputConfig, TargetEnv,
   },
@@ -76,13 +74,6 @@ fn build_worker(
     Config {
       input,
       persistent_cache: Box::new(PersistentCacheConfig::Bool(false)),
-      partial_bundling: Box::new(PartialBundlingConfig {
-        enforce_resources: vec![PartialBundlingEnforceResourceConfig {
-          name: full_file_name.to_string(),
-          test: vec![ConfigRegex::new(".+")],
-        }],
-        ..*compiler_config.partial_bundling.clone()
-      }),
       output: Box::new(OutputConfig {
         target_env: TargetEnv::Library,
         ..*compiler_config.output.clone()
@@ -96,7 +87,6 @@ fn build_worker(
   .unwrap();
   compiler.compile().unwrap();
   let resources_map = compiler.context().resources_map.lock();
-  println!("worker resources_map: {:?}", resources_map.keys());
   let resource_name = format!("{}.mjs", full_file_name);
   let resource = resources_map.get(&resource_name).unwrap();
   let content_bytes = resource.bytes.clone();

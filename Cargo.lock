@@ -977,6 +977,7 @@ dependencies = [
  "brotli",
  "farmfe_core",
  "farmfe_macro_plugin",
+ "farmfe_toolkit",
  "farmfe_toolkit_plugin_types",
  "flate2",
  "serde",

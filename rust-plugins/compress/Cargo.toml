@@ -10,6 +10,7 @@ crate-type = ["cdylib", "rlib"]
 farmfe_core = { workspace = true }
 farmfe_toolkit_plugin_types = { workspace = true }
 farmfe_macro_plugin = { workspace = true }
+farmfe_toolkit = { workspace = true }
 serde = { version = "1.0.217", features = ["derive"] }
 serde_json = "1.0.138"
 flate2 = { version = "1.0.35", features = ["zlib"] }
