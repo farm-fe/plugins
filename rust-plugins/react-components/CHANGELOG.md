@@ -1,5 +1,11 @@
 # @farmfe/plugin-react-components
 
+## 1.1.0-beta.0
+
+### Minor Changes
+
+- feat(rust-plugins): update farm v2-beta
+
 ## 1.0.12
 
 ### Patch Changes
