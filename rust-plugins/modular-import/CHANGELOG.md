@@ -1,4 +1,4 @@
-# @farmfe/plugin-compress
+# @farmfe/plugin-modular-import
 
 ## 0.1.0
 
@@ -11,9 +11,3 @@
 ### Minor Changes
 
 - feat(rust-plugins): update farm v2-beta
-
-## 0.0.2
-
-### Patch Changes
-
-- update ci config to release packages

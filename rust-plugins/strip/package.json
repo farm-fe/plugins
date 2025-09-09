@@ -1,6 +1,6 @@
 {
   "name": "@farmfe/plugin-strip",
-  "version": "0.0.9",
+  "version": "0.1.0",
   "private": false,
   "main": "scripts/index.js",
   "types": "scripts/index.d.ts",
