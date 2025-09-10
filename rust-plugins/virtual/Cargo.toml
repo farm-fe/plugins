@@ -10,4 +10,6 @@ crate-type = ["cdylib", "rlib"]
 farmfe_toolkit_plugin_types = { workspace = true }
 farmfe_macro_plugin = { workspace = true }
 farmfe_core = { workspace = true }
+farmfe_toolkit = { workspace = true }
 thiserror = "2.0.3"
+serde = { version = "1.0.197", features = ["derive"] }

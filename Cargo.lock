@@ -1331,7 +1331,9 @@ version = "0.0.1"
 dependencies = [
  "farmfe_core",
  "farmfe_macro_plugin",
+ "farmfe_toolkit",
  "farmfe_toolkit_plugin_types",
+ "serde",
  "thiserror 2.0.16",
 ]
 

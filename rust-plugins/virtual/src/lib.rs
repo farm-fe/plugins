@@ -9,6 +9,7 @@ use farmfe_core::{
   plugin::{Plugin, PluginLoadHookResult, PluginResolveHookResult},
   serde_json,
 };
+use farmfe_toolkit::script::module_type_from_id;
 use std::{collections::HashMap, path::Path, sync::Arc};
 use thiserror::Error;
 use utils::{normalize_path, path_join};
@@ -30,13 +31,23 @@ pub enum VirtualModuleError {
 #[derive(Debug)]
 #[farm_plugin]
 pub struct FarmPluginVirtualModule {
-  virtual_modules: HashMap<String, String>,
-  resolved_paths: HashMap<String, String>,
+  virtual_modules: HashMap<String, Value>,
+  resolved_paths: HashMap<String, Value>,
+}
+
+#[derive(Debug, Clone, serde::Deserialize)]
+#[serde(untagged)]
+enum Value {
+  Struct {
+    raw: String,
+    module_type: Option<ModuleType>,
+  },
+  Str(String),
 }
 
 impl FarmPluginVirtualModule {
   fn new(_: &Config, options: String) -> Self {
-    let virtual_modules:HashMap<String, String> =
+    let virtual_modules: HashMap<String, Value> =
       serde_json::from_str(&options).expect("Failed to parse virtual module options");
 
     let mut resolved_paths = HashMap::new();
@@ -104,9 +115,17 @@ impl FarmPluginVirtualModule {
       .virtual_modules
       .get(id)
       .or_else(|| self.resolved_paths.get(id))
-      .map(|content| PluginLoadHookResult {
-        content: content.clone(),
-        module_type: ModuleType::Js,
+      .map(|value| PluginLoadHookResult {
+        content: match value {
+          Value::Struct { raw, .. } => raw.clone(),
+          Value::Str(s) => s.clone(),
+        },
+        module_type: match value {
+          Value::Struct { module_type, .. } => module_type
+            .clone()
+            .unwrap_or(module_type_from_id(id).unwrap_or(ModuleType::Js)),
+          Value::Str(_) => module_type_from_id(id).unwrap_or(ModuleType::Js),
+        },
         source_map: None,
       })
   }
@@ -159,7 +178,6 @@ impl Plugin for FarmPluginVirtualModule {
 #[cfg(test)]
 mod tests {
   use super::*;
-  use std::path::PathBuf;
 
   #[test]
   fn test_virtual_module_creation() {

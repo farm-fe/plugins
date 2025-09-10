@@ -82,7 +82,6 @@ pub fn normalize_path<P: AsRef<Path>>(path: P) -> PathBuf {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use std::env;
 
     #[test]
     fn test_normalize_path() {
