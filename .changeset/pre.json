@@ -27,6 +27,7 @@
     "vuetify": "0.0.0"
   },
   "changesets": [
-    "blue-crabs-fail"
+    "blue-crabs-fail",
+    "brown-turkeys-clean"
   ]
 }
