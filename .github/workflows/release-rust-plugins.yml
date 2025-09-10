@@ -54,4 +54,4 @@ jobs:
 
       - name: Publish to npm
         run: |
-          npm set //registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }} && npm config set access public && pnpm --filter "{rust-plugins}[HEAD~1]" publish --no-git-checks
+          npm set //registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }} && npm config set access public && pnpm --filter "{rust-plugins}[HEAD~1]" publish --tag beta --no-git-checks

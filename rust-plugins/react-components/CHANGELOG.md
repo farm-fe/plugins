@@ -1,5 +1,11 @@
 # @farmfe/plugin-react-components
 
+## 2.0.0-beta.0
+
+### Major Changes
+
+- release farm v2-beta
+
 ## 1.1.0-beta.0
 
 ### Minor Changes
