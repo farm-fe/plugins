@@ -5,6 +5,9 @@
   "packageManager": "pnpm@9.1.0",
   "scripts": {
     "release": "npx changeset && npx changeset version",
+    "changeset": "changeset",
+    "version-packages": "changeset version",
+    "release-packages": "changeset publish",
     "prepare": "husky install",
     "commit": "git cz"
   },

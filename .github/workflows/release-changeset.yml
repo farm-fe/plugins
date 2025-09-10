@@ -1,0 +1,142 @@
+name: Release with Changeset
+
+on:
+  push:
+    branches:
+      - main
+      - v1-main
+
+concurrency: ${{ github.workflow }}-${{ github.ref }}
+
+jobs:
+  release-js:
+    name: Release JS Plugins
+    runs-on: ubuntu-latest
+    if: contains(github.event.head_commit.message, 'js-plugins') || contains(github.event.head_commit.message, 'all')
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v4
+        with:
+          # This makes Actions fetch all Git history so that Changesets can generate changelogs with the correct commits
+          fetch-depth: 0
+
+      - name: Setup Node.js 20.x
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20.x
+
+      - name: Enable Corepack
+        run: corepack enable
+
+      - name: Install Dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build Packages
+        run: pnpm --filter "{js-plugins}[HEAD~1]" build
+
+      - name: Set npm access config
+        run: |
+          echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}" > ~/.npmrc
+          npm config set access public
+
+      - name: Create Release Pull Request or Publish to npm (main branch - beta)
+        if: github.ref == 'refs/heads/main'
+        id: changesets-main
+        uses: changesets/action@v1
+        with:
+          publish: pnpm exec changeset publish --tag beta
+          title: "Release: JS Plugins (Beta)"
+          commit: "chore: release js plugins (beta)"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Create Release Pull Request or Publish to npm (v1-main branch - stable)
+        if: github.ref == 'refs/heads/v1-main'
+        id: changesets-v1
+        uses: changesets/action@v1
+        with:
+          publish: pnpm exec changeset publish
+          title: "Release: JS Plugins (Stable)"
+          commit: "chore: release js plugins (stable)"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+  release-rust:
+    name: Release Rust Plugins
+    runs-on: ubuntu-latest
+    if: contains(github.event.head_commit.message, 'rust-plugins') || contains(github.event.head_commit.message, 'all')
+    needs: [call-rust-build]
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js 20.x
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20.x
+
+      - name: Enable Corepack
+        run: corepack enable
+
+      # Download artifacts from build job
+      - uses: actions/download-artifact@v4
+        with:
+          path: /tmp/artifacts
+
+      - name: Move Artifacts
+        run: |
+          for abi in linux-x64-gnu linux-x64-musl darwin-x64 win32-x64-msvc linux-arm64-musl linux-arm64-gnu darwin-arm64 win32-ia32-msvc win32-arm64-msvc
+          do
+            for package in dsv react-components virtual yaml strip image url icons auto-import mdx wasm worker svgr modular-import compress
+              do
+                folder_path="/tmp/artifacts/${{github.sha}}-${abi}-${package}"
+                if [ -d "${folder_path}" ] && [ -n "$(ls -A $folder_path)" ]; then
+                  mv /tmp/artifacts/${{ github.sha }}-${abi}-${package}/* ./rust-plugins/${package}/npm/${abi}
+                  ls -R $folder_path
+                  ls -R ./rust-plugins/${package}/npm/${abi}
+                  test -f ./rust-plugins/${package}/npm/${abi}/index.farm
+                else
+                  echo "${folder_path} is empty"
+                fi
+              done
+          done
+
+      - name: Install Dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Set npm access config
+        run: |
+          echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}" > ~/.npmrc
+          npm config set access public
+
+      - name: Create Release Pull Request or Publish to npm (main branch - beta)
+        if: github.ref == 'refs/heads/main'
+        id: changesets-rust-main
+        uses: changesets/action@v1
+        with:
+          publish: pnpm exec changeset publish --tag beta
+          title: "Release: Rust Plugins (Beta)"
+          commit: "chore: release rust plugins (beta)"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Create Release Pull Request or Publish to npm (v1-main branch - stable)
+        if: github.ref == 'refs/heads/v1-main'
+        id: changesets-rust-v1
+        uses: changesets/action@v1
+        with:
+          publish: pnpm exec changeset publish
+          title: "Release: Rust Plugins (Stable)"
+          commit: "chore: release rust plugins (stable)"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+  call-rust-build:
+    if: contains(github.event.head_commit.message, 'rust-plugins') || contains(github.event.head_commit.message, 'all')
+    uses: ./.github/workflows/build.yaml
