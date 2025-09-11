@@ -27,7 +27,9 @@
     "vuetify": "0.0.0"
   },
   "changesets": [
+    "beige-eyes-repeat",
     "blue-crabs-fail",
-    "brown-turkeys-clean"
+    "brown-turkeys-clean",
+    "tender-cats-swim"
   ]
 }
