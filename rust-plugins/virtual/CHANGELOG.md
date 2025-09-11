@@ -1,5 +1,11 @@
 # @farmfe/plugin-virtual
 
+## 2.0.0-beta.1
+
+### Patch Changes
+
+- fix(virtual): options camelCase
+
 ## 2.0.0-beta.0
 
 ### Major Changes

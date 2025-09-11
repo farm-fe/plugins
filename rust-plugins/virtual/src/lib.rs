@@ -37,6 +37,7 @@ pub struct FarmPluginVirtualModule {
 
 #[derive(Debug, Clone, serde::Deserialize)]
 #[serde(untagged)]
+#[serde(rename_all = "camelCase")]
 enum Value {
   Struct {
     raw: String,
