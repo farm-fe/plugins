@@ -37,15 +37,17 @@ pub struct FarmPluginVirtualModule {
 
 #[derive(Debug, Clone, serde::Deserialize)]
 #[serde(untagged)]
-#[serde(rename_all = "camelCase")]
 enum Value {
-  Struct {
-    raw: String,
-    module_type: Option<ModuleType>,
-  },
+  Struct(StructValue),
   Str(String),
 }
 
+#[derive(Debug, Clone, serde::Deserialize)]
+#[serde(rename_all = "camelCase")]
+struct StructValue {
+  raw: String,
+  module_type: Option<ModuleType>,
+}
 impl FarmPluginVirtualModule {
   fn new(_: &Config, options: String) -> Self {
     let virtual_modules: HashMap<String, Value> =
@@ -118,11 +120,11 @@ impl FarmPluginVirtualModule {
       .or_else(|| self.resolved_paths.get(id))
       .map(|value| PluginLoadHookResult {
         content: match value {
-          Value::Struct { raw, .. } => raw.clone(),
+          Value::Struct(s) => s.raw.clone(),
           Value::Str(s) => s.clone(),
         },
         module_type: match value {
-          Value::Struct { module_type, .. } => module_type
+          Value::Struct(s) => s.module_type
             .clone()
             .unwrap_or(module_type_from_id(id).unwrap_or(ModuleType::Js)),
           Value::Str(_) => module_type_from_id(id).unwrap_or(ModuleType::Js),
