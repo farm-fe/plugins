@@ -1,5 +1,11 @@
 # @farmfe/plugin-worker
 
+## 2.0.0-beta.1
+
+### Patch Changes
+
+- Fix invalid worker output extension
+
 ## 2.0.0-beta.0
 
 ### Major Changes

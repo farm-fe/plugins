@@ -8,8 +8,8 @@ use farmfe_compiler::Compiler;
 use farmfe_core::{
   cache_item,
   config::{
-    persistent_cache::PersistentCacheConfig,
-    Config, ModuleFormat, ModuleFormatConfig, OutputConfig, TargetEnv,
+    persistent_cache::PersistentCacheConfig, Config, ModuleFormat, ModuleFormatConfig,
+    OutputConfig, TargetEnv,
   },
   context::{CompilationContext, EmitFileParams},
   deserialize,
@@ -76,6 +76,7 @@ fn build_worker(
       persistent_cache: Box::new(PersistentCacheConfig::Bool(false)),
       output: Box::new(OutputConfig {
         target_env: TargetEnv::Library,
+        entry_filename: full_file_name.clone(),
         ..*compiler_config.output.clone()
       }),
       lazy_compilation: false,
@@ -87,8 +88,7 @@ fn build_worker(
   .unwrap();
   compiler.compile().unwrap();
   let resources_map = compiler.context().resources_map.lock();
-  let resource_name = format!("{}.mjs", full_file_name);
-  let resource = resources_map.get(&resource_name).unwrap();
+  let resource = resources_map.get(&full_file_name).unwrap();
   let content_bytes = resource.bytes.clone();
   content_bytes
 }
