@@ -118,7 +118,7 @@ jobs:
         id: changesets-rust-main
         uses: changesets/action@v1
         with:
-          publish: pnpm exec changeset publish --tag beta
+          publish: pnpm exec changeset publish
           title: "Release: Rust Plugins (Beta)"
           commit: "chore: release rust plugins (beta)"
         env:
