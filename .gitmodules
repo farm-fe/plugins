@@ -1,0 +1,3 @@
+[submodule "rust-plugins/html-inject"]
+	path = rust-plugins/html-inject
+	url = https://github.com/xiaoguaishou1/farm-plugin-html-inject.git
