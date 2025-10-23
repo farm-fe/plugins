@@ -181,3 +181,64 @@ impl Plugin for FarmfePluginUrl {
     Ok(None)
   }
 }
+
+#[cfg(test)]
+mod tests {
+  use super::*;
+
+  #[test]
+  fn test_plugin_name() {
+    let config = Config::default();
+    let options = r#"{}"#.to_string();
+    let plugin = FarmfePluginUrl::new(&config, options);
+    assert_eq!(plugin.name(), "FarmfePluginUrl");
+  }
+
+  #[test]
+  fn test_options_deserialization_defaults() {
+    let json = r#"{}"#;
+    let options: Options = serde_json::from_str(json).unwrap();
+    assert_eq!(options.limit, None);
+    assert_eq!(options.public_path, None);
+    assert_eq!(options.emit_files, None);
+  }
+
+  #[test]
+  fn test_options_deserialization_with_values() {
+    let json = r#"{"limit":8192,"publicPath":"/assets/","emitFiles":true}"#;
+    let options: Options = serde_json::from_str(json).unwrap();
+    assert_eq!(options.limit, Some(8192));
+    assert_eq!(options.public_path, Some("/assets/".to_string()));
+    assert_eq!(options.emit_files, Some(true));
+  }
+
+  #[test]
+  fn test_get_file_size_nonexistent() {
+    let size = get_file_size("/nonexistent/file.txt");
+    assert_eq!(size, 0);
+  }
+
+  #[test]
+  fn test_copy_file_function() {
+    use std::fs::{self, File};
+    use std::io::Write;
+    
+    // Create a temp directory and file
+    let temp_dir = std::env::temp_dir().join("farm_url_test");
+    let _ = fs::create_dir_all(&temp_dir);
+    let src = temp_dir.join("test_src.txt");
+    let dst = temp_dir.join("subdir").join("test_dst.txt");
+    
+    // Write test content
+    let mut file = File::create(&src).unwrap();
+    file.write_all(b"test content").unwrap();
+    
+    // Test copy
+    let result = copy_file(&src, &dst);
+    assert!(result.is_ok());
+    assert!(dst.exists());
+    
+    // Cleanup
+    let _ = fs::remove_dir_all(&temp_dir);
+  }
+}

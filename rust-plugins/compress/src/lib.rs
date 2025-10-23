@@ -161,3 +161,48 @@ impl Plugin for FarmfePluginCompress {
     Ok(None)
   }
 }
+
+#[cfg(test)]
+mod tests {
+  use super::*;
+
+  #[test]
+  fn test_compress_algorithm_default() {
+    let algo: CompressAlgorithm = Default::default();
+    assert!(matches!(algo, CompressAlgorithm::Brotli));
+  }
+
+  #[test]
+  fn test_default_filter() {
+    let filter = default_filter();
+    assert_eq!(filter, "\\.(js|mjs|json|css|html)$");
+  }
+
+  #[test]
+  fn test_default_level() {
+    assert_eq!(default_level(), 6);
+  }
+
+  #[test]
+  fn test_default_threshold() {
+    assert_eq!(default_threshold(), 1024);
+  }
+
+  #[test]
+  fn test_options_deserialization() {
+    let json = r#"{"algorithm":"gzip","level":9,"threshold":2048,"filter":"\\.(js|css)$"}"#;
+    let options: Options = serde_json::from_str(json).unwrap();
+    assert!(matches!(options.algorithm, CompressAlgorithm::Gzip));
+    assert_eq!(options.level, 9);
+    assert_eq!(options.threshold, 2048);
+    assert_eq!(options.filter, "\\.(js|css)$");
+  }
+
+  #[test]
+  fn test_plugin_creation() {
+    let config = Config::default();
+    let options = r#"{"algorithm":"brotli","level":6,"threshold":1024}"#.to_string();
+    let plugin = FarmfePluginCompress::new(&config, options);
+    assert_eq!(plugin.name(), "FarmfePluginCompress");
+  }
+}

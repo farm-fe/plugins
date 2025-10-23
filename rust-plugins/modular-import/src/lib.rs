@@ -41,3 +41,24 @@ impl Plugin for FarmfePluginComponent {
     transform(&self.options, param)
   }
 }
+
+#[cfg(test)]
+mod tests {
+  use super::*;
+
+  #[test]
+  fn test_plugin_name() {
+    let config = Config::default();
+    let options = r#"{}"#.to_string();
+    let plugin = FarmfePluginComponent::new(&config, options);
+    assert_eq!(plugin.name(), "FarmfePluginComponent");
+  }
+
+  #[test]
+  fn test_options_deserialization() {
+    let json = r#"{}"#;
+    let options: Options = serde_json::from_str(json).unwrap();
+    // Just verify it can be deserialized
+    drop(options);
+  }
+}

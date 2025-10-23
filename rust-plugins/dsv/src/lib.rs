@@ -103,3 +103,54 @@ impl Plugin for FarmPluginDsv {
     }))
   }
 }
+
+#[cfg(test)]
+mod tests {
+  use super::*;
+
+  #[test]
+  fn test_plugin_name() {
+    let config = Config::default();
+    let options = r#"{"include":[],"exclude":[]}"#.to_string();
+    let plugin = FarmPluginDsv::new(&config, options);
+    assert_eq!(plugin.name(), "FarmPluginDsv");
+  }
+
+  #[test]
+  fn test_options_deserialization() {
+    let json = r#"{"include":[],"exclude":[]}"#;
+    let options: Options = serde_json::from_str(json).unwrap();
+    assert!(options.include.is_some());
+    assert!(options.exclude.is_some());
+  }
+
+  #[test]
+  fn test_csv_parsing() {
+    let param = Param {
+      module_id: "test.csv".to_string(),
+      content: "name,age\nJohn,30\nJane,25".to_string(),
+    };
+    let reader = get_reader(&param);
+    assert!(reader.is_ok());
+  }
+
+  #[test]
+  fn test_tsv_parsing() {
+    let param = Param {
+      module_id: "test.tsv".to_string(),
+      content: "name\tage\nJohn\t30\nJane\t25".to_string(),
+    };
+    let reader = get_reader(&param);
+    assert!(reader.is_ok());
+  }
+
+  #[test]
+  fn test_unsupported_file_type() {
+    let param = Param {
+      module_id: "test.txt".to_string(),
+      content: "some content".to_string(),
+    };
+    let reader = get_reader(&param);
+    assert!(reader.is_err());
+  }
+}

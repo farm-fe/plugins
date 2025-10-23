@@ -486,3 +486,47 @@ impl Plugin for FarmfePluginWorker {
     }
   }
 }
+
+#[cfg(test)]
+mod tests {
+  use super::*;
+
+  #[test]
+  fn test_plugin_name() {
+    let config = Config::default();
+    let options = r#"{}"#.to_string();
+    let plugin = FarmfePluginWorker::new(&config, options);
+    assert_eq!(plugin.name(), "FarmfePluginWorker");
+  }
+
+  #[test]
+  fn test_plugin_priority() {
+    let config = Config::default();
+    let options = r#"{}"#.to_string();
+    let plugin = FarmfePluginWorker::new(&config, options);
+    assert_eq!(plugin.priority(), 105);
+  }
+
+  #[test]
+  fn test_worker_regex_patterns() {
+    let re = JsRegex::new(WORKER_OR_SHARED_WORKER_RE).unwrap();
+    assert!(re.find("test.js?worker").is_some());
+    assert!(re.find("test.js?sharedworker").is_some());
+    assert!(re.find("test.js?worker&inline").is_some());
+    assert!(re.find("test.js").is_none());
+  }
+
+  #[test]
+  fn test_worker_import_meta_url_regex() {
+    let re = JsRegex::new(WORKER_IMPORT_META_URL_RE).unwrap();
+    let test_code = r#"new Worker(new URL('./worker.js', import.meta.url))"#;
+    assert!(re.find(test_code).is_some());
+  }
+
+  #[test]
+  fn test_options_deserialization() {
+    let json = r#"{"isBuild":true}"#;
+    let options: Value = serde_json::from_str(json).unwrap();
+    assert_eq!(options.get("isBuild").and_then(|x| x.as_bool()), Some(true));
+  }
+}
