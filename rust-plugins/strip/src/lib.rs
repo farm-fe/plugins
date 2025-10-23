@@ -281,3 +281,62 @@ fn create_first_pass_regex(first_pass: &[String]) -> Result<Regex, Box<dyn Error
   let regex = Regex::new(&format!(r"\b(?:{})", joined_patterns))?;
   Ok(regex)
 }
+
+#[cfg(test)]
+mod tests {
+  use super::*;
+
+  #[test]
+  fn test_plugin_name() {
+    let config = Config::default();
+    let options = r#"{}"#.to_string();
+    let plugin = FarmPulginStrip::new(&config, options);
+    assert_eq!(plugin.name(), PLUGIN_NAME);
+  }
+
+  #[test]
+  fn test_options_deserialization() {
+    let json = r#"{"labels":["TEST"],"functions":["console.log"],"debugger":true}"#;
+    let options: Options = serde_json::from_str(json).unwrap();
+    assert_eq!(options.labels.as_ref().unwrap().len(), 1);
+    assert_eq!(options.functions.as_ref().unwrap().len(), 1);
+    assert_eq!(options.debugger, Some(true));
+  }
+
+  #[test]
+  fn test_create_regex_from_list() {
+    let functions = vec!["console.log".to_string(), "console.debug".to_string()];
+    let regex = create_regex_from_list(&functions);
+    assert!(regex.is_ok());
+    let regex = regex.unwrap();
+    assert!(regex.is_match("console.log"));
+    assert!(regex.is_match("console.debug"));
+    assert!(!regex.is_match("console.error"));
+  }
+
+  #[test]
+  fn test_flatten_member_expression() {
+    use farmfe_core::swc_common::DUMMY_SP;
+    use farmfe_core::swc_common::SyntaxContext;
+    
+    // Test simple identifier (should return None)
+    let ident_expr = Expr::Ident(Ident {
+      sym: "test".into(),
+      span: DUMMY_SP,
+      optional: false,
+      ctxt: SyntaxContext::empty(),
+    });
+    assert_eq!(flatten(&ident_expr), None);
+  }
+
+  #[test]
+  fn test_void_expr_creation() {
+    let expr = void_expr();
+    match *expr {
+      Expr::Ident(ref ident) => {
+        assert_eq!(ident.sym.as_ref(), "(void 0)");
+      }
+      _ => panic!("Expected Ident expression"),
+    }
+  }
+}

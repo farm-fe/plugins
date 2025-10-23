@@ -172,3 +172,21 @@ impl Plugin for FarmfePluginWasm {
     }
   }
 }
+
+#[cfg(test)]
+mod tests {
+  use super::*;
+
+  #[test]
+  fn test_plugin_name() {
+    let config = Config::default();
+    let options = String::new();
+    let plugin = FarmfePluginWasm::new(&config, options);
+    assert_eq!(plugin.name(), "FarmfePluginWasm");
+  }
+
+  #[test]
+  fn test_wasm_helper_constant() {
+    assert_eq!(WASM_HELPER_ID_FARM, "farm/wasm-helper.js");
+  }
+}

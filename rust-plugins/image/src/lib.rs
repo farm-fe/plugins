@@ -74,3 +74,40 @@ impl Plugin for FarmfePluginImage {
     Ok(None)
   }
 }
+
+#[cfg(test)]
+mod tests {
+  use super::*;
+
+  #[test]
+  fn test_plugin_name() {
+    let config = Config::default();
+    let options = r#"{}"#.to_string();
+    let plugin = FarmfePluginImage::new(&config, options);
+    assert_eq!(plugin.name(), "FarmfePluginImage");
+  }
+
+  #[test]
+  fn test_options_deserialization_default() {
+    let json = r#"{}"#;
+    let options: Options = serde_json::from_str(json).unwrap();
+    assert_eq!(options.dom, None);
+    assert!(options.include.is_none());
+    assert!(options.exclude.is_none());
+  }
+
+  #[test]
+  fn test_options_deserialization_with_dom() {
+    let json = r#"{"dom":true}"#;
+    let options: Options = serde_json::from_str(json).unwrap();
+    assert_eq!(options.dom, Some(true));
+  }
+
+  #[test]
+  fn test_options_deserialization_with_filters() {
+    let json = r#"{"include":[".*\\.png$"],"exclude":[".*\\.svg$"]}"#;
+    let options: Options = serde_json::from_str(json).unwrap();
+    assert!(options.include.is_some());
+    assert!(options.exclude.is_some());
+  }
+}

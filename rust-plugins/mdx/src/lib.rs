@@ -136,3 +136,40 @@ impl Plugin for FarmPluginMdx {
     return Ok(None);
   }
 }
+
+#[cfg(test)]
+mod tests {
+  use super::*;
+
+  #[test]
+  fn test_plugin_name() {
+    let config = Config::default();
+    let options = r#"{}"#.to_string();
+    let plugin = FarmPluginMdx::new(&config, options);
+    assert_eq!(plugin.name(), "FarmPluginMdx");
+  }
+
+  #[test]
+  fn test_is_mdx_file() {
+    assert!(is_mdx_file(&"test.md".to_string()));
+    assert!(is_mdx_file(&"test.mdx".to_string()));
+    assert!(!is_mdx_file(&"test.js".to_string()));
+    assert!(!is_mdx_file(&"test.txt".to_string()));
+  }
+
+  #[test]
+  fn test_options_deserialization_defaults() {
+    let json = r#"{}"#;
+    let options: FarmPluginMdxOptions = serde_json::from_str(json).unwrap();
+    assert_eq!(options.development, None);
+    assert_eq!(options.jsx, None);
+  }
+
+  #[test]
+  fn test_options_deserialization_with_values() {
+    let json = r#"{"development":true,"jsx":true}"#;
+    let options: FarmPluginMdxOptions = serde_json::from_str(json).unwrap();
+    assert_eq!(options.development, Some(true));
+    assert_eq!(options.jsx, Some(true));
+  }
+}

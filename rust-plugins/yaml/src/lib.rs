@@ -153,3 +153,65 @@ impl Plugin for FarmPluginYaml {
         }))
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_plugin_name() {
+        let config = Config::default();
+        let options = r#"{}"#.to_string();
+        let plugin = FarmPluginYaml::new(&config, options);
+        assert_eq!(plugin.name(), "FarmPluginYaml");
+    }
+
+    #[test]
+    fn test_is_yaml_file() {
+        assert!(is_yaml_file(&"test.yaml".to_string()));
+        assert!(is_yaml_file(&"test.yml".to_string()));
+        assert!(!is_yaml_file(&"test.json".to_string()));
+        assert!(!is_yaml_file(&"test.js".to_string()));
+    }
+
+    #[test]
+    fn test_options_deserialization_defaults() {
+        let json = r#"{}"#;
+        let options: FarmPluginYamlOptions = serde_json::from_str(json).unwrap();
+        assert!(options.document_mode.is_none());
+        assert_eq!(options.include, None);
+        assert_eq!(options.exclude, None);
+    }
+
+    #[test]
+    fn test_options_deserialization_with_values() {
+        let json = r#"{"documentMode":"multi","include":".*\\.yaml$","exclude":"node_modules"}"#;
+        let options: FarmPluginYamlOptions = serde_json::from_str(json).unwrap();
+        assert!(options.document_mode.is_some());
+        assert_eq!(options.include, Some(".*\\.yaml$".to_string()));
+        assert_eq!(options.exclude, Some("node_modules".to_string()));
+    }
+
+    #[test]
+    fn test_should_process_path() {
+        let config = Config::default();
+        let options = r#"{"include":".*\\.yaml$"}"#.to_string();
+        let plugin = FarmPluginYaml::new(&config, options);
+        
+        assert!(plugin.should_process_path("test.yaml"));
+        assert!(!plugin.should_process_path("test.txt"));
+    }
+
+    #[test]
+    fn test_yaml_to_js_simple() {
+        let config = Config::default();
+        let options = r#"{}"#.to_string();
+        let plugin = FarmPluginYaml::new(&config, options);
+        
+        let yaml_content = "key: value";
+        let result = plugin.yaml_to_js(yaml_content);
+        assert!(result.is_ok());
+        let js_code = result.unwrap();
+        assert!(js_code.contains("export default"));
+    }
+}
